@@ -37,7 +37,13 @@ class LoginPage extends HookConsumerWidget{
                   MyTextField(label: 'Email', placeHolder: '12345@gmail.com', controller: emailController, icon: Icon(Icons.email), fieldValidator: Validators.emailValidator, focusNode: emailFocus, width: width,),
                   PasswordField(label: 'Password', placeHolder: 'Enter your password', controller: passController, hidePassword: Icon(Icons.visibility_off), showPassword: Icon(Icons.visibility), fieldValidator: Validators.passwordValidator, focusNode: passFocus, width: width,),
                   LinkButton(onPressed: (){}, text: 'Forgot Password?'),
-                  FunctionButton(text: 'Login', onPressed: (){}, btnColor: AppColors.deepBlue,width: width,),
+                  FunctionButton(text:
+                  'Login', onPressed: (){
+                    context.go("/demo");
+
+
+                  },
+                    btnColor: AppColors.deepBlue,width: width,),
                   SizedBox(
                     width: width,
                     child: Row(children: [
