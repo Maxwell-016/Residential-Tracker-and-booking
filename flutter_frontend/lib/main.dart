@@ -13,6 +13,7 @@ class ResidentialTrackerAndBooking extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
+      debugShowCheckedModeBanner: false,
       theme: Themes.lightTheme,
       darkTheme: Themes.darkTheme,
       routerConfig: Routes.routeMaker(context),
