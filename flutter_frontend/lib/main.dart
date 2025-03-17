@@ -1,14 +1,21 @@
 import 'dart:ui';
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_frontend/View-Model/navigation/routes.dart';
 import 'package:flutter_frontend/constants.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-void main() {
-  // SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-  // WidgetsFlutterBinding.ensureInitialized();
+import 'firebase_options.dart';
 
+Future<void> main() async {
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
 
   runApp(
