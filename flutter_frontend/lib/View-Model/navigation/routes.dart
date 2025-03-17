@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_frontend/View/Screens/demo_page.dart';
+import 'package:flutter_frontend/View/Screens/forgot_password.dart';
 import 'package:flutter_frontend/View/Screens/login_page.dart';
 import 'package:flutter_frontend/View/Screens/registration_page.dart';
 import 'package:go_router/go_router.dart';
@@ -33,12 +34,12 @@ class Routes {
             builder: (context, state) {
               return LayoutBuilder(builder: (context, constraints) {
                 if (constraints.maxWidth > 800) {
-                  loggedIn=true;
+                  //loggedIn=true;
                   return LoginPage(
                     width: deviceWidth / 2,
                   );
                 } else {
-                  loggedIn=true;
+                  //loggedIn=true;
                   return LoginPage(
                     width: deviceWidth / 1.1,
                   );
@@ -62,7 +63,21 @@ class Routes {
             },
             path: '/registration'),
 
-        // GoRoute(path: '/forgot-password'),
+        GoRoute(
+          builder: (context,state){
+            return LayoutBuilder(builder: (context,constraints){
+              if (constraints.maxWidth > 800) {
+                return ForgotPassword(
+                  width: deviceWidth / 2,
+                );
+              } else {
+                return ForgotPassword(
+                  width: deviceWidth / 1.1,
+                );
+              }
+            });
+          },
+            path: '/forgot-password'),
         // GoRoute(path: '/verify_email'),
         // GoRoute(path: '/student-dashboard'),
         // GoRoute(path: '/landlord-dashboard'),
@@ -86,15 +101,17 @@ class Routes {
     );
   }
 }
-bool loggedIn=false;
+// bool loggedIn=false;
 
 Future<String?> _appRedirect(
     BuildContext context, GoRouterState state) async {
+      return null;
+
   // to be implemented
-  if(!loggedIn){
-    return '/login';
-  }else{
-    return '/demo';
-  }
+  // if(!loggedIn){
+  //   return '/login';
+  // }else{
+  //   return '/login';
+  // }
     }
 
