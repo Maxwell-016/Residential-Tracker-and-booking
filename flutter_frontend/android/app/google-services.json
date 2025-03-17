@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "820226507396",
+    "project_id": "residential-tracker-aad98",
+    "storage_bucket": "residential-tracker-aad98.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:820226507396:android:1859da5db02f372ed378d1",
+        "android_client_info": {
+          "package_name": "com.residentialTracker.flutter_frontend"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBCYIgrhD0NinGuXUkowBVazuJH4fvMGhs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
