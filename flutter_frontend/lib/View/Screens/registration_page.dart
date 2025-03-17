@@ -11,19 +11,34 @@ import '../Components/link_button.dart';
 import '../Components/password_field.dart';
 import '../Components/text_field.dart';
 
-class RegistrationPage extends HookConsumerWidget {
+// class RegistrationPage extends HookConsumerWidget {
+//   final double width;
+//
+//   const RegistrationPage({super.key, required this.width});
+//
+//   @override
+//
+// }
+class RegistrationPage extends StatefulWidget {
   final double width;
   const RegistrationPage({super.key, required this.width});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    TextEditingController emailController = useTextEditingController();
-    FocusNode emailFocus = useFocusNode();
-    TextEditingController passController = useTextEditingController();
-    FocusNode passFocus = useFocusNode();
-    TextEditingController confirmPassController = useTextEditingController();
-    FocusNode confirmPassFocus = useFocusNode();
+  State<RegistrationPage> createState() => _RegistrationPageState();
+}
+
+class _RegistrationPageState extends State<RegistrationPage> {
+  @override
+  Widget build(BuildContext context) {
+    TextEditingController emailController = TextEditingController();
+    FocusNode emailFocus = FocusNode();
+    TextEditingController passController = TextEditingController();
+    FocusNode passFocus = FocusNode();
+    TextEditingController confirmPassController = TextEditingController();
+    FocusNode confirmPassFocus = FocusNode();
+    TextEditingController roleController = TextEditingController();
     bool isDark = Theme.of(context).brightness == Brightness.dark;
+    String? selectedValue;
     return SafeArea(
       child: Scaffold(
         body: SingleChildScrollView(
@@ -46,6 +61,68 @@ class RegistrationPage extends HookConsumerWidget {
                       myFont: 'Open Sans',
                       size: 20.0,
                     ),
+                    // UseFont(
+                    //     text: 'Select your role',
+                    //     myFont: 'Open Sans',
+                    //     size: 17.0),
+                    // SizedBox(
+                    //   width: widget.width,
+                    //   child: Row(
+                    //     children: [
+                    //       Expanded(
+                    //         child: RadioListTile<String?>(
+                    //             title: Text('Student'),
+                    //             value: 'student',
+                    //             groupValue: selectedValue,
+                    //             onChanged: (value) {
+                    //               setState(() {
+                    //                 selectedValue = value;
+                    //               });
+                    //             }),
+                    //       ),
+                    //       Expanded(
+                    //         child: RadioListTile<String?>(
+                    //             title: Text('Landlord'),
+                    //             value: 'landlord',
+                    //             groupValue: selectedValue,
+                    //             onChanged: (value) {
+                    //               setState(() {
+                    //                 selectedValue = value;
+                    //               });
+                    //             }),
+                    //       ),
+                    //       Expanded(
+                    //         child: RadioListTile<String?>(
+                    //             title: Text('Admin'),
+                    //             value: 'admin',
+                    //             groupValue: selectedValue,
+                    //             onChanged: (value) {
+                    //               setState(() {
+                    //                 selectedValue = value;
+                    //               });
+                    //             }),
+                    //       ),
+                    //     ],
+                    //   ),
+                    // ),
+                    SizedBox(height: 20.0,),
+                    DropdownMenu(dropdownMenuEntries: [
+                      DropdownMenuEntry(value: 'student', label: 'Student'),
+                      DropdownMenuEntry(value: 'landlord', label: 'Landlord'),
+                      DropdownMenuEntry(value: 'admin', label: 'Admin'),
+
+                    ],
+                      label: Text('Select your role'),
+                      onSelected: (value){
+                      setState(() {
+                        selectedValue = value;
+                      });
+                      },
+                      width: widget.width,
+                      enableFilter: false,
+                      enableSearch: false,
+                      controller: roleController,
+                    ),
                     MyTextField(
                       label: 'Email',
                       placeHolder: '12345@gmail.com',
@@ -53,7 +130,7 @@ class RegistrationPage extends HookConsumerWidget {
                       icon: Icon(Icons.email),
                       fieldValidator: Validators.emailValidator,
                       focusNode: emailFocus,
-                      width: width,
+                      width: widget.width,
                     ),
                     PasswordField(
                       label: 'Password',
@@ -63,7 +140,7 @@ class RegistrationPage extends HookConsumerWidget {
                       showPassword: Icon(Icons.visibility),
                       fieldValidator: Validators.passwordValidator,
                       focusNode: passFocus,
-                      width: width,
+                      width: widget.width,
                     ),
                     PasswordField(
                       label: 'Confirm Password',
@@ -75,16 +152,18 @@ class RegistrationPage extends HookConsumerWidget {
                           Validators.confirmPasswordValidator(
                               value, passController.text),
                       focusNode: confirmPassFocus,
-                      width: width,
+                      width: widget.width,
                     ),
                     FunctionButton(
                       text: 'Register',
-                      onPressed: () {},
+                      onPressed: () {
+                        context.go('/verify-email');
+                      },
                       btnColor: AppColors.deepBlue,
-                      width: width,
+                      width: widget.width,
                     ),
                     SizedBox(
-                      width: width,
+                      width: widget.width,
                       child: Row(
                         children: [
                           Text('Already have an account? Click here to'),
