@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_frontend/View/Screens/demo_page.dart';
+import 'package:flutter_frontend/View/Screens/email_verification_page.dart';
 import 'package:flutter_frontend/View/Screens/forgot_password.dart';
 import 'package:flutter_frontend/View/Screens/login_page.dart';
 import 'package:flutter_frontend/View/Screens/registration_page.dart';
@@ -81,7 +82,21 @@ class Routes {
             });
           },
             path: '/forgot-password'),
-        // GoRoute(path: '/verify_email'),
+        GoRoute(
+          builder: (context,state){
+            return LayoutBuilder(builder: (context,constraints){
+              if (constraints.maxWidth > 800) {
+                return EmailVerificationPage(
+                  width: deviceWidth / 2,
+                );
+              } else {
+                return EmailVerificationPage(
+                  width: deviceWidth / 1.1,
+                );
+              }
+            });
+          },
+            path: '/verify-email'),
         // GoRoute(path: '/student-dashboard'),
         // GoRoute(path: '/landlord-dashboard'),
         // GoRoute(path: '/admin-dashboard')

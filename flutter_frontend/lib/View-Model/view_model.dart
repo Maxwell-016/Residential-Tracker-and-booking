@@ -8,7 +8,7 @@ final viewModel =
 
 class ViewModel extends ChangeNotifier {
   bool isObscured = true;
-  bool showResendBtn = false;
+  bool showResendBtn = true;
 
   void toggleObscured() {
     isObscured = !isObscured;
