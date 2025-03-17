@@ -5,8 +5,8 @@ import 'package:flutter_frontend/View/Components/theme_button.dart';
 
 import '../../constants.dart';
 
-class DashboardScreen extends StatelessWidget {
-  const DashboardScreen({
+class LandLoardDashboardScreen extends StatelessWidget {
+  const LandLoardDashboardScreen({
     super.key,
     required this.changeTheme,
     required this.changeColor,
@@ -22,7 +22,7 @@ class DashboardScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
 appBar: AppBar(
-  title: Text("dash"),
+  title: Text("LandLady Dashboard"),
   actions: [
     ThemeButton(changeThemeMode: changeTheme),
     ColorButton(changeColor: changeColor, colorSelected: colorSelected)

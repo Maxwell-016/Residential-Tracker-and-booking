@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_frontend/View/Screens/demo_page.dart';
+import 'package:flutter_frontend/View/Screens/admin_dash.dart';
+import 'package:flutter_frontend/View/Screens/landloard_dash.dart';
 import 'package:flutter_frontend/View/Screens/email_verification_page.dart';
 import 'package:flutter_frontend/View/Screens/forgot_password.dart';
 import 'package:flutter_frontend/View/Screens/login_page.dart';
 import 'package:flutter_frontend/View/Screens/registration_page.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../View/Screens/student_dash.dart';
 import '../../constants.dart';
 
 
@@ -101,10 +103,24 @@ class Routes {
         // GoRoute(path: '/landlord-dashboard'),
         // GoRoute(path: '/admin-dashboard')
          GoRoute(
-           path: "/demo",
-           builder: (context, state) => DashboardScreen(changeTheme: changeTheme, changeColor: changeColor, colorSelected: colorSelected),
+           path: "/landloaddashboard",
+           builder: (context, state) => LandLoardDashboardScreen(changeTheme: changeTheme, changeColor: changeColor, colorSelected: colorSelected),
 
-         )
+         ),
+        GoRoute(
+          path: "/studentdashboard",
+          builder: (context, state) => StudentDashboardScreen(changeTheme: changeTheme, changeColor: changeColor, colorSelected: colorSelected),
+
+        ),
+        GoRoute(
+          path: "/admin_dashboard",
+          builder: (context, state) => AdminDashboardScreen(changeTheme: changeTheme, changeColor: changeColor, colorSelected: colorSelected),
+
+        )
+
+
+
+
       ],
       errorPageBuilder: (context, state) {
         return MaterialPage(
