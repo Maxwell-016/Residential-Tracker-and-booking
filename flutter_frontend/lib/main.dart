@@ -12,12 +12,17 @@ import 'View-Model/view_model.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
   WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
+// error handling
+  try{
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
   );
+  } catch(e){
+    print('Firebase initialisation error: $e');
+  }
 
 
   runApp(
@@ -99,7 +104,12 @@ class _StateResidentialTrackerAndBooking extends   ConsumerState<ResidentialTrac
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    var routes =   Routes(changeTheme: changeThemeMode, changeColor: changeColor, colorSelected: colorSelectied,appdirect: _appRedirect);
+    var routes =   Routes(
+     changeTheme: changeThemeMode,
+     changeColor: changeColor,
+     colorSelected: colorSelectied,
+     appdirect: _appRedirect
+     );
 
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
