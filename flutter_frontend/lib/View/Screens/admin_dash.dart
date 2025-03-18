@@ -8,14 +8,14 @@ import '../../constants.dart';
 class AdminDashboardScreen extends StatelessWidget {
   const AdminDashboardScreen({
     super.key,
-    required this.changeTheme,
-    required this.changeColor,
-    required this.colorSelected,
+    // required this.changeTheme,
+    // required this.changeColor,
+    // required this.colorSelected,
   });
 
-  final ColorSelection colorSelected;
-  final void Function(bool useLightMode) changeTheme;
-  final void Function(int value) changeColor;
+  // final ColorSelection colorSelected;
+  // final void Function(bool useLightMode) changeTheme;
+  // final void Function(int value) changeColor;
 
 
   @override
@@ -24,8 +24,8 @@ class AdminDashboardScreen extends StatelessWidget {
 appBar: AppBar(
   title: Text("Admin Dashboard"),
   actions: [
-    ThemeButton(changeThemeMode: changeTheme),
-    ColorButton(changeColor: changeColor, colorSelected: colorSelected)
+    // ThemeButton(changeThemeMode: changeTheme),
+    // ColorButton(changeColor: changeColor, colorSelected: colorSelected)
   ],
 ),
 

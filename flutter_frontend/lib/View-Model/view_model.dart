@@ -1,20 +1,17 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_frontend/View-Model/utils/user_dao.dart';
+import 'package:flutter_frontend/services/firebase_services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 
-final userDaoProvider = ChangeNotifierProvider<UserDao>((ref) {
-  return UserDao();
-});
-
+// final userDaoProvider = ChangeNotifierProvider<UserDao>((ref) {
+//   return UserDao();
+// });
+//
 
 
 final selectedNameProvider=StateProvider<String>((ref)=>'Student');
-
-
-
 
 
 final viewModel =
@@ -22,7 +19,7 @@ final viewModel =
 
 class ViewModel extends ChangeNotifier {
   bool isObscured = true;
-  bool showResendBtn = true;
+  bool showResendBtn = false;
 
   void toggleObscured() {
     isObscured = !isObscured;

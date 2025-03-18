@@ -8,14 +8,14 @@ import '../../constants.dart';
 class LandLoardDashboardScreen extends StatelessWidget {
   const LandLoardDashboardScreen({
     super.key,
-    required this.changeTheme,
-    required this.changeColor,
-    required this.colorSelected,
+    // required this.changeTheme,
+    // required this.changeColor,
+    // required this.colorSelected,
   });
 
-  final ColorSelection colorSelected;
-  final void Function(bool useLightMode) changeTheme;
-  final void Function(int value) changeColor;
+  // final ColorSelection colorSelected;
+  // final void Function(bool useLightMode) changeTheme;
+  // final void Function(int value) changeColor;
 
 
   @override
@@ -24,8 +24,8 @@ class LandLoardDashboardScreen extends StatelessWidget {
 appBar: AppBar(
   title: Text("LandLady Dashboard"),
   actions: [
-    ThemeButton(changeThemeMode: changeTheme),
-    ColorButton(changeColor: changeColor, colorSelected: colorSelected)
+    // ThemeButton(changeThemeMode: changeTheme),
+    // ColorButton(changeColor: changeColor, colorSelected: colorSelected)
   ],
 ),
 

@@ -12,8 +12,8 @@ import 'View-Model/view_model.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
   WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -67,39 +67,39 @@ class _StateResidentialTrackerAndBooking extends   ConsumerState<ResidentialTrac
   }
 
 
-  Future<String?> _appRedirect(
-      BuildContext context, GoRouterState state) async {
-    final userDao = ref.watch(userDaoProvider);
-    final loggedIn=userDao.isLoggedIn();
-
-
-    // final loggedIn = await _auth.loggedIn;
-    final isOnLoginPage = state.matchedLocation == '/login';
-
-
-
-    // Go to /login if the user is not signed in
-    if (!loggedIn) {
-      return '/login';
-    }
-
-
-    else if (loggedIn && isOnLoginPage) {
-      return '/studentdashboard';
-
-    }
-
-    // no redirect
-    return null;
-
-
-  }
+  // Future<String?> _appRedirect(
+  //     BuildContext context, GoRouterState state) async {
+  //   final userDao = ref.watch(userDaoProvider);
+  //   final loggedIn=userDao.isLoggedIn();
+  //
+  //
+  //   // final loggedIn = await _auth.loggedIn;
+  //   final isOnLoginPage = state.matchedLocation == '/login';
+  //
+  //
+  //
+  //   // Go to /login if the user is not signed in
+  //   if (!loggedIn) {
+  //     return '/login';
+  //   }
+  //
+  //
+  //   else if (loggedIn && isOnLoginPage) {
+  //     return '/studentdashboard';
+  //
+  //   }
+  //
+  //   // no redirect
+  //   return null;
+  //
+  //
+  // }
 
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    var routes =   Routes(changeTheme: changeThemeMode, changeColor: changeColor, colorSelected: colorSelectied,appdirect: _appRedirect);
+    //var routes =   Routes(changeTheme: changeThemeMode, changeColor: changeColor, colorSelected: colorSelectied,appdirect: _appRedirect);
 
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
@@ -116,7 +116,7 @@ class _StateResidentialTrackerAndBooking extends   ConsumerState<ResidentialTrac
       brightness: Brightness.dark
     ),
 
-      routerConfig: routes.routeMaker(context),
+      routerConfig: Routes.routeMaker(context),
       title: "Residential Tracker and Booking",
     );
   }

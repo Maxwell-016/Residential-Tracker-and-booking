@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_frontend/View-Model/utils/app_colors.dart';
+import 'package:flutter_frontend/services/firebase_services.dart';
 import 'package:flutter_frontend/View-Model/view_model.dart';
 import 'package:flutter_frontend/View/Components/function_button.dart';
 import 'package:flutter_frontend/View/Components/google_fonts.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class EmailVerificationPage extends HookConsumerWidget {
@@ -13,6 +16,35 @@ class EmailVerificationPage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     bool isDark = Theme.of(context).brightness == Brightness.dark;
     final viewModelProvider = ref.watch(viewModel);
+    final firebaseServicesProvider = ref.watch(firebaseServices);
+    final user = ref.watch(userState);
+    bool isVerified = user!.emailVerified;
+    useEffect(() {
+      Future<void> getRoleAndNavigate() async {
+        if (isVerified) {
+          String? role = await firebaseServicesProvider.getUserRole();
+          if (role != null) {
+            switch (role) {
+              case 'Student':
+                if(!context.mounted)return;
+                context.go('/student-dashboard');
+                break;
+              case 'Landlord':
+                if(!context.mounted)return;
+                context.go('/landlord-dashboard');
+                break;
+              case 'Admin':
+                if(!context.mounted)return;
+                context.go('/admin-dashboard');
+                break;
+            }
+          }
+        } else {
+          user.reload().then((_) => ref.refresh(userState));
+        }
+      }
+      getRoleAndNavigate();
+    }, [user, isVerified]);
     return SafeArea(
       child: Scaffold(
         body: SingleChildScrollView(
