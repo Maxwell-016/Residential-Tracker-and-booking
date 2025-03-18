@@ -11,7 +11,6 @@ import 'package:go_router/go_router.dart';
 import '../../View/Screens/student_dash.dart';
 import '../../constants.dart';
 
-///what if we move routes to main.dart
 class Routes {
   Routes({
     required this.changeTheme,
@@ -33,34 +32,10 @@ class Routes {
 
       routes: [
         GoRoute(
-            builder: (context, state) {
-              return LayoutBuilder(builder: (context, constraints) {
-                if (constraints.maxWidth > 800) {
-                  return LoginPage(
-                    width: deviceWidth / 2,
-                  );
-                } else {
-                  return LoginPage(
-                    width: deviceWidth / 1.1,
-                  );
-                }
-              });
-            },
+            builder: (context, state) =>LoginPage(),
             path: '/login'),
         GoRoute(
-            builder: (context, state) {
-              return LayoutBuilder(builder: (context, constraints) {
-                if (constraints.maxWidth > 800) {
-                  return RegistrationPage(
-                    width: deviceWidth / 2,
-                  );
-                } else {
-                  return RegistrationPage(
-                    width: deviceWidth / 1.1,
-                  );
-                }
-              });
-            },
+            builder: (context, state)=>RegistrationPage(),
             path: '/registration'),
 
         GoRoute(
