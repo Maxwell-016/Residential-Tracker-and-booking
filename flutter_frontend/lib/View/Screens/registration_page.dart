@@ -5,6 +5,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../View-Model/utils/app_colors.dart';
 import '../../View-Model/utils/validator.dart';
+import '../../View-Model/view_model.dart';
+import '../../security/hashPassword.dart';
 import '../Components/function_button.dart';
 import '../Components/google_fonts.dart';
 import '../Components/link_button.dart';
@@ -19,17 +21,28 @@ import '../Components/text_field.dart';
 //   @override
 //
 // }
-class RegistrationPage extends StatefulWidget {
+class RegistrationPage extends ConsumerStatefulWidget {
   final double width;
   const RegistrationPage({super.key, required this.width});
 
   @override
-  State<RegistrationPage> createState() => _RegistrationPageState();
+  ConsumerState<RegistrationPage> createState() => _RegistrationPageState();
 }
 
-class _RegistrationPageState extends State<RegistrationPage> {
+
+
+
+class _RegistrationPageState extends ConsumerState<RegistrationPage> {
+
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+
   @override
   Widget build(BuildContext context) {
+    final userDao = ref.watch(userDaoProvider);
+
+    String selectedUser=ref.watch(selectedNameProvider);
+
     TextEditingController emailController = TextEditingController();
     FocusNode emailFocus = FocusNode();
     TextEditingController passController = TextEditingController();
@@ -38,7 +51,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
     FocusNode confirmPassFocus = FocusNode();
     TextEditingController roleController = TextEditingController();
     bool isDark = Theme.of(context).brightness == Brightness.dark;
-    String? selectedValue;
+
     return SafeArea(
       child: Scaffold(
         body: SingleChildScrollView(
@@ -48,7 +61,12 @@ class _RegistrationPageState extends State<RegistrationPage> {
               shadowColor: isDark ? Colors.white : Colors.black54,
               child: Padding(
                 padding: const EdgeInsets.all(20.0),
-                child: Column(
+                child:
+                Form(
+                  key: _formKey,
+                  child:
+
+                Column(
                   spacing: 15.0,
                   children: [
                     SizedBox(),
@@ -61,68 +79,59 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       myFont: 'Open Sans',
                       size: 20.0,
                     ),
-                    // UseFont(
-                    //     text: 'Select your role',
-                    //     myFont: 'Open Sans',
-                    //     size: 17.0),
-                    // SizedBox(
-                    //   width: widget.width,
-                    //   child: Row(
-                    //     children: [
-                    //       Expanded(
-                    //         child: RadioListTile<String?>(
-                    //             title: Text('Student'),
-                    //             value: 'student',
-                    //             groupValue: selectedValue,
-                    //             onChanged: (value) {
-                    //               setState(() {
-                    //                 selectedValue = value;
-                    //               });
-                    //             }),
-                    //       ),
-                    //       Expanded(
-                    //         child: RadioListTile<String?>(
-                    //             title: Text('Landlord'),
-                    //             value: 'landlord',
-                    //             groupValue: selectedValue,
-                    //             onChanged: (value) {
-                    //               setState(() {
-                    //                 selectedValue = value;
-                    //               });
-                    //             }),
-                    //       ),
-                    //       Expanded(
-                    //         child: RadioListTile<String?>(
-                    //             title: Text('Admin'),
-                    //             value: 'admin',
-                    //             groupValue: selectedValue,
-                    //             onChanged: (value) {
-                    //               setState(() {
-                    //                 selectedValue = value;
-                    //               });
-                    //             }),
-                    //       ),
-                    //     ],
-                    //   ),
-                    // ),
-                    SizedBox(height: 20.0,),
-                    DropdownMenu(dropdownMenuEntries: [
-                      DropdownMenuEntry(value: 'student', label: 'Student'),
-                      DropdownMenuEntry(value: 'landlord', label: 'Landlord'),
-                      DropdownMenuEntry(value: 'admin', label: 'Admin'),
 
-                    ],
-                      label: Text('Select your role'),
-                      onSelected: (value){
-                      setState(() {
-                        selectedValue = value;
-                      });
-                      },
-                      width: widget.width,
-                      enableFilter: false,
-                      enableSearch: false,
-                      controller: roleController,
+                    SizedBox(height: 20.0,),
+
+
+                    DropdownButton<String>
+                      (
+                        value: selectedUser,
+                        items: <String>['Student','Landlord',"Admin"]
+                            .map<DropdownMenuItem<String>>((String user){
+                          return DropdownMenuItem<String>(
+                            value: user,
+                            child: Text(user),
+                          );
+                        }).toList(),
+                        onChanged: (newValue){
+                          setState(() {
+
+                            ref.read(selectedNameProvider.notifier).state=newValue!;
+
+
+                          });
+                        }
                     ),
+
+
+
+                    // DropdownMenu(
+                    //   controller: roleController,
+                    //   dropdownMenuEntries: [
+                    //   DropdownMenuEntry(value: 'student', label: 'Student'),
+                    //   DropdownMenuEntry(value: 'landlord', label: 'Landlord'),
+                    //   DropdownMenuEntry(value: 'admin', label: 'Admin'),
+                    //
+                    // ],
+                    //   label: Text(roleController.text.isEmpty? 'Select your role':roleController.text),
+                    //   onSelected: (value){
+                    //
+                    //   setState(() {
+                    //     selectedUser = value; // Update selected value
+                    //     roleController.text = value!;
+                    //     print(roleController.text);
+                    //   });
+                    //   },
+                    //   width: widget.width,
+                    //   enableFilter: false,
+                    //   enableSearch: false,
+                    //
+                    //
+                    // ),
+
+
+
+
                     MyTextField(
                       label: 'Email',
                       placeHolder: '12345@gmail.com',
@@ -132,6 +141,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       focusNode: emailFocus,
                       width: widget.width,
                     ),
+
+
                     PasswordField(
                       label: 'Password',
                       placeHolder: 'Enter your password',
@@ -154,10 +165,33 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       focusNode: confirmPassFocus,
                       width: widget.width,
                     ),
+
+
+
                     FunctionButton(
                       text: 'Register',
-                      onPressed: () {
-                        context.go('/verify-email');
+                      onPressed: () async {
+    if (_formKey.currentState!.validate()) {
+      final errorMessage = await userDao.signUp(
+        emailController.text,
+        passController.text == confirmPassController.text ?
+        hashPassword(passController.text) : '',
+        ref.watch(selectedNameProvider),
+
+      );
+      if (errorMessage == null) {
+        context.go('/verify-email');
+      } else {
+        if (!mounted) return;
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorMessage),
+            duration: const Duration(milliseconds: 700),
+          ),
+        );
+      }
+    }
                       },
                       btnColor: AppColors.deepBlue,
                       width: widget.width,
@@ -177,6 +211,11 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     )
                   ],
                 ),
+
+              )
+
+
+
               ),
             ),
           ),
