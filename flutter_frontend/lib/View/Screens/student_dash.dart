@@ -8,14 +8,14 @@ import '../../constants.dart';
 class StudentDashboardScreen extends StatelessWidget {
   const StudentDashboardScreen({
     super.key,
-    required this.changeTheme,
-    required this.changeColor,
-    required this.colorSelected,
+    // required this.changeTheme,
+    // required this.changeColor,
+    // required this.colorSelected,
   });
 
-  final ColorSelection colorSelected;
-  final void Function(bool useLightMode) changeTheme;
-  final void Function(int value) changeColor;
+  // final ColorSelection? colorSelected;
+  // final void Function(bool useLightMode)? changeTheme;
+  // final void Function(int value)? changeColor;
 
 
   @override
@@ -23,10 +23,10 @@ class StudentDashboardScreen extends StatelessWidget {
     return Scaffold(
 appBar: AppBar(
   title: Text("Student Dashboard"),
-  actions: [
-    ThemeButton(changeThemeMode: changeTheme),
-    ColorButton(changeColor: changeColor, colorSelected: colorSelected)
-  ],
+  // actions: [
+  //   ThemeButton(changeThemeMode: changeTheme),
+  //   ColorButton(changeColor: changeColor, colorSelected: colorSelected)
+  // ],
 ),
 
     );
