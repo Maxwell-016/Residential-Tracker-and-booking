@@ -6,7 +6,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_frontend/View-Model/navigation/routes.dart';
 import 'package:flutter_frontend/constants.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import 'View-Model/view_model.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
@@ -34,15 +36,15 @@ class CustomScrollBehavior extends MaterialScrollBehavior {
   };
 }
 
-class ResidentialTrackerAndBooking extends StatefulWidget {
+class ResidentialTrackerAndBooking extends ConsumerStatefulWidget {
   const ResidentialTrackerAndBooking({super.key});
 
   @override
-  State<StatefulWidget> createState()=>_StateResidentialTrackerAndBooking();
+  ConsumerState<ResidentialTrackerAndBooking> createState()=>_StateResidentialTrackerAndBooking();
 
 }
 
-class _StateResidentialTrackerAndBooking extends   State<StatefulWidget>{
+class _StateResidentialTrackerAndBooking extends   ConsumerState<ResidentialTrackerAndBooking>{
 
 
   ThemeMode themeMode =ThemeMode.light;
@@ -65,10 +67,39 @@ class _StateResidentialTrackerAndBooking extends   State<StatefulWidget>{
   }
 
 
+  Future<String?> _appRedirect(
+      BuildContext context, GoRouterState state) async {
+    final userDao = ref.watch(userDaoProvider);
+    final loggedIn=userDao.isLoggedIn();
+
+
+    // final loggedIn = await _auth.loggedIn;
+    final isOnLoginPage = state.matchedLocation == '/login';
+
+
+
+    // Go to /login if the user is not signed in
+    if (!loggedIn) {
+      return '/login';
+    }
+
+
+    else if (loggedIn && isOnLoginPage) {
+      return '/studentdashboard';
+
+    }
+
+    // no redirect
+    return null;
+
+
+  }
+
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    var routes =   Routes(changeTheme: changeThemeMode, changeColor: changeColor, colorSelected: colorSelectied);
+    var routes =   Routes(changeTheme: changeThemeMode, changeColor: changeColor, colorSelected: colorSelectied,appdirect: _appRedirect);
 
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,

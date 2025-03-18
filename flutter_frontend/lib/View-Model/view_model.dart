@@ -1,7 +1,21 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_frontend/View-Model/utils/user_dao.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+
+final userDaoProvider = ChangeNotifierProvider<UserDao>((ref) {
+  return UserDao();
+});
+
+
+
+final selectedNameProvider=StateProvider<String>((ref)=>'Student');
+
+
+
+
 
 final viewModel =
     ChangeNotifierProvider.autoDispose<ViewModel>((ref) => ViewModel());
