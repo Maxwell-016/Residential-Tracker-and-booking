@@ -18,72 +18,42 @@ import '../Components/password_field.dart';
 import '../Components/text_field.dart';
 
 class RegistrationPage extends HookConsumerWidget {
-
-
   const RegistrationPage({super.key});
 
-// class RegistrationPage extends ConsumerStatefulWidget {
-//   final double width;
-//   const RegistrationPage({super.key, required this.width});
-//
-//   @override
-//   ConsumerState<RegistrationPage> createState() => _RegistrationPageState();
-// }
-//
-// class _RegistrationPageState extends ConsumerState<RegistrationPage> {
-//   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-//
-
   @override
-  Widget build(BuildContext context,WidgetRef ref) {
-    var widths = MediaQuery
-        .of(context)
-        .size
-        .width;
+  Widget build(BuildContext context, WidgetRef ref) {
+    var widths = MediaQuery.of(context).size.width;
     return SafeArea(
       child: Scaffold(
-         body: widths > 700 ?
-          largeScreen(context) :
-        RegForm(),
-
-
-
-    ),
+        body: widths > 700 ? largeScreen(context) : RegForm(),
+      ),
     );
   }
 
-
-
   Widget largeScreen(BuildContext context) {
-    var width = MediaQuery
-        .of(context)
-        .size
-        .width / 2;
+    var width = MediaQuery.of(context).size.width / 2;
 
-    return Stack(
-        children: [
-          Container(
-            margin: EdgeInsets.only(right: width),
-            decoration: const BoxDecoration(
-                color: Colors.grey,
-                image: DecorationImage(
-                    image: AssetImage('assets/launch.png'),
-                    fit: BoxFit.cover
-                )),
+    return Stack(children: [
+      Container(
+        margin: EdgeInsets.only(right: width),
+        decoration: const BoxDecoration(
+          color: Colors.grey,
+          image: DecorationImage(
+            image: AssetImage('assets/launch.png'),
+            fit: BoxFit.fill,
+            filterQuality: FilterQuality.high,
           ),
-
-          Positioned(
-              top: 0,
-              bottom: 0,
-              right: 0,
-              child: SizedBox(
-                  width: width,
-                  child:
-                  RegForm()
-
-              )
-          )
-        ]
-    );
+        ),
+      ),
+      Positioned(
+        top: 0,
+        bottom: 0,
+        right: 0,
+        child: SizedBox(
+          width: width,
+          child: RegForm(),
+        ),
+      ),
+    ]);
   }
 }

@@ -83,22 +83,6 @@ class Routes {
               return AdminDashboardScreen();
             },
             path: '/admin-dashboard')
-
-        // GoRoute(
-        //   path: "/landloaddashboard",
-        //   builder: (context, state) => LandLoardDashboardScreen(changeTheme: changeTheme, changeColor: changeColor, colorSelected: colorSelected),
-        //
-        // ),
-        // GoRoute(
-        //   path: "/studentdashboard",
-        //   builder: (context, state) => StudentDashboardScreen(changeTheme: changeTheme, changeColor: changeColor, colorSelected: colorSelected),
-        //
-        // ),
-        // GoRoute(
-        //   path: "/admin_dashboard",
-        //   builder: (context, state) => AdminDashboardScreen(changeTheme: changeTheme, changeColor: changeColor, colorSelected: colorSelected),
-        //
-        // )
       ],
       errorPageBuilder: (context, state) {
         return MaterialPage(

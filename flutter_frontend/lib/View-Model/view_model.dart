@@ -5,13 +5,8 @@ import 'package:flutter_frontend/services/firebase_services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 
-// final userDaoProvider = ChangeNotifierProvider<UserDao>((ref) {
-//   return UserDao();
-// });
-//
 
-
-final selectedNameProvider=StateProvider<String>((ref)=>'Student');
+final selectedNameProvider = StateProvider<String>((ref)=>'Student');
 
 
 final viewModel =
