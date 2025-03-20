@@ -37,7 +37,6 @@ class RegForm extends HookConsumerWidget{
     FocusNode passFocus = FocusNode();
     TextEditingController confirmPassController = TextEditingController();
     FocusNode confirmPassFocus = FocusNode();
-    // TextEditingController roleController = TextEditingController();
     bool isDark = Theme.of(context).brightness == Brightness.dark;
 
     var width = MediaQuery
@@ -88,9 +87,7 @@ class RegForm extends HookConsumerWidget{
                                 .map<DropdownMenuItem<String>>((String user) {
                               return DropdownMenuItem<String>(
                                 value: user,
-                                child: user=="Admin"?Text("Register as an $user"):
-                                Text("Register as a $user")
-                                ,
+                                child: Text("Register as a $user"),
                               );
                             }).toList(),
                             onChanged: (newValue) {
