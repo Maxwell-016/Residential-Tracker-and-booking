@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_frontend/View/Components/color_button.dart';
 import 'package:flutter_frontend/View/Components/theme_button.dart';
 
-import '../../constants.dart';
+import '../../../constants.dart';
 
 class AdminDashboardScreen extends StatelessWidget {
   const AdminDashboardScreen({

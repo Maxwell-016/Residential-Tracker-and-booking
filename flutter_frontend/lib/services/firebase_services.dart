@@ -52,6 +52,7 @@ class FirebaseServices extends ChangeNotifier {
     setIsLoading(true);
     await _auth.signInWithEmailAndPassword(email: email, password: password);
     if (_auth.currentUser!.emailVerified) {
+      await _auth.setPersistence(Persistence.LOCAL);
       String? role = await getUserRole();
       logger.i('user role : $role');
       //go to dashboards

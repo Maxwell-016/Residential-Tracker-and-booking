@@ -152,7 +152,7 @@ class RegForm extends HookConsumerWidget{
                                         .handleFirebaseAuthErrors(
                                         e as FirebaseAuthException));
                               }finally{
-                                firebaseServicesProvider.isLoading = false;
+                                firebaseServicesProvider.setIsLoading(false);
                               }
                             }
                           },
