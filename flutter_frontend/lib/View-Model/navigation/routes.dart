@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_frontend/View/Screens/admin_dash.dart';
-import 'package:flutter_frontend/View/Screens/landloard_dash.dart';
-import 'package:flutter_frontend/View/Screens/email_verification_page.dart';
-import 'package:flutter_frontend/View/Screens/forgot_password.dart';
-import 'package:flutter_frontend/View/Screens/login_page.dart';
-import 'package:flutter_frontend/View/Screens/registration_page.dart';
+import 'package:flutter_frontend/View/Screens/Admin/admin_dash.dart';
+import 'package:flutter_frontend/View/Screens/Landlord/landloard_dash.dart';
+import 'package:flutter_frontend/View/Screens/Common/email_verification_page.dart';
+import 'package:flutter_frontend/View/Screens/Common/forgot_password.dart';
+import 'package:flutter_frontend/View/Screens/Common/login_page.dart';
+import 'package:flutter_frontend/View/Screens/Common/registration_page.dart';
+import 'package:flutter_frontend/View/Screens/Landlord/manage_house_listings.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../View/Screens/student_dash.dart';
+import '../../View/Screens/Student/student_dash.dart';
 import '../../constants.dart';
 
 class Routes {
@@ -78,6 +79,15 @@ class Routes {
               return LandLoardDashboardScreen();
             },
             path: '/landlord-dashboard'),
+        GoRoute(
+            builder: (context, state) {
+              return ManageHouseListings();
+            },
+            path: '/manageListings'),
+
+
+
+
         GoRoute(
             builder: (context, state) {
               return AdminDashboardScreen();
