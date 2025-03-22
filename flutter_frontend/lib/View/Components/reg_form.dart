@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_frontend/View-Model/utils/savecurrentpage.dart';
 import 'package:flutter_frontend/View/Components/password_field.dart';
 import 'package:flutter_frontend/View/Components/snackbars.dart';
 import 'package:flutter_frontend/View/Components/text_field.dart';
@@ -73,21 +74,27 @@ class RegForm extends HookConsumerWidget{
                         height: 20.0,
                       ),
 
-                      Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.rectangle,
-                          borderRadius: BorderRadius.circular(10),
+                      // Container(
+                      //   decoration: BoxDecoration(
+                      //     shape: BoxShape.rectangle,
+                      //     borderRadius: BorderRadius.circular(10),
+                      //
+                      //   ),
+                      //   width: width,
+                      //   child:
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                            children: [
 
-                        ),
-                        width: width,
-                        child: DropdownButton<String>(
+                        Text("Select the role to register as  "),
+                        DropdownButton<String>(
 
                             value: selectedUser,
                             items: <String>['Student', 'Landlord', "Admin"]
                                 .map<DropdownMenuItem<String>>((String user) {
                               return DropdownMenuItem<String>(
                                 value: user,
-                                child: Text("Register as a $user"),
+                                child: Text(user),
                               );
                             }).toList(),
                             onChanged: (newValue) {
@@ -95,7 +102,11 @@ class RegForm extends HookConsumerWidget{
                               ref.read(selectedNameProvider.notifier).state =
                               newValue!;
                             }),
-                      ),
+
+                    ] ,
+                  ),
+
+
 
                       MyTextField(
                         label: 'Email',
@@ -172,6 +183,7 @@ class RegForm extends HookConsumerWidget{
                             LinkButton(
                                 onPressed: () {
                                   context.go('/login');
+                                  saveCurrentPage("/login");
                                 },
                                 text: 'Login'),
                           ],

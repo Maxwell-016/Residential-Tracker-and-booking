@@ -11,6 +11,8 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../../../View-Model/utils/savecurrentpage.dart';
+
 class ForgotPassword extends HookConsumerWidget {
   final double width;
   const ForgotPassword({
@@ -20,6 +22,7 @@ class ForgotPassword extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    saveCurrentPage('/forgot-password');
     final formKey = GlobalKey<FormState>();
     TextEditingController emailController = useTextEditingController();
     final firebaseServicesProvider = ref.watch(firebaseServices);

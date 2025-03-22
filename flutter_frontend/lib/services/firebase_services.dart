@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_frontend/View-Model/utils/savecurrentpage.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -54,6 +55,7 @@ class FirebaseServices extends ChangeNotifier {
 
     if (!context.mounted) return;
     context.go('/verification');
+    saveCurrentPage("/verification");
   }
 
   //Signing in a user
@@ -97,6 +99,7 @@ class FirebaseServices extends ChangeNotifier {
       viewModelProvider.startTimer();
       if (!context.mounted) return;
       context.go('/verification');
+      saveCurrentPage("/verification");
     }
   }
 
