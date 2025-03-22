@@ -24,17 +24,17 @@ static String ? passwordValidator(String? value) {
       errors.add ('Password must be less than 15 characters');
     }
     if(!RegExp(r'[A-Z]').hasMatch(value)){
-      errors.add ('Password must contain atleast 1 uppercase letter');
+      errors.add ('Password must contain at least 1 uppercase letter');
     }
     if(!RegExp(r'[a-z]').hasMatch(value)){
-      errors.add ('Password must contain atleast 1 lowercase letter');
+      errors.add ('Password must contain at least 1 lowercase letter');
     }
     if(!RegExp(r'[0-9]').hasMatch(value)){
-      errors.add  ('Password must contain atleast 1 number');
+      errors.add  ('Password must contain at least 1 number');
     }
-    if(!RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(value)){
-      errors.add ('Password must contain atleast 1 special character');
-    }
+    // if(!RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(value)){
+    //   errors.add ('Password must contain atleast 1 special character');
+    // }
     if(errors.isNotEmpty){
       return errors.join('\n');
     }
@@ -46,6 +46,12 @@ static String? confirmPasswordValidator(String? value, String? password) {
     }
     if (value != password) {
       return 'Passwords do not match';
+    }
+    return null;
+}
+static String? fieldValidator(String? value){
+    if(value == null || value.isEmpty){
+      return 'Please fill in this field';
     }
     return null;
 }

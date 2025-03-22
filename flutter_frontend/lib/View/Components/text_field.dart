@@ -10,6 +10,7 @@ class MyTextField extends StatefulWidget {
   final FormFieldValidator<String?> fieldValidator;
   final FocusNode focusNode;
   final double width;
+  final int? maxLines;
   const MyTextField(
       {super.key,
       required this.label,
@@ -19,6 +20,7 @@ class MyTextField extends StatefulWidget {
       required this.fieldValidator,
       required this.focusNode,
       required this.width,
+      this.maxLines,
       });
 
   @override
@@ -43,6 +45,7 @@ class _MyTextFieldState extends State<MyTextField> {
               focusNode: widget.focusNode,
               validator: widget.fieldValidator,
               controller: widget.controller,
+              maxLines: widget.maxLines,
               decoration: InputDecoration(
                 hintText: widget.placeHolder,
                 hintStyle: TextStyle(color: Colors.grey, fontSize: 14.0),

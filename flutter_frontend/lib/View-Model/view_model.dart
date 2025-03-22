@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 
 final selectedNameProvider = StateProvider<String>((ref)=>'Student');
+final selectedHouseSize = StateProvider<String>((ref) => 'Single');
 
 
 final viewModel =
