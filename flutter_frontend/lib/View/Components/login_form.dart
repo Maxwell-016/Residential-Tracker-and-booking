@@ -99,8 +99,9 @@ class LoginForm extends HookConsumerWidget{
                     ),
                     LinkButton(
                         onPressed: () {
-                          context.go('/forgot-password');
                           saveCurrentPage('/forgot-password');
+                          context.go('/forgot-password');
+
                         },
                         text: 'Forgot Password?'),
                     Center(
@@ -139,8 +140,9 @@ class LoginForm extends HookConsumerWidget{
                           Text('Don\'t have an account? Click here to'),
                           LinkButton(
                               onPressed: () {
-                                context.go('/registration');
                                 saveCurrentPage('/registration');
+                                context.go('/registration');
+
                               },
                               text: 'Register'),
                         ],

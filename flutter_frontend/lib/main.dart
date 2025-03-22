@@ -165,64 +165,19 @@ class _StateResidentialTrackerAndBooking
       },
     );
   }
-  //
-  // Future<String?> _appRedirect(BuildContext context, GoRouterState state) async {
-  //   final fb = ref.watch(firebaseServices);
-  //   final loggedIn = fb.loggedIn();
-  //   final isOnLoginPage = state.matchedLocation == '/login';
-  //
-  //   // If the user is not logged in, redirect them to login
-  //   if (!loggedIn && !['/login', '/registration', '/forgot-password'].contains(state.matchedLocation)) {
-  //     return null;
-  //   }
-  //
-  //   // If the user is logged in but is on the login page, send them to their dashboard
-  //   if (loggedIn && isOnLoginPage) {
-  //     String? role = await fb.getUserRole();
-  //     if (role != null) {
-  //       switch (role) {
-  //         case 'Student':
-  //           return '/student-dashboard';
-  //         case 'Landlord':
-  //           return '/landlord-dashboard';
-  //         case 'Admin':
-  //           return '/admin-dashboard';
-  //       }
-  //     } else {
-  //       return '/login';
-  //     }
-  //   }
-  //
-  //   // Stay on the current page
-  //   return null;
-  // }
-
 
   Future<String?> _appRedirect(BuildContext context, GoRouterState state) async {
     final fb = ref.watch(firebaseServices);
     final loggedIn = fb.loggedIn();
-
-    // Pages that do not require authentication
-    final publicPaths = [
-      '/login',
-      '/registration',
-      '/forgot-password',
-      '/verification'
-    ];
-
-
     final isOnLoginPage = state.matchedLocation == '/login';
 
-    // allow navigation to pages that require navigation
-    if (!loggedIn && publicPaths.contains(state.matchedLocation)) {
-   return null;
-     }
-    //
-    // if (!loggedIn) {
-    //   return '/login';
-    // }
+    // If the user is not logged in, redirect them to login
+    if (!loggedIn && !['/login', '/registration', '/forgot-password'].contains(state.matchedLocation)) {
+      return null;
+    }
 
-     if (loggedIn && isOnLoginPage) {
+    // If the user is logged in but is on the login page, send them to their dashboard
+    if (loggedIn && isOnLoginPage) {
       String? role = await fb.getUserRole();
       if (role != null) {
         switch (role) {
@@ -233,13 +188,17 @@ class _StateResidentialTrackerAndBooking
           case 'Admin':
             return '/admin-dashboard';
         }
+      } else {
+        return '/login';
       }
     }
-    // no redirect
+
+    // Stay on the current page
     return null;
   }
 
-  // This widget is the root of your application.
+
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
