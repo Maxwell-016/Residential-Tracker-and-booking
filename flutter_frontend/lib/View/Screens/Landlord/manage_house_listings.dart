@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_frontend/View-Model/utils/app_colors.dart';
 import 'package:flutter_frontend/View/Components/card_button.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../Components/side_nav.dart';
 
@@ -28,13 +29,16 @@ class ManageHouseListings extends StatelessWidget {
             spacing: 40.0,
             runSpacing: 40.0,
             children: [
-              CardButton(
-                bgColor: AppColors.manage,
-                title: 'Add House',
-                icon: Icon(
-                  color: Colors.black,
-                  Icons.add_circle_outline_outlined,
-                  size: 30.0,
+              GestureDetector(
+                onTap: (){context.go('/manageListings/add-house');},
+                child: CardButton(
+                  bgColor: AppColors.manage,
+                  title: 'Add House',
+                  icon: Icon(
+                    color: Colors.black,
+                    Icons.add_circle_outline_outlined,
+                    size: 30.0,
+                  ),
                 ),
               ),
               CardButton(
