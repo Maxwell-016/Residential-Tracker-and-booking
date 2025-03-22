@@ -23,52 +23,54 @@ class ManageHouseListings extends StatelessWidget {
           ],
         ),
         drawer: SideNav(),
-        body: Padding(
-          padding: const EdgeInsets.only(left: 100.0),
-          child: Wrap(
-            spacing: 40.0,
-            runSpacing: 40.0,
-            children: [
-              GestureDetector(
-                onTap: (){context.go('/manageListings/add-house');},
-                child: CardButton(
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.only(left: 100.0),
+            child: Wrap(
+              spacing: 40.0,
+              runSpacing: 40.0,
+              children: [
+                GestureDetector(
+                  onTap: (){context.go('/manageListings/add-house');},
+                  child: CardButton(
+                    bgColor: AppColors.manage,
+                    title: 'Add House',
+                    icon: Icon(
+                      color: Colors.black,
+                      Icons.add_circle_outline_outlined,
+                      size: 30.0,
+                    ),
+                  ),
+                ),
+                CardButton(
                   bgColor: AppColors.manage,
-                  title: 'Add House',
+                  title: 'Update Listings',
                   icon: Icon(
                     color: Colors.black,
-                    Icons.add_circle_outline_outlined,
+                    Icons.update,
                     size: 30.0,
                   ),
                 ),
-              ),
-              CardButton(
-                bgColor: AppColors.manage,
-                title: 'Update Listings',
-                icon: Icon(
-                  color: Colors.black,
-                  Icons.update,
-                  size: 30.0,
+                CardButton(
+                  bgColor: AppColors.manage,
+                  title: 'Mark House as Booked',
+                  icon: Icon(
+                    color: Colors.black,
+                    Icons.calendar_month_outlined,
+                    size: 30.0,
+                  ),
                 ),
-              ),
-              CardButton(
-                bgColor: AppColors.manage,
-                title: 'Mark House as Booked',
-                icon: Icon(
-                  color: Colors.black,
-                  Icons.calendar_month_outlined,
-                  size: 30.0,
+                CardButton(
+                  bgColor: AppColors.manage,
+                  title: 'Delete Listing',
+                  icon: Icon(
+                    color: Colors.black,
+                    Icons.delete_outline,
+                    size: 30.0,
+                  ),
                 ),
-              ),
-              CardButton(
-                bgColor: AppColors.manage,
-                title: 'Delete Listing',
-                icon: Icon(
-                  color: Colors.black,
-                  Icons.delete_outline,
-                  size: 30.0,
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

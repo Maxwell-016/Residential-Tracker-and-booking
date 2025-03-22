@@ -30,26 +30,28 @@ class LandLoardDashboardScreen extends StatelessWidget {
           ],
         ),
         drawer: SideNav(),
-        body: Padding(
-          padding: const EdgeInsets.only(left: 100.0),
-          child: Wrap(
-            spacing: 40.0,
-            runSpacing: 40.0,
-            children: [
-              // display
-              CardButton(
-                  quantity: 89,
-                  bgColor: AppColors.totalListings,
-                  title: 'Total Listings'),
-              CardButton(
-                  quantity: 50,
-                  bgColor: AppColors.booked,
-                  title: 'Booked Houses'),
-              CardButton(
-                  quantity: 39,
-                  bgColor: AppColors.availableListings,
-                  title: 'Available Houses'),
-            ],
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.only(left: 100.0),
+            child: Wrap(
+              spacing: 40.0,
+              runSpacing: 40.0,
+              children: [
+                // display
+                CardButton(
+                    quantity: 89,
+                    bgColor: AppColors.totalListings,
+                    title: 'Total Listings'),
+                CardButton(
+                    quantity: 50,
+                    bgColor: AppColors.booked,
+                    title: 'Booked Houses'),
+                CardButton(
+                    quantity: 39,
+                    bgColor: AppColors.availableListings,
+                    title: 'Available Houses'),
+              ],
+            ),
           ),
         ),
       ),

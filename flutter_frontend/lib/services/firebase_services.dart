@@ -1,4 +1,3 @@
-
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -12,14 +11,16 @@ import 'package:logger/logger.dart';
 import '../View-Model/view_model.dart';
 
 final firebaseServices =
-ChangeNotifierProvider<FirebaseServices>((ref) => FirebaseServices());
+    ChangeNotifierProvider<FirebaseServices>((ref) => FirebaseServices());
 final userState =
-StateProvider<User?>((ref) => FirebaseAuth.instance.currentUser);
+    StateProvider<User?>((ref) => FirebaseAuth.instance.currentUser);
 
 class FirebaseServices extends ChangeNotifier {
   Logger logger = Logger();
   final _auth = FirebaseAuth.instance;
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
+  CollectionReference houseReference =
+      FirebaseFirestore.instance.collection('Houses');
 
   User? get isLoggedIn => _auth.currentUser;
 
@@ -30,11 +31,9 @@ class FirebaseServices extends ChangeNotifier {
     notifyListeners();
   }
 
-
-  bool loggedIn(){
-    return _auth.currentUser!=null;
+  bool loggedIn() {
+    return _auth.currentUser != null;
   }
-
 
   //Creating a user on first time registration
   Future<void> createUser(BuildContext context, WidgetRef ref, String email,
@@ -76,13 +75,11 @@ class FirebaseServices extends ChangeNotifier {
 
             context.go('/student-dashboard');
 
-
             break;
           case 'Landlord':
             if (!context.mounted) return;
 
             context.go('/landlord-dashboard');
-
 
             break;
           case 'Admin':
@@ -107,29 +104,13 @@ class FirebaseServices extends ChangeNotifier {
     if (_auth.currentUser == null) return null;
 
     DocumentSnapshot userDoc =
-    await firestore.collection('users').doc(_auth.currentUser!.uid).get();
+        await firestore.collection('users').doc(_auth.currentUser!.uid).get();
 
     if (userDoc.exists) {
       return userDoc['role'];
     }
     return null;
   }
-
-
-  //Google sign in
-  // Future<void> googleSignIn(BuildContext context) async {
-  //   final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-  //   final GoogleSignInAuthentication? googleAuth =
-  //   await googleUser?.authentication;
-  //   final credential = GoogleAuthProvider.credential(
-  //     idToken: googleAuth?.idToken,
-  //     accessToken: googleAuth?.accessToken,
-  //   );
-  //   await _auth.signInWithCredential(credential);
-  //   if (!context.mounted) return;
-  //   logger.i(_auth.currentUser);
-  //   Navigator.of(context).pushReplacementNamed('/landing');
-  // }
 
   //reset users password
   Future<void> resetPassword(email) async {
@@ -159,22 +140,22 @@ class FirebaseServices extends ChangeNotifier {
       'user-not-found': "No user found with this email address.",
       'wrong-password': "The password is incorrect.",
       'invalid-credential':
-      "Incorrect credentials. Check your email and password and try again or sign up if you don't have an account",
+          "Incorrect credentials. Check your email and password and try again or sign up if you don't have an account",
       'too-many-requests': "Too many attempts. Try again later.",
       'operation-not-allowed': "This operation is not allowed.",
       'network-request-failed': "Network error. Check your connection.",
 
       // Create User Errors
       'email-already-in-use':
-      "The email address is already in use by another account.",
+          "The email address is already in use by another account.",
       'weak-password':
-      "The password is too weak. It must be at least 8 characters long.",
+          "The password is too weak. It must be at least 8 characters long.",
       'user-disabled': "This account has been disabled by the administrator.",
 
       // Generic Errors
       'internal-error': "An internal error occurred. Please try again later.",
       'timeout':
-      "The request has timed out. Please check your internet connection.",
+          "The request has timed out. Please check your internet connection.",
       'unknown': "An unknown error occurred. Please try again.",
     };
     String message =
@@ -182,6 +163,25 @@ class FirebaseServices extends ChangeNotifier {
     return message;
   }
 
-
-
+  //Adding house to the database
+  Future<void> addHouseListing(
+    String name,
+    int price,
+    String size,
+    List? images,
+    String description,
+    List? amenities,
+  ) async {
+    await houseReference
+        .doc(_auth.currentUser!.uid)
+        .collection('House Details')
+        .add({
+      'House Name': name,
+      'House Price': price,
+      'House Size': size,
+      'Images': images,
+      'Description': description,
+      'Available Amenities': amenities
+    });
+  }
 }
