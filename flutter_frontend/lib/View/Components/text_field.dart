@@ -7,6 +7,7 @@ class MyTextField extends StatefulWidget {
   final String placeHolder;
   final TextEditingController controller;
   final Icon icon;
+  final bool? isEnabled;
   final FormFieldValidator<String?> fieldValidator;
   final FocusNode focusNode;
   final double width;
@@ -21,6 +22,7 @@ class MyTextField extends StatefulWidget {
       required this.focusNode,
       required this.width,
       this.maxLines,
+      this.isEnabled,
       });
 
   @override
