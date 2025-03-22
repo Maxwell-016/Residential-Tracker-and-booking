@@ -10,6 +10,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../View-Model/utils/app_colors.dart';
+import '../../View-Model/utils/savecurrentpage.dart';
 import '../../View-Model/utils/validator.dart';
 import '../../security/hashPassword.dart';
 import '../../services/firebase_services.dart';
@@ -98,7 +99,9 @@ class LoginForm extends HookConsumerWidget{
                     ),
                     LinkButton(
                         onPressed: () {
+                          saveCurrentPage('/forgot-password');
                           context.go('/forgot-password');
+
                         },
                         text: 'Forgot Password?'),
                     Center(
@@ -137,7 +140,9 @@ class LoginForm extends HookConsumerWidget{
                           Text('Don\'t have an account? Click here to'),
                           LinkButton(
                               onPressed: () {
+                                saveCurrentPage('/registration');
                                 context.go('/registration');
+
                               },
                               text: 'Register'),
                         ],

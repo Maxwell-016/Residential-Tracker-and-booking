@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_frontend/View-Model/utils/app_colors.dart';
+import 'package:flutter_frontend/View-Model/utils/savecurrentpage.dart';
 import 'package:flutter_frontend/View/Components/login_form.dart';
 import 'package:flutter_frontend/services/firebase_services.dart';
 import 'package:flutter_frontend/View-Model/utils/validator.dart';
@@ -23,6 +24,7 @@ class LoginPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    saveCurrentPage("/login");
     var widths = MediaQuery.of(context).size.width;
 
     return SafeArea(

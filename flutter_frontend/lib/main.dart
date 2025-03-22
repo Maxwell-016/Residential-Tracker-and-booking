@@ -8,7 +8,9 @@ import 'package:flutter_frontend/constants.dart';
 import 'package:flutter_frontend/services/firebase_services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import 'View-Model/utils/savecurrentpage.dart';
 import 'View-Model/view_model.dart';
 import 'View/Screens/Admin/admin_dash.dart';
 import 'View/Screens/Common/email_verification_page.dart';
@@ -33,8 +35,8 @@ Future<void> main() async {
   } catch (e) {
     print('Firebase initialisation error: $e');
   }
-
-  runApp(ProviderScope(child: ResidentialTrackerAndBooking()));
+  String initialRoute = await getLastVisitedPage();
+  runApp(ProviderScope(child: ResidentialTrackerAndBooking(initialRoute: initialRoute)));
 }
 
 class CustomScrollBehavior extends MaterialScrollBehavior {
@@ -47,7 +49,8 @@ class CustomScrollBehavior extends MaterialScrollBehavior {
 }
 
 class ResidentialTrackerAndBooking extends ConsumerStatefulWidget {
-  const ResidentialTrackerAndBooking({super.key});
+  final String initialRoute;
+  const ResidentialTrackerAndBooking({super.key, required this.initialRoute});
 
   @override
   ConsumerState<ResidentialTrackerAndBooking> createState() =>
@@ -73,10 +76,12 @@ class _StateResidentialTrackerAndBooking
     });
   }
 
-  GoRouter routeMaker(BuildContext context) {
+
+  GoRouter routeMaker(BuildContext context)  {
     double deviceWidth = MediaQuery.of(context).size.width;
     return GoRouter(
-      initialLocation: '/login',
+      initialLocation: widget.initialRoute,
+      routerNeglect: false,
       redirect: _appRedirect,
       routes: [
         GoRoute(builder: (context, state) => LoginPage(), path: '/login'),
@@ -161,18 +166,18 @@ class _StateResidentialTrackerAndBooking
     );
   }
 
-  Future<String?> _appRedirect(
-      BuildContext context, GoRouterState state) async {
+  Future<String?> _appRedirect(BuildContext context, GoRouterState state) async {
     final fb = ref.watch(firebaseServices);
     final loggedIn = fb.loggedIn();
-
-    // final loggedIn = await _auth.loggedIn;
     final isOnLoginPage = state.matchedLocation == '/login';
 
-    // Go to /login if the user is not signed in
-    if (!loggedIn) {
-      return '/login';
-    } else if (loggedIn && isOnLoginPage) {
+    // If the user is not logged in, redirect them to login
+    if (!loggedIn && !['/login', '/registration', '/forgot-password'].contains(state.matchedLocation)) {
+      return null;
+    }
+
+    // If the user is logged in but is on the login page, send them to their dashboard
+    if (loggedIn && isOnLoginPage) {
       String? role = await fb.getUserRole();
       if (role != null) {
         switch (role) {
@@ -187,11 +192,13 @@ class _StateResidentialTrackerAndBooking
         return '/login';
       }
     }
-    // no redirect
+
+    // Stay on the current page
     return null;
   }
 
-  // This widget is the root of your application.
+
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
@@ -203,7 +210,7 @@ class _StateResidentialTrackerAndBooking
           colorSchemeSeed: colorSelectied.color,
           useMaterial3: true,
           brightness: Brightness.dark),
-      routerConfig: routeMaker(context),
+      routerConfig:  routeMaker(context),
       title: "Residential Tracker and Booking",
     );
   }

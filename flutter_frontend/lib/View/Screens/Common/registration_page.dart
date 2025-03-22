@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../View-Model/utils/app_colors.dart';
+import '../../../View-Model/utils/savecurrentpage.dart';
 import '../../../View-Model/utils/validator.dart';
 import '../../../View-Model/view_model.dart';
 import '../../../security/hashPassword.dart';
@@ -17,12 +18,26 @@ import '../../Components/link_button.dart';
 import '../../Components/password_field.dart';
 import '../../Components/text_field.dart';
 
-class RegistrationPage extends HookConsumerWidget {
+class RegistrationPage extends ConsumerStatefulWidget {
   const RegistrationPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    var widths = MediaQuery.of(context).size.width;
+  ConsumerState<RegistrationPage> createState() =>_StateRegistrationPage();
+}
+
+class _StateRegistrationPage extends   ConsumerState<RegistrationPage> {
+  @override
+  void initState() {
+    super.initState();
+    saveCurrentPage('/registration');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var widths = MediaQuery
+        .of(context)
+        .size
+        .width;
     return SafeArea(
       child: Scaffold(
         body: widths > 700 ? largeScreen(context) : RegForm(),
@@ -31,7 +46,10 @@ class RegistrationPage extends HookConsumerWidget {
   }
 
   Widget largeScreen(BuildContext context) {
-    var width = MediaQuery.of(context).size.width / 2;
+    var width = MediaQuery
+        .of(context)
+        .size
+        .width / 2;
 
     return Stack(children: [
       Container(
@@ -56,4 +74,6 @@ class RegistrationPage extends HookConsumerWidget {
       ),
     ]);
   }
+
+
 }

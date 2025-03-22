@@ -40,6 +40,8 @@ dependencies:
   google_maps_flutter: ^2.11.0
   google_maps_flutter_web: ^0.5.12
 
+  shared_preferences: ^2.5.2
+
 
 dev_dependencies:
   flutter_test:
