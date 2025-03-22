@@ -19,28 +19,40 @@ StateProvider<User?>((ref) => FirebaseAuth.instance.currentUser);
 class FirebaseServices extends ChangeNotifier {
   Logger logger = Logger();
   final _auth = FirebaseAuth.instance;
-  final FirebaseFirestore firestore=FirebaseFirestore.instance;
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   User? get isLoggedIn => _auth.currentUser;
 
   bool isLoading = false;
+
   void setIsLoading(bool value) {
     isLoading = value;
     notifyListeners();
   }
+
+
+  bool loggedIn(){
+    return _auth.currentUser!=null;
+  }
+
+
   //Creating a user on first time registration
   Future<void> createUser(BuildContext context, WidgetRef ref, String email,
-      String password,String role) async {
+      String password, String role) async {
     final viewModelProvider = ref.watch(viewModel);
     setIsLoading(true);
     await _auth.createUserWithEmailAndPassword(
         email: email, password: password);
+
     _auth.currentUser!.sendEmailVerification();
+
     await firestore.collection("users").doc(_auth.currentUser!.uid).set({
-        "email":email,
-        "role":role,
-      });
-    viewModelProvider.startTimer();
+      "email": email,
+      "role": role,
+    });
+
+    // viewModelProvider.startTimer();
+
     if (!context.mounted) return;
     context.go('/verification');
   }
@@ -53,25 +65,33 @@ class FirebaseServices extends ChangeNotifier {
     await _auth.signInWithEmailAndPassword(email: email, password: password);
     if (_auth.currentUser!.emailVerified) {
       await _auth.setPersistence(Persistence.LOCAL);
+
       String? role = await getUserRole();
       logger.i('user role : $role');
       //go to dashboards
-      if(role != null){
-        switch(role){
+      if (role != null) {
+        switch (role) {
           case 'Student':
-            if(!context.mounted)return;
+            if (!context.mounted) return;
+
             context.go('/student-dashboard');
+
+
             break;
           case 'Landlord':
-            if(!context.mounted)return;
+            if (!context.mounted) return;
+
             context.go('/landlord-dashboard');
+
+
             break;
           case 'Admin':
-            if(!context.mounted)return;
+            if (!context.mounted) return;
             context.go('/admin-dashboard');
+
             break;
         }
-      }else{
+      } else {
         logger.i(role);
       }
     } else {
@@ -82,7 +102,8 @@ class FirebaseServices extends ChangeNotifier {
       context.go('/verification');
     }
   }
-    Future<String?> getUserRole() async {
+
+  Future<String?> getUserRole() async {
     if (_auth.currentUser == null) return null;
 
     DocumentSnapshot userDoc =
@@ -93,6 +114,7 @@ class FirebaseServices extends ChangeNotifier {
     }
     return null;
   }
+
 
   //Google sign in
   // Future<void> googleSignIn(BuildContext context) async {
@@ -159,6 +181,7 @@ class FirebaseServices extends ChangeNotifier {
         errorMessages[e.code] ?? "An unknown error occurred. Please try again.";
     return message;
   }
+
+
+
 }
-
-

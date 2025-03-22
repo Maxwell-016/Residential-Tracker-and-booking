@@ -22,7 +22,7 @@ class ViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  int timeLeft = 50;
+  int timeLeft = 15;
   void startTimer() {
     showResendBtn = false;
     Timer.periodic(Duration(seconds: 1), (timer) {
@@ -32,7 +32,7 @@ class ViewModel extends ChangeNotifier {
         showResendBtn = true;
         notifyListeners();
         timer.cancel();
-        timeLeft = 50;
+        timeLeft = 15;
       }
     });
   }

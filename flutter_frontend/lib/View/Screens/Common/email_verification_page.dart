@@ -28,14 +28,21 @@ class EmailVerificationPage extends HookConsumerWidget {
               case 'Student':
                 if(!context.mounted)return;
                 context.go('/student-dashboard');
+
+
                 break;
               case 'Landlord':
                 if(!context.mounted)return;
+
                 context.go('/landlord-dashboard');
+
+
                 break;
               case 'Admin':
                 if(!context.mounted)return;
                 context.go('/admin-dashboard');
+
+
                 break;
             }
           }
@@ -44,6 +51,7 @@ class EmailVerificationPage extends HookConsumerWidget {
         }
       }
       getRoleAndNavigate();
+      return null;
     }, [user, isVerified]);
     return SafeArea(
       child: Scaffold(

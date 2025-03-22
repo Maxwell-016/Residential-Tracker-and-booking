@@ -137,6 +137,7 @@ class RegForm extends HookConsumerWidget{
                           onPressed: () async {
                             if (formKey.currentState!.validate()) {
                               try {
+
                                 await firebaseServicesProvider.createUser(
                                   context,
                                   ref,
@@ -144,6 +145,9 @@ class RegForm extends HookConsumerWidget{
                                   hashPassword(passController.text),
                                   ref.watch(selectedNameProvider),
                                 );
+
+
+
                               }catch(e){
                                 if (!context.mounted) return;
                                 SnackBars.showErrorSnackBar(
