@@ -187,4 +187,15 @@ class FirebaseServices extends ChangeNotifier {
       'Available Amenities': amenities
     });
   }
+
+  Future<List<Map<String,dynamic>>?> getHouseListing()async{
+    QuerySnapshot housesSnapshot = await houseReference.doc(_auth.currentUser!.uid).collection('House Details').get();
+    List<Map<String,dynamic>> houses = [];
+    for(var snapshot in housesSnapshot.docs){
+      if(snapshot.exists){
+        houses.add(snapshot.data() as Map<String,dynamic>);
+      }
+    }
+    return houses;
+  }
 }

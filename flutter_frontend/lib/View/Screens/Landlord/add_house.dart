@@ -4,6 +4,7 @@ import 'package:flutter_frontend/View-Model/view_model.dart';
 import 'package:flutter_frontend/View/Components/function_button.dart';
 import 'package:flutter_frontend/View/Components/side_nav.dart';
 import 'package:flutter_frontend/View/Components/text_field.dart';
+import 'package:flutter_frontend/services/ImagePickerService.dart';
 import 'package:flutter_frontend/services/firebase_services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -30,6 +31,7 @@ class AddHouse extends HookConsumerWidget {
     FocusNode descFocus = useFocusNode();
     String selectedSize = ref.watch(selectedHouseSize);
     Logger logger = Logger();
+    ImagePickerService imagePickerService = ImagePickerService();
     String imageName = 'Select images';
 
     final amenities = useState<Map<String, bool>>({
@@ -125,6 +127,7 @@ class AddHouse extends HookConsumerWidget {
                       GestureDetector(
                           onTap: () {
                             logger.i('Images field');
+                            imagePickerService.pickImages();
                           },
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
