@@ -1,16 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_frontend/View-Model/utils/app_colors.dart';
 import 'package:flutter_frontend/View/Components/card_button.dart';
+import 'package:flutter_frontend/services/firebase_services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:logger/logger.dart';
 
 import '../../Components/side_nav.dart';
 
-class ManageHouseListings extends StatelessWidget {
+class ManageHouseListings extends HookConsumerWidget {
   const ManageHouseListings({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    Logger logger = Logger();
+    final firebaseServicesProvider = ref.watch(firebaseServices);
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -23,54 +28,59 @@ class ManageHouseListings extends StatelessWidget {
           ],
         ),
         drawer: SideNav(),
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.only(left: 100.0),
-            child: Wrap(
-              spacing: 40.0,
-              runSpacing: 40.0,
-              children: [
-                GestureDetector(
-                  onTap: (){context.go('/manageListings/add-house');},
-                  child: CardButton(
-                    bgColor: AppColors.manage,
-                    title: 'Add House',
-                    icon: Icon(
-                      color: Colors.black,
-                      Icons.add_circle_outline_outlined,
-                      size: 30.0,
-                    ),
+        body: Padding(
+          padding: const EdgeInsets.only(left: 100.0),
+          child: Wrap(
+            spacing: 40.0,
+            runSpacing: 40.0,
+            children: [
+              GestureDetector(
+                onTap: () {
+                  context.go('/manageListings/add-house');
+                },
+                child: CardButton(
+                  bgColor: AppColors.manage,
+                  title: 'Add House',
+                  icon: Icon(
+                    color: Colors.black,
+                    Icons.add_circle_outline_outlined,
+                    size: 30.0,
                   ),
                 ),
-                CardButton(
+              ),
+              GestureDetector(
+                onTap: () async {
+                  context.go('/manageListings/view-and-update-listings');
+                },
+                child: CardButton(
                   bgColor: AppColors.manage,
-                  title: 'Update Listings',
+                  title: 'View / Update Listings',
                   icon: Icon(
                     color: Colors.black,
                     Icons.update,
                     size: 30.0,
                   ),
                 ),
-                CardButton(
-                  bgColor: AppColors.manage,
-                  title: 'Mark House as Booked',
-                  icon: Icon(
-                    color: Colors.black,
-                    Icons.calendar_month_outlined,
-                    size: 30.0,
-                  ),
+              ),
+              CardButton(
+                bgColor: AppColors.manage,
+                title: 'Mark House as Booked',
+                icon: Icon(
+                  color: Colors.black,
+                  Icons.calendar_month_outlined,
+                  size: 30.0,
                 ),
-                CardButton(
-                  bgColor: AppColors.manage,
-                  title: 'Delete Listing',
-                  icon: Icon(
-                    color: Colors.black,
-                    Icons.delete_outline,
-                    size: 30.0,
-                  ),
+              ),
+              CardButton(
+                bgColor: AppColors.manage,
+                title: 'Delete Listing',
+                icon: Icon(
+                  color: Colors.black,
+                  Icons.delete_outline,
+                  size: 30.0,
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

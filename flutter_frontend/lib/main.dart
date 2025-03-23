@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_frontend/View-Model/navigation/routes.dart';
+import 'package:flutter_frontend/View/Screens/Landlord/view_and_update_listings.dart';
 import 'package:flutter_frontend/constants.dart';
 import 'package:flutter_frontend/services/firebase_services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -36,7 +37,8 @@ Future<void> main() async {
     print('Firebase initialisation error: $e');
   }
   String initialRoute = await getLastVisitedPage();
-  runApp(ProviderScope(child: ResidentialTrackerAndBooking(initialRoute: initialRoute)));
+  runApp(ProviderScope(
+      child: ResidentialTrackerAndBooking(initialRoute: initialRoute)));
 }
 
 class CustomScrollBehavior extends MaterialScrollBehavior {
@@ -76,8 +78,7 @@ class _StateResidentialTrackerAndBooking
     });
   }
 
-
-  GoRouter routeMaker(BuildContext context)  {
+  GoRouter routeMaker(BuildContext context) {
     double deviceWidth = MediaQuery.of(context).size.width;
     return GoRouter(
       initialLocation: widget.initialRoute,
@@ -146,6 +147,9 @@ class _StateResidentialTrackerAndBooking
                   },
                 ),
               ),
+              GoRoute(
+                  path: 'view-and-update-listings',
+                  builder: (context, state) => ViewAndUpdateListings())
             ]),
         GoRoute(
             builder: (context, state) {
@@ -166,13 +170,16 @@ class _StateResidentialTrackerAndBooking
     );
   }
 
-  Future<String?> _appRedirect(BuildContext context, GoRouterState state) async {
+  Future<String?> _appRedirect(
+      BuildContext context, GoRouterState state) async {
     final fb = ref.watch(firebaseServices);
     final loggedIn = fb.loggedIn();
     final isOnLoginPage = state.matchedLocation == '/login';
 
     // If the user is not logged in, redirect them to login
-    if (!loggedIn && !['/login', '/registration', '/forgot-password'].contains(state.matchedLocation)) {
+    if (!loggedIn &&
+        !['/login', '/registration', '/forgot-password']
+            .contains(state.matchedLocation)) {
       return null;
     }
 
@@ -197,8 +204,6 @@ class _StateResidentialTrackerAndBooking
     return null;
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
@@ -210,7 +215,7 @@ class _StateResidentialTrackerAndBooking
           colorSchemeSeed: colorSelectied.color,
           useMaterial3: true,
           brightness: Brightness.dark),
-      routerConfig:  routeMaker(context),
+      routerConfig: routeMaker(context),
       title: "Residential Tracker and Booking",
     );
   }
