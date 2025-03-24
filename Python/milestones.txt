@@ -31,6 +31,9 @@ House listings
 Bookings:
     -Students must be able to book a house.
     -Landlords must be able to manage bookings(approve, reject, view booking details).
+    -Admin should be able to view students location.
+    -Students should be able to provide feedback of the place of residence after booking. The landlord should be able to view the feedback.
+    -Admin should be able to generate reports.
 
 Notifications
     -Users must receive notifications on important events(e.g, booking confirmation, booking rejection, new house listings)
