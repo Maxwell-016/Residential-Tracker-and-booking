@@ -16,7 +16,7 @@ Dashboard:
     -The dashboard must display relevant information based on the user role.
 
 Location:
-    -Use of Google maps API for location. 
+    -The system should use Google maps API for location or any other mapping software. 
 
 Continous Testing and optimization:
      -The system should be continously tested and optimized using algorithms and other computer science concepts.
@@ -24,11 +24,12 @@ Continous Testing and optimization:
 
 House listings
     -Landlords must be able to add, edit and delete house listings.
+    -Landlords must be able to view their available houses.
     -Students must be able to view house listings.
-    -Students mus be able to search for house listings based on various criteria(e.g, location, price, amenities)
+    -Students mus be able to search for house listings based on various criteria(e.g, location, price, amenities).
 
 Bookings:
-    -Students must be able to book a house
+    -Students must be able to book a house.
     -Landlords must be able to manage bookings(approve, reject, view booking details).
 
 Notifications
