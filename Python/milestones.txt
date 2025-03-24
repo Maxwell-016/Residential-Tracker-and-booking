@@ -18,6 +18,10 @@ Dashboard:
 Location:
     -Use of Google maps API for location. 
 
+Continous Testing and optimization:
+     -The system should be continously tested and optimized using algorithms and other computer science concepts.
+     -The system should be continously deployed on CI/CD using github and hosted on the cloud eg Heroku. 
+
 House listings
     -Landlords must be able to add, edit and delete house listings.
     -Students must be able to view house listings.
