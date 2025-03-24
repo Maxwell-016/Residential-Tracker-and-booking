@@ -1,0 +1,72 @@
+Functional requirements
+
+Frontend based:
+
+User Authentication:
+    -Users must be able to register and log in using their email and password.
+    -Users must be able to reset their password if they forget it.
+    -Users must be able to verify their email address.
+
+User Roles:
+    -The system must support different user roles : Admin, Landlord and Student.
+    -Each role must have specific permissions and access to different parts of the application.
+
+Dashboard:
+    -Admin, Landlord and student must have access to their respective dashboards
+    -The dashboard must display relevant information based on the user role.
+
+House listings
+    -Landlords must be able to add, edit and delete house listings.
+    -Students must be able to view house listings.
+    -Students mus be able to search for house listings based on various criteria(e.g, location, price, amenities)
+
+Bookings:
+    -Students must be able to book a house
+    -Landlords must be able to manage bookings(approve, reject, view booking details).
+
+Notifications
+    -Users must receive notifications on important events(e.g, booking confirmation, booking rejection, new house listings)
+
+Profile Management
+    -Users must be able to view and edit their profile information.
+
+Navigation
+    -The application must provide smooth navigation between different screens using GoRouter.
+
+
+
+Non-Functional Requirements
+
+Performance:
+    -The application must load within 3 seconds.
+    -The application must handle up to 1000 concurrent users without performance degradation.
+
+Security:
+    -User data must be encrypted in transit and at rest.
+    -The application must implement secure authentication and authorization mechanisms.
+    -The application must prevent common security vulnerabilities (e.g., SQL injection, XSS, CSRF).
+
+Usability:
+    -The application must have an intuitive and user-friendly interface.
+    -The application must be accessible to users with disabilities (e.g., screen reader support, keyboard navigation).
+
+Scalability:
+    -The application must be able to scale horizontally to handle increased load.
+    -The application must use cloud services (e.g., Firebase) to ensure scalability and reliability.
+
+Maintainability:
+    -The codebase must follow best practices for code organization and readability.
+    -The application must have comprehensive unit tests and integration tests.
+    -The application must use a version control system (e.g., Git) for code management.
+
+Reliability:
+    -The application must have an uptime of 99.9%.
+    -The application must handle errors gracefully and provide meaningful error messages to users.
+
+Compatibility:
+    -The application must be compatible with the latest versions of major web browsers (e.g., Chrome, Firefox, Safari).
+    -The application must be responsive and work on different screen sizes (e.g., desktop, tablet, mobile).
+
+Documentation:
+    -The application must have comprehensive documentation for developers and users.
+    -The documentation must include setup instructions, API documentation, and user guides.
