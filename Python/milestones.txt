@@ -1,6 +1,6 @@
 Functional requirements
 
-Frontend based:
+Mostly Frontend based and some backend:
 
 User Authentication:
     -Users must be able to register and log in using their email and password.
@@ -14,6 +14,9 @@ User Roles:
 Dashboard:
     -Admin, Landlord and student must have access to their respective dashboards
     -The dashboard must display relevant information based on the user role.
+
+Location:
+    -Use of Google maps API for location. 
 
 House listings
     -Landlords must be able to add, edit and delete house listings.
