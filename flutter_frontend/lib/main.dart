@@ -62,7 +62,7 @@ class ResidentialTrackerAndBooking extends ConsumerStatefulWidget {
 class _StateResidentialTrackerAndBooking
     extends ConsumerState<ResidentialTrackerAndBooking> {
   ThemeMode themeMode = ThemeMode.light;
-  ColorSelection colorSelectied = ColorSelection.blue;
+  ColorSelection colorSelected = ColorSelection.blue;
 
 //call this to change the theme of the app (dark or light)
   void changeThemeMode(bool useLightMode) {
@@ -74,7 +74,7 @@ class _StateResidentialTrackerAndBooking
   //use it to change the color of the page /you can add any color in the constants.dart
   void changeColor(int value) {
     setState(() {
-      colorSelectied = ColorSelection.values[value];
+      colorSelected = ColorSelection.values[value];
     });
   }
 
@@ -210,9 +210,9 @@ class _StateResidentialTrackerAndBooking
       debugShowCheckedModeBanner: false,
       scrollBehavior: CustomScrollBehavior(),
       theme:
-          ThemeData(colorSchemeSeed: colorSelectied.color, useMaterial3: true),
+          ThemeData(colorSchemeSeed: colorSelected.color, useMaterial3: true),
       darkTheme: ThemeData(
-          colorSchemeSeed: colorSelectied.color,
+          colorSchemeSeed: colorSelected.color,
           useMaterial3: true,
           brightness: Brightness.dark),
       routerConfig: routeMaker(context),

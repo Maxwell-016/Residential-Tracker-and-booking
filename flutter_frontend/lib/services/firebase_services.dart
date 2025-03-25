@@ -188,12 +188,62 @@ class FirebaseServices extends ChangeNotifier {
     });
   }
 
-  Future<List<Map<String,dynamic>>?> getHouseListing()async{
-    QuerySnapshot housesSnapshot = await houseReference.doc(_auth.currentUser!.uid).collection('House Details').get();
-    List<Map<String,dynamic>> houses = [];
-    for(var snapshot in housesSnapshot.docs){
-      if(snapshot.exists){
-        houses.add(snapshot.data() as Map<String,dynamic>);
+  Future<String?> updateListings(
+    String id,
+    String name,
+    int price,
+    String size,
+    List? images,
+    String description,
+    List? amenities,
+  ) async {
+    Map<String, dynamic> previousDetails =
+       await getIndividualListing(id) as Map<String, dynamic>;
+    if (previousDetails['House Name'] == name &&
+        previousDetails['House Price'] == price &&
+        previousDetails['House Size'] == size &&
+        previousDetails['Images'] == images &&
+        previousDetails['Description'] == description &&
+        previousDetails['Available Amenities'] == amenities) {
+      return 'No Change';
+    } else {
+      await houseReference
+          .doc(_auth.currentUser!.uid)
+          .collection('House Details')
+          .doc(id)
+          .update({
+        'House Name': name,
+        'House Price': price,
+        'House Size': size,
+        'Images': images,
+        'Description': description,
+        'Available Amenities': amenities
+      });
+      return null;
+    }
+  }
+
+  Future<Object?> getIndividualListing(String id) async {
+    DocumentSnapshot snapshot = await houseReference
+        .doc(_auth.currentUser!.uid)
+        .collection('House Details')
+        .doc(id)
+        .get();
+    if (snapshot.exists) {
+      return snapshot.data();
+    }
+    return null;
+  }
+
+  Future<List<Map<String, dynamic>>?> getHouseListing() async {
+    QuerySnapshot housesSnapshot = await houseReference
+        .doc(_auth.currentUser!.uid)
+        .collection('House Details')
+        .get();
+    List<Map<String, dynamic>> houses = [];
+    for (var snapshot in housesSnapshot.docs) {
+      if (snapshot.exists) {
+        houses.add({ 'Id' : snapshot.id, ...snapshot.data() as Map<String, dynamic>});
       }
     }
     return houses;
