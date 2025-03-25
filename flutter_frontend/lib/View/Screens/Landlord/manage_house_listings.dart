@@ -71,15 +71,6 @@ class ManageHouseListings extends HookConsumerWidget {
                   size: 30.0,
                 ),
               ),
-              CardButton(
-                bgColor: AppColors.manage,
-                title: 'Delete Listing',
-                icon: Icon(
-                  color: Colors.black,
-                  Icons.delete_outline,
-                  size: 30.0,
-                ),
-              ),
             ],
           ),
         ),

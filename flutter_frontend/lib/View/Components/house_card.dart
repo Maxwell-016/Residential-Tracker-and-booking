@@ -7,12 +7,14 @@ class HouseCard extends StatelessWidget {
   final String price;
   final String houseSize;
   final String? imageUrl;
+  final Future Function()? onDeletePressed;
   const HouseCard(
       {super.key,
       required this.houseName,
       required this.price,
       required this.houseSize,
-      this.imageUrl});
+      this.imageUrl,
+      this.onDeletePressed});
 
   @override
   Widget build(BuildContext context) {
@@ -27,13 +29,13 @@ class HouseCard extends StatelessWidget {
           imageUrl == null
               ? Image.asset(
                   'assets/launch.png',
-                  height: 200.0,
+                  height: 198.0,
                   fit: BoxFit.fill,
                   filterQuality: FilterQuality.high,
                 )
               : CachedNetworkImage(
                   imageUrl: imageUrl!,
-                  height: 200.0,
+                  height: 198.0,
                   filterQuality: FilterQuality.high,
                   fit: BoxFit.fill,
                 ),
@@ -50,11 +52,24 @@ class HouseCard extends StatelessWidget {
                 ),
                 UseFont(text: houseSize, myFont: 'Open Sans', size: 12.0),
                 Divider(),
-                UseFont(
-                  text: 'Ksh.$price',
-                  myFont: 'Roboto',
-                  size: 16.0,
-                  weight: FontWeight.bold,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    UseFont(
+                      text: 'Ksh.$price',
+                      myFont: 'Roboto',
+                      size: 16.0,
+                      weight: FontWeight.bold,
+                    ),
+                    onDeletePressed != null
+                        ? IconButton(
+                            onPressed: () async {
+                              await onDeletePressed!();
+                            },
+                            icon: Icon(Icons.delete),
+                          )
+                        : SizedBox(),
+                  ],
                 ),
               ],
             ),
