@@ -56,7 +56,7 @@ Future dialogBox(BuildContext context, String title, String body,
             },
             btnColor: AppColors.deepBlue),
         FunctionButton(
-            text: 'Update',
+            text: title,
             onPressed: () async {
               await onOkPressed();
             },

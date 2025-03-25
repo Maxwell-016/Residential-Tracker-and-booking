@@ -198,7 +198,7 @@ class FirebaseServices extends ChangeNotifier {
     List? amenities,
   ) async {
     Map<String, dynamic> previousDetails =
-       await getIndividualListing(id) as Map<String, dynamic>;
+        await getIndividualListing(id) as Map<String, dynamic>;
     if (previousDetails['House Name'] == name &&
         previousDetails['House Price'] == price &&
         previousDetails['House Size'] == size &&
@@ -235,7 +235,7 @@ class FirebaseServices extends ChangeNotifier {
     return null;
   }
 
-  Future<List<Map<String, dynamic>>?> getHouseListing() async {
+  Future<List<Map<String, dynamic>>> getHouseListing() async {
     QuerySnapshot housesSnapshot = await houseReference
         .doc(_auth.currentUser!.uid)
         .collection('House Details')
@@ -243,9 +243,18 @@ class FirebaseServices extends ChangeNotifier {
     List<Map<String, dynamic>> houses = [];
     for (var snapshot in housesSnapshot.docs) {
       if (snapshot.exists) {
-        houses.add({ 'Id' : snapshot.id, ...snapshot.data() as Map<String, dynamic>});
+        houses.add(
+            {'Id': snapshot.id, ...snapshot.data() as Map<String, dynamic>});
       }
     }
     return houses;
+  }
+
+  Future<void> deleteDocById(String id) async {
+    await houseReference
+        .doc(_auth.currentUser!.uid)
+        .collection('House Details')
+        .doc(id)
+        .delete();
   }
 }

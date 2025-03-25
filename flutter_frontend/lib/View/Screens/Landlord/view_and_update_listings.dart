@@ -12,12 +12,17 @@ import '../../Components/function_button.dart';
 import '../../Components/snackbars.dart';
 import '../../Components/text_field.dart';
 
-class ViewAndUpdateListings extends HookConsumerWidget {
+class ViewAndUpdateListings extends StatefulWidget {
   const ViewAndUpdateListings({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final firebaseServicesProvider = ref.watch(firebaseServices);
+  State<ViewAndUpdateListings> createState() => _ViewAndUpdateListingsState();
+}
+
+class _ViewAndUpdateListingsState extends State<ViewAndUpdateListings> {
+  @override
+  Widget build(BuildContext context) {
+    final firebaseServicesProvider = FirebaseServices();
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -40,7 +45,7 @@ class ViewAndUpdateListings extends HookConsumerWidget {
                   ),
                 );
               }
-              if (snapshot.data == null) {
+              if (snapshot.data == null || snapshot.data!.isEmpty) {
                 return Center(
                   child: Text('You have no houses'),
                 );
@@ -67,9 +72,30 @@ class ViewAndUpdateListings extends HookConsumerWidget {
                         );
                       },
                       child: HouseCard(
-                          houseName: houses[index]['House Name'],
-                          price: houses[index]['House Price'].toString(),
-                          houseSize: houses[index]['House Size']),
+                        houseName: houses[index]['House Name'],
+                        price: houses[index]['House Price'].toString(),
+                        houseSize: houses[index]['House Size'],
+                        onDeletePressed: () async {
+                          await dialogBox(context, 'Delete',
+                              'Are you sure you want to delete house ${houses[index]['House Name']}',
+                              () async {
+                            try {
+                              await firebaseServicesProvider
+                                  .deleteDocById(houses[index]['Id']);
+                              setState(() {});
+                              if (!context.mounted) return;
+                              SnackBars.showSuccessSnackBar(context,
+                                  'House ${houses[index]['House Name']} deleted successfully');
+                              Navigator.pop(context);
+                            } catch (e) {
+                              if (!context.mounted) return;
+                              SnackBars.showErrorSnackBar(context,
+                                  'An error occurred trying to delete house ${houses[index]['House Name']}');
+                              Navigator.pop(context);
+                            }
+                          });
+                        },
+                      ),
                     );
                   });
             }),
@@ -144,7 +170,7 @@ class HouseDetails extends HookConsumerWidget {
                 runSpacing: 20.0,
                 children: [
                   Column(
-                    spacing: 20.0,
+                    spacing: 30.0,
                     children: [
                       //display the images of the house
                       Image.asset(
@@ -410,29 +436,58 @@ class HouseDetails extends HookConsumerWidget {
                             ),
                           );
                         }
-                        if (snapshot.data == null) {
+                        if (snapshot.data == null || snapshot.data!.isEmpty) {
                           return Center(
                             child: Text('You have no other houses'),
                           );
                         }
                         List<Map<String, dynamic>> houses = snapshot.data!;
-                        return GestureDetector(
-                          onTap: () {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => HouseDetails(
-                                  house: houses[index],
-                                  othersLength: houses.length,
+                        return StatefulBuilder(builder: (context, setState) {
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => HouseDetails(
+                                    house: houses[index],
+                                    othersLength: houses.length,
+                                  ),
                                 ),
-                              ),
-                            );
-                          },
-                          child: HouseCard(
-                              houseName: houses[index]['House Name'],
-                              price: houses[index]['House Price'].toString(),
-                              houseSize: houses[index]['House Size']),
-                        );
+                              );
+                            },
+                            child: index < houses.length
+                                ? HouseCard(
+                                    houseName: houses[index]['House Name'],
+                                    price:
+                                        houses[index]['House Price'].toString(),
+                                    houseSize: houses[index]['House Size'],
+                                    // onDeletePressed: () async {
+                                    //   await dialogBox(context, 'Delete',
+                                    //       'Are you sure you want to delete house ${houses[index]['House Name']}',
+                                    //       () async {
+                                    //     try {
+                                    //       await firebaseServicesProvider
+                                    //           .deleteDocById(
+                                    //               houses[index]['Id']);
+                                    //       setState(() {
+                                    //         houses.removeAt(index);
+                                    //       });
+                                    //       if (!context.mounted) return;
+                                    //       SnackBars.showSuccessSnackBar(context,
+                                    //           'House ${houses[index]['House Name']} deleted successfully');
+                                    //       Navigator.pop(context);
+                                    //     } catch (e) {
+                                    //       if (!context.mounted) return;
+                                    //       SnackBars.showErrorSnackBar(context,
+                                    //           'An error occurred trying to delete house ${houses[index]['House Name']}');
+                                    //       Navigator.pop(context);
+                                    //     }
+                                    //   });
+                                    // }
+                                    )
+                                : null,
+                          );
+                        });
                       });
                 })
                 //items
