@@ -9,6 +9,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:logger/logger.dart';
 
+
 import '../View-Model/view_model.dart';
 
 final firebaseServices =
@@ -18,7 +19,7 @@ final userState =
 
 class FirebaseServices extends ChangeNotifier {
   Logger logger = Logger();
-  final _auth = FirebaseAuth.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
   CollectionReference houseReference =
       FirebaseFirestore.instance.collection('Houses');
@@ -257,4 +258,15 @@ class FirebaseServices extends ChangeNotifier {
         .doc(id)
         .delete();
   }
+  Future<List<Map<String, dynamic>>> fetchResidences() async {
+  try{
+    QuerySnapshot snapshot = await this.firestore.collection('booked_students').get();
+    return snapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
+  } catch(e){
+    this.logger.e('Error fetching residences: $e');
+    return [];
+  }
 }
+}
+
+
