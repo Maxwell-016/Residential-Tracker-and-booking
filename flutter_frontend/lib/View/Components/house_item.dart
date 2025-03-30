@@ -141,18 +141,30 @@ class _StateHouseCard extends ConsumerState<HouseCard> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (widget.house.containsKey("Images"))
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: Image.network(
-                        widget.house["Images"],
-                        width: double.infinity,
-                        height: 200,
-                        fit: BoxFit.cover,
+                  if (widget.house.containsKey("Images") && widget.house["Images"] is List)
+                    SizedBox(
+                      height: 200,
+                      child: PageView.builder(
+                        itemCount: widget.house["Images"].length,
+                        itemBuilder: (context, index) {
+                          return ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: Image.network(
+                              widget.house["Images"][index],
+                              width: double.infinity,
+                              height: 200,
+                              fit: BoxFit.cover,
+                            ),
+                          );
+                        },
                       ),
                     ),
+
+
+
+
                   SizedBox(height: 8),
-                  Text("🏠 ${widget.house["House Name"]} - Ksh ${widget.house["House Price"]}",
+                  Text("🏠 ${"House Name "+widget.house["House Name"]}\t\t-\t\t Ksh  ${widget.house["House Price"]}  per month",
                       style: TextStyle(
                           fontWeight: FontWeight.bold, fontSize: 16)),
                   Text("📍 ${widget.house["Location"]}"),

@@ -98,7 +98,8 @@ class FirebaseServices extends ChangeNotifier {
       }
     } else {
       //go to email verification page
-      sendEmailVerification();
+      await _auth.currentUser!.sendEmailVerification();
+   //   sendEmailVerification();
       viewModelProvider.startTimer();
       if (!context.mounted) return;
       context.go('/verification');
