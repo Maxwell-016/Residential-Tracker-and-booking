@@ -203,6 +203,8 @@ class FirebaseServices extends ChangeNotifier {
   Future<String> addHouseListing(
       String name,
       String location,
+      double liveLatitude,
+      double liveLongitude,
       int price,
       String size,
       List? images,
@@ -223,6 +225,8 @@ class FirebaseServices extends ChangeNotifier {
         .set({
       'House Name': name,
       'Location' : location,
+      'Live Longitude' : liveLongitude,
+      'Live Latitude' : liveLatitude,
       'House Price': price,
       'House Size': size,
       'Images': images,

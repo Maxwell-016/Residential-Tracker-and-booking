@@ -1,7 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_frontend/View/Components/house_card.dart';
 import 'package:flutter_frontend/View/Components/image_builder.dart';
 import 'package:flutter_frontend/services/firebase_services.dart';
+import 'package:flutter_frontend/services/image_picker_service.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
@@ -133,6 +135,10 @@ class _ViewAndUpdateListingsState extends State<ViewAndUpdateListings> {
   }
 }
 
+final updatedImageNameProvider = StateProvider<List<String>>((ref) => ['Select images'] );
+final updatedImageFileProvider = StateProvider<List<Uint8List>>((ref) => [] );
+
+
 class HouseDetails extends HookConsumerWidget {
   final Map<String, dynamic> house;
   final int othersLength;
@@ -145,7 +151,7 @@ class HouseDetails extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final firebaseServicesProvider = ref.watch(firebaseServices);
-    final viewModelProvider = ref.watch(viewModel);
+    ImagePickerService imagePickerService = ImagePickerService();
     Logger logger = Logger();
     final formKey = GlobalKey<FormState>();
     TextEditingController houseNameController =
@@ -178,19 +184,19 @@ class HouseDetails extends HookConsumerWidget {
     });
 
     List<String> areas = [
-      'Mwiyala',
-      'Lurambi',
-      'Sichirayi',
-      'Amalemba',
-      'Kefinco',
-      'Milimani',
-      'Shinyalu',
-      'Koromatangi',
-      'Kakamega Town',
-      'Mudiri',
-      'Lubao',
-      'Stage Mandazi',
-      'Khayega'
+      'myala',
+      'lurambi',
+      'sichirayi',
+      'amalemba',
+      'kefinco',
+      'milimani',
+      'shinyalu',
+      'koromatangi',
+      'kakamega town',
+      'mudiri',
+      'lubao',
+      'stage mandazi',
+      'khayega'
     ];
     areas.sort((a, b) => a.compareTo(b));
 
@@ -221,12 +227,10 @@ class HouseDetails extends HookConsumerWidget {
                 spacing: 20.0,
                 runSpacing: 20.0,
                 children: [
-                  Center(
-                    child: ImageBuilder(
-                        imageUrls: house['Images'],
-                        width: width,
-                        placeholderAsset: 'assets/launch.png'),
-                  ),
+                  ImageBuilder(
+                      imageUrls: house['Images'],
+                      width: width,
+                      placeholderAsset: 'assets/launch.png'),
                   //form
                   Card(
                     child: Padding(
@@ -333,11 +337,24 @@ class HouseDetails extends HookConsumerWidget {
                                   // imagePickerService.pickImages();
                                 },
                                 child: GestureDetector(
-                                  onTap: (){
+                                  onTap: () async{
 
 
-                                    //TODO: add image picking logic
+                                    List<Uint8List> imageFiles = [];
+                                    List<String> imageNames = [];
 
+                                    final images = await imagePickerService.pickImages();
+
+                                    if(images != null && images.isNotEmpty) {
+
+                                      for (final image in images) {
+                                        imageFiles.add(image.bytes);
+                                        imageNames.add(image.name);
+
+                                        ref.read(updatedImageNameProvider.notifier).state = imageNames;
+                                        ref.read(updatedImageFileProvider.notifier).state = imageFiles;
+                                      }
+                                    }
 
 
                                   },
@@ -481,6 +498,9 @@ class HouseDetails extends HookConsumerWidget {
                                       'Are you sure you want to save the changes?',
                                       () async {
                                     try {
+                                      List<String>? updatedUrls = await imagePickerService
+                                          .uploadFiles(ref.watch(updatedImageFileProvider));
+
                                       String? message =
                                           await firebaseServicesProvider
                                               .updateListings(
@@ -488,7 +508,7 @@ class HouseDetails extends HookConsumerWidget {
                                         selectedLocation,
                                         int.parse(priceController.text),
                                         selectedSize,
-                                        null,
+                                        updatedUrls,
                                         descController.text,
                                         selectedAmenities.value,
                                         bookingStatus == 'Booked'
