@@ -6,10 +6,30 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 
+import '../../../constants.dart';
+import '../../Components/SimpleAppBar.dart';
 import '../../Components/landlord_side_nav.dart';
 
-class ManageHouseListings extends HookConsumerWidget {
-  const ManageHouseListings({super.key});
+class ManageHouseListings extends ConsumerWidget {
+
+
+  const ManageHouseListings({
+    super.key,
+    required this.changeTheme,
+    required this.changeColor,
+    required this.colorSelected,
+  });
+
+
+  final ColorSelection colorSelected;
+  final void Function(bool useLightMode) changeTheme;
+  final void Function(int value) changeColor;
+
+
+
+
+
+
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -18,15 +38,17 @@ class ManageHouseListings extends HookConsumerWidget {
     final firebaseServicesProvider = ref.watch(firebaseServices);
     return SafeArea(
       child: Scaffold(
-        appBar: AppBar(
-          iconTheme: IconThemeData(size: 30.0),
-          centerTitle: true,
-          title: Text("Manage House Listings"),
-          actions: [
-            // ThemeButton(changeThemeMode: changeTheme),
-            // ColorButton(changeColor: changeColor, colorSelected: colorSelected)
-          ],
+
+        appBar:PreferredSize(
+          preferredSize: Size.fromHeight(60),
+          child:App_Bar(changeTheme: changeTheme,
+              changeColor: changeColor,
+              colorSelected: colorSelected,
+              title: "Manage House Listings"),
         ),
+
+
+
         drawer: LandlordSideNav(),
         body: Padding(
           padding: const EdgeInsets.only(left: 100.0),
