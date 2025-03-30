@@ -9,6 +9,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:logger/logger.dart';
 
+
 import '../View-Model/view_model.dart';
 
 final firebaseServices =
@@ -20,7 +21,7 @@ final verifiedLandlord = StateProvider<bool>((ref) => FirebaseAuth.instance.curr
 
 class FirebaseServices extends ChangeNotifier {
   Logger logger = Logger();
-  final _auth = FirebaseAuth.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
   CollectionReference landlordReference =
   FirebaseFirestore.instance.collection('Landlords');
@@ -311,48 +312,49 @@ class FirebaseServices extends ChangeNotifier {
 
 
 
-  Future<Map<String,dynamic>> getAllHouses(
-      {DocumentSnapshot? lastLandlordDoc,
-        Map<String, DocumentSnapshot>? lastHouseDocs,
-        int perLandlordLimit = 4,
-        int totalLimit = 20}) async {
 
-    Query landlordsQuery = FirebaseFirestore.instance.collection('Houses').orderBy(FieldPath.documentId).limit(totalLimit );
+//   Future<Map<String,dynamic>> getAllHouses(
+//       {DocumentSnapshot? lastLandlordDoc,
+//         Map<String, DocumentSnapshot>? lastHouseDocs,
+//         int perLandlordLimit = 4,
+//         int totalLimit = 20}) async {
 
-    if(lastLandlordDoc != null){
-      landlordsQuery = landlordsQuery.startAfterDocument(lastLandlordDoc);
-    }
+//     Query landlordsQuery = FirebaseFirestore.instance.collection('Houses').orderBy(FieldPath.documentId).limit(totalLimit );
 
-    QuerySnapshot landlords = await landlordsQuery.get();
+//     if(lastLandlordDoc != null){
+//       landlordsQuery = landlordsQuery.startAfterDocument(lastLandlordDoc);
+//     }
 
-    List<Map<String, dynamic>> allHouses = [];
-    DocumentSnapshot? newLastLandlordDoc ;
-    Map<String, DocumentSnapshot>? newLastHouseDocs = {};
-    logger.e(landlords.docs.length);
-    for(var landlordDoc in landlords.docs){
+//     QuerySnapshot landlords = await landlordsQuery.get();
 
-      Query houseQuery = landlordDoc.reference.collection('House Details').orderBy(FieldPath.documentId).limit(perLandlordLimit);
-      if(lastHouseDocs != null && lastHouseDocs.containsKey(landlordDoc.id)){
-        houseQuery = houseQuery.startAfterDocument(lastHouseDocs[landlordDoc.id]!);
-      }
+//     List<Map<String, dynamic>> allHouses = [];
+//     DocumentSnapshot? newLastLandlordDoc ;
+//     Map<String, DocumentSnapshot>? newLastHouseDocs = {};
+//     logger.e(landlords.docs.length);
+//     for(var landlordDoc in landlords.docs){
 
-      QuerySnapshot houses = await houseQuery.get();
+//       Query houseQuery = landlordDoc.reference.collection('House Details').orderBy(FieldPath.documentId).limit(perLandlordLimit);
+//       if(lastHouseDocs != null && lastHouseDocs.containsKey(landlordDoc.id)){
+//         houseQuery = houseQuery.startAfterDocument(lastHouseDocs[landlordDoc.id]!);
+//       }
 
-      for(var houseDoc in houses.docs){
-        allHouses.add({
-          'id' : houseDoc.id,
-          'landlordId' : landlordDoc.id,
-          ...houseDoc.data() as Map<String,dynamic>
-        });
-        newLastHouseDocs[landlordDoc.id] = houseDoc;
-      }
-      newLastLandlordDoc = landlordDoc;
-    }
-    return{
-      'houses' : allHouses,
-      'lastLandlordDoc' : newLastLandlordDoc,
-      'lastHouseDocs' : newLastHouseDocs,
-    };
+//       QuerySnapshot houses = await houseQuery.get();
+
+//       for(var houseDoc in houses.docs){
+//         allHouses.add({
+//           'id' : houseDoc.id,
+//           'landlordId' : landlordDoc.id,
+//           ...houseDoc.data() as Map<String,dynamic>
+//         });
+//         newLastHouseDocs[landlordDoc.id] = houseDoc;
+//       }
+//       newLastLandlordDoc = landlordDoc;
+//     }
+//     return{
+//       'houses' : allHouses,
+//       'lastLandlordDoc' : newLastLandlordDoc,
+//       'lastHouseDocs' : newLastHouseDocs,
+//     };
 
 
 
@@ -387,3 +389,17 @@ class FirebaseServices extends ChangeNotifier {
     // return {'houses' : allTheHouses, 'lastDoc' : lastDocumentSnapshot};
   }
 }
+
+//   Future<List<Map<String, dynamic>>> fetchResidences() async {
+//   try{
+//     QuerySnapshot snapshot = await this.firestore.collection('booked_students').get();
+//     return snapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
+//   } catch(e){
+//     this.logger.e('Error fetching residences: $e');
+//     return [];
+//   }
+// }
+// }
+
+
+

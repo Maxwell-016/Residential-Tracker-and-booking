@@ -24,6 +24,7 @@ import 'View/Screens/Landlord/landloard_dash.dart';
 import 'View/Screens/Landlord/manage_house_listings.dart';
 import 'View/Screens/Student/student_dash.dart';
 import 'firebase_options.dart';
+import 'View/Screens/Admin/admin_settings.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -169,7 +170,12 @@ class _StateResidentialTrackerAndBooking
             builder: (context, state) {
               return AdminDashboardScreen();
             },
-            path: '/admin-dashboard')
+            path: '/admin-dashboard'),
+        GoRoute(
+          path: '/admin-settings',
+          builder: (context, state) => AdminSettingsPage(),
+          
+        ),
       ],
       errorPageBuilder: (context, state) {
         return MaterialPage(

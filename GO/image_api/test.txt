@@ -1,0 +1,51 @@
+1️⃣ Upload an Image (POST /upload)
+📌 Command:
+
+
+curl -X POST https://residential-tracker-and-booking-images.onrender.com/upload \
+  -F "file=@/path/to/your/image.jpg"
+🔹 Replace /path/to/your/image.jpg with the actual image path on your system.
+
+📌 Expected Response:
+
+
+"/image.jpg"
+2️⃣ List All Images (GET /)
+📌 Command:
+
+
+curl -X GET https://residential-tracker-and-booking-images.onrender.com/
+📌 Expected Response:
+
+[
+  {
+    "id": 1,
+    "image_name": "image.jpg",
+    "file_path": "./house_images/image.jpg"
+  }
+]
+3️⃣ Download an Image (GET /:filename)
+📌 Command:
+
+
+curl -O https://residential-tracker-and-booking-images.onrender.com/image.jpg
+or open in browser:
+👉 https://residential-tracker-and-booking-images.onrender.com/image.jpg
+
+📌 Expected: The file should download.
+🔹 Delete an Image (DELETE /api/delete/:filename)
+📌 Command:
+
+
+curl -X DELETE "https://residential-tracker-and-booking-images.onrender.com/api/delete/image.jpg" \
+  -H "x-api-key: plmnbvcxzaqwertyuio"
+👉 Replace image.jpg with the actual filename you want to delete.
+
+📌 Expected Response (Success):
+
+
+{"message": "File deleted successfully"}
+📌 Expected Response (If file not found):
+
+
+{"error": "Image not found"}
