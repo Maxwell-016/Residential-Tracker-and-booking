@@ -6,7 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 
-import '../../Components/side_nav.dart';
+import '../../Components/landlord_side_nav.dart';
 
 class ManageHouseListings extends HookConsumerWidget {
   const ManageHouseListings({super.key});
@@ -27,7 +27,7 @@ class ManageHouseListings extends HookConsumerWidget {
             // ColorButton(changeColor: changeColor, colorSelected: colorSelected)
           ],
         ),
-        drawer: SideNav(),
+        drawer: LandlordSideNav(),
         body: Padding(
           padding: const EdgeInsets.only(left: 100.0),
           child: Wrap(

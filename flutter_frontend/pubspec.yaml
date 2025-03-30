@@ -41,6 +41,7 @@ dependencies:
   google_maps_flutter_web: ^0.5.12
 
   shared_preferences: ^2.5.2
+  file_picker: ^9.2.3
 
 
 dev_dependencies:

@@ -1,22 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_frontend/View-Model/utils/app_colors.dart';
 import 'package:flutter_frontend/View/Components/card_button.dart';
-import 'package:flutter_frontend/View/Components/side_nav.dart';
+import 'package:flutter_frontend/View/Components/landlord_side_nav.dart';
+import 'package:logger/logger.dart';
 
-class LandLoardDashboardScreen extends StatelessWidget {
-  const LandLoardDashboardScreen({
-    super.key,
-    // required this.changeTheme,
-    // required this.changeColor,
-    // required this.colorSelected,
-  });
+import '../../../constants.dart';
+import '../../Components/color_button.dart';
+import '../../Components/theme_button.dart';
 
-  // final ColorSelection colorSelected;
-  // final void Function(bool useLightMode) changeTheme;
-  // final void Function(int value) changeColor;
+
+class LandLordDashboardScreen extends StatefulWidget {
+  const LandLordDashboardScreen({super.key});
 
   @override
+  State<LandLordDashboardScreen> createState() => _LandLordDashboardScreenState();
+}
+
+class _LandLordDashboardScreenState extends State<LandLordDashboardScreen> {
+  @override
   Widget build(BuildContext context) {
+    Logger logger = Logger();
+    logger.i('Rebuilding admin dash');
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return SafeArea(
       child: Scaffold(
@@ -25,11 +29,12 @@ class LandLoardDashboardScreen extends StatelessWidget {
           centerTitle: true,
           title: Text("Landlord Dashboard"),
           actions: [
-            // ThemeButton(changeThemeMode: changeTheme),
-            // ColorButton(changeColor: changeColor, colorSelected: colorSelected)
+          //   ThemeButton(changeThemeMode: changeTheme),
+          //    ColorButton(changeColor: changeColor,
+          //        colorSelected: colorSelected)
           ],
         ),
-        drawer: SideNav(),
+        drawer: LandlordSideNav(),
         body: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.only(left: 100.0),
