@@ -54,7 +54,7 @@ class FirebaseServices extends ChangeNotifier {
       "role": role,
     });
 
-    // viewModelProvider.startTimer();
+     viewModelProvider.startTimer();
 
     if (!context.mounted) return;
     context.go('/verification');
@@ -102,7 +102,7 @@ class FirebaseServices extends ChangeNotifier {
       viewModelProvider.startTimer();
       if (!context.mounted) return;
       context.go('/verification');
-      saveCurrentPage("/verification");
+
     }
   }
 
@@ -387,19 +387,19 @@ class FirebaseServices extends ChangeNotifier {
     // }
     // logger.i('From get all houses: $allTheHouses');
     // return {'houses' : allTheHouses, 'lastDoc' : lastDocumentSnapshot};
+
+
+
+  Future<List<Map<String, dynamic>>> fetchResidences() async {
+  try{
+    QuerySnapshot snapshot = await this.firestore.collection('booked_students').get();
+    return snapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
+  } catch(e){
+    this.logger.e('Error fetching residences: $e');
+    return [];
   }
 }
-
-//   Future<List<Map<String, dynamic>>> fetchResidences() async {
-//   try{
-//     QuerySnapshot snapshot = await this.firestore.collection('booked_students').get();
-//     return snapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
-//   } catch(e){
-//     this.logger.e('Error fetching residences: $e');
-//     return [];
-//   }
-// }
-// }
+}
 
 
 

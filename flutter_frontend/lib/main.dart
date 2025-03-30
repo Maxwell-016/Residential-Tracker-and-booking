@@ -22,6 +22,7 @@ import 'View/Screens/Common/registration_page.dart';
 import 'View/Screens/Landlord/add_house.dart';
 import 'View/Screens/Landlord/landloard_dash.dart';
 import 'View/Screens/Landlord/manage_house_listings.dart';
+import 'View/Screens/Student/chart_screen.dart';
 import 'View/Screens/Student/student_dash.dart';
 import 'firebase_options.dart';
 import 'View/Screens/Admin/admin_settings.dart';
@@ -38,9 +39,9 @@ Future<void> main() async {
   } catch (e) {
     print('Firebase initialisation error: $e');
   }
-  String initialRoute = await getLastVisitedPage();
+ // String initialRoute = await getLastVisitedPage();
   runApp(ProviderScope(
-      child: ResidentialTrackerAndBooking(initialRoute: initialRoute)));
+      child: ResidentialTrackerAndBooking()));
 }
 
 class CustomScrollBehavior extends MaterialScrollBehavior {
@@ -53,8 +54,8 @@ class CustomScrollBehavior extends MaterialScrollBehavior {
 }
 
 class ResidentialTrackerAndBooking extends ConsumerStatefulWidget {
-  final String initialRoute;
-  const ResidentialTrackerAndBooking({super.key, required this.initialRoute});
+//  final String initialRoute;
+  const ResidentialTrackerAndBooking({super.key});
 
   @override
   ConsumerState<ResidentialTrackerAndBooking> createState() =>
@@ -65,27 +66,28 @@ class _StateResidentialTrackerAndBooking
     extends ConsumerState<ResidentialTrackerAndBooking> {
 
   ThemeMode themeMode = ThemeMode.light;
+
+
   ColorSelection colorSelected = ColorSelection.blue;
 
-//call this to change the theme of the app (dark or light)
   void changeThemeMode(bool useLightMode) {
     setState(() {
-      themeMode = useLightMode ? ThemeMode.light : ThemeMode.dark;
+      themeMode = useLightMode
+          ? ThemeMode.light
+          : ThemeMode.dark;
     });
   }
 
-  //use it to change the color of the page /you can add any color in the constants.dart
   void changeColor(int value) {
     setState(() {
       colorSelected = ColorSelection.values[value];
     });
   }
 
-  GoRouter routeMaker(BuildContext context) {
-    double deviceWidth = MediaQuery.of(context).size.width;
-    return GoRouter(
-      initialLocation: widget.initialRoute,
-      routerNeglect: false,
+
+
+  late final _router = GoRouter(
+      initialLocation: "/login",
       redirect: _appRedirect,
       routes: [
         GoRoute(builder: (context, state) => LoginPage(), path: '/login'),
@@ -93,49 +95,27 @@ class _StateResidentialTrackerAndBooking
             builder: (context, state) => RegistrationPage(),
             path: '/registration'),
         GoRoute(
-            builder: (context, state) {
-              return LayoutBuilder(builder: (context, constraints) {
-                if (constraints.maxWidth > 800) {
-                  return ForgotPassword(
-                    width: deviceWidth / 2,
-                  );
-                } else {
-                  return ForgotPassword(
-                    width: deviceWidth / 1.1,
-                  );
-                }
-              });
-            },
+            builder: (context, state)=> ForgotPassword(),
+
             path: '/forgot-password'),
         GoRoute(
-            builder: (context, state) {
-              return LayoutBuilder(builder: (context, constraints) {
-                if (constraints.maxWidth > 800) {
-                  return EmailVerificationPage(
-                    width: deviceWidth / 2,
-                  );
-                } else {
-                  return EmailVerificationPage(
-                    width: deviceWidth / 1.1,
-                  );
-                }
-              });
-            },
+            builder: (context, state) => EmailVerificationPage(),
+
             path: '/verification'),
 
-        GoRoute(
-            builder: (context, state) {
-              return StudentDashboard();
-            },
-            path: '/student-dashboard'),
+        // GoRoute(
+        //     builder: (context, state) {
+        //       return StudentDashboard();
+        //     },
+        //     path: '/student-dashboard'),
 
 
         GoRoute(
             builder: (context, state) {
               return LandLordDashboardScreen(
-               //   changeTheme: changeThemeMode,
-               //    changeColor: changeColor,
-               //    colorSelected: colorSelected,
+                changeTheme: changeThemeMode,
+                changeColor: changeColor,
+                colorSelected: colorSelected,
               );
             },
             path: '/landlord-dashboard'),
@@ -143,39 +123,70 @@ class _StateResidentialTrackerAndBooking
 
         GoRoute(
             builder: (context, state) {
-              return ManageHouseListings();
+              return ManageHouseListings(
+                changeTheme: changeThemeMode,
+                changeColor: changeColor,
+                colorSelected: colorSelected,
+              );
             },
             path: '/manageListings',
             routes: [
               GoRoute(
                 path: 'add-house',
-                builder: (context, state) => LayoutBuilder(
-                  builder: (BuildContext context, BoxConstraints constraints) {
-                    if (constraints.maxWidth > 800) {
-                      return AddHouse(width: deviceWidth / 2);
-                    } else {
-                      return AddHouse(width: deviceWidth / 1.1);
-                    }
-                  },
+                builder: (context, state) => AddHouse(
+                  changeTheme: changeThemeMode,
+                  changeColor: changeColor,
+                  colorSelected: colorSelected,
                 ),
+
               ),
               GoRoute(
                   path: 'view-and-update-listings',
-                  builder: (context, state) => ViewAndUpdateListings())
+                  builder: (context, state) => ViewAndUpdateListings(
+                    changeTheme: changeThemeMode,
+                    changeColor: changeColor,
+                    colorSelected: colorSelected,
+                  ))
             ]),
         GoRoute(
-          builder: (context,state) => LandlordProfile(),
+          builder: (context,state) => LandlordProfile(
+            changeTheme: changeThemeMode,
+            changeColor: changeColor,
+            colorSelected: colorSelected,
+          ),
             path: '/landlord-profile'),
         GoRoute(
             builder: (context, state) {
-              return AdminDashboardScreen();
+              return AdminDashboardScreen(
+                changeTheme: changeThemeMode,
+                changeColor: changeColor,
+                colorSelected: colorSelected,
+              );
             },
             path: '/admin-dashboard'),
         GoRoute(
           path: '/admin-settings',
-          builder: (context, state) => AdminSettingsPage(),
+          builder: (context, state) => AdminSettingsPage(
+            changeTheme: changeThemeMode,
+            changeColor: changeColor,
+            colorSelected: colorSelected,
+          ),
           
         ),
+
+        GoRoute(
+            builder: (context, state) {
+              return  ChatScreen(
+                changeTheme: changeThemeMode,
+                changeColor: changeColor,
+                colorSelected: colorSelected,
+              );
+            },
+            path: '/student-dashboard'),
+
+
+
+
       ],
       errorPageBuilder: (context, state) {
         return MaterialPage(
@@ -188,7 +199,7 @@ class _StateResidentialTrackerAndBooking
         );
       },
     );
-  }
+
 
   Future<String?> _appRedirect(
       BuildContext context, GoRouterState state) async {
@@ -229,13 +240,14 @@ class _StateResidentialTrackerAndBooking
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       scrollBehavior: CustomScrollBehavior(),
+      themeMode: themeMode,
       theme:
           ThemeData(colorSchemeSeed: colorSelected.color, useMaterial3: true),
       darkTheme: ThemeData(
           colorSchemeSeed: colorSelected.color,
           useMaterial3: true,
           brightness: Brightness.dark),
-      routerConfig: routeMaker(context),
+      routerConfig: _router,
       title: "Residential Tracker and Booking",
     );
   }

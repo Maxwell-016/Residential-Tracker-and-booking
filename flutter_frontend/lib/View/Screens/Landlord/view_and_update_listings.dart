@@ -9,12 +9,30 @@ import 'package:logger/logger.dart';
 import '../../../View-Model/utils/app_colors.dart';
 import '../../../View-Model/utils/validator.dart';
 import '../../../View-Model/view_model.dart';
+import '../../../constants.dart';
+import '../../Components/SimpleAppBar.dart';
 import '../../Components/function_button.dart';
 import '../../Components/snackbars.dart';
 import '../../Components/text_field.dart';
 
 class ViewAndUpdateListings extends StatefulWidget {
-  const ViewAndUpdateListings({super.key});
+  const ViewAndUpdateListings({
+
+    super.key,
+    required this.changeTheme,
+    required this.changeColor,
+    required this.colorSelected,
+  });
+
+
+  final ColorSelection colorSelected;
+  final void Function(bool useLightMode) changeTheme;
+  final void Function(int value) changeColor;
+
+
+
+
+
 
   @override
   State<ViewAndUpdateListings> createState() => _ViewAndUpdateListingsState();
@@ -27,11 +45,19 @@ class _ViewAndUpdateListingsState extends State<ViewAndUpdateListings> {
     final firebaseServicesProvider = FirebaseServices();
     return SafeArea(
       child: Scaffold(
-        appBar: AppBar(
-          iconTheme: IconThemeData(size: 30.0),
-          centerTitle: true,
-          title: Text("View Listings"),
+
+
+        appBar:PreferredSize(
+          preferredSize: Size.fromHeight(60),
+          child:App_Bar(
+              changeTheme: widget.changeTheme,
+              changeColor: widget.changeColor,
+              colorSelected: widget.colorSelected,
+              title: "View Listings"),
         ),
+
+
+
         body: FutureBuilder(
             future: firebaseServicesProvider.getHouseListing(),
             builder: (context, snapshot) {

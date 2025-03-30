@@ -13,12 +13,25 @@ import 'package:logger/logger.dart';
 
 import '../../../View-Model/utils/app_colors.dart';
 import '../../../View-Model/view_model.dart';
+import '../../../constants.dart';
+import '../../Components/SimpleAppBar.dart';
 
 
-class LandlordProfile extends HookConsumerWidget {
-  const LandlordProfile({super.key});
+class LandlordProfile extends HookConsumerWidget{
+  const LandlordProfile({
+    super.key,
+    required this.changeTheme,
+    required this.changeColor,
+    required this.colorSelected,
+  });
 
-  @override
+
+  final ColorSelection colorSelected;
+  final void Function(bool useLightMode) changeTheme;
+  final void Function(int value) changeColor;
+
+
+@override
   Widget build(BuildContext context,WidgetRef ref) {
     final formKey = GlobalKey<FormState>();
     Logger logger = Logger();
@@ -81,9 +94,22 @@ class LandlordProfile extends HookConsumerWidget {
 
     return SafeArea(
       child: Scaffold(
-        appBar: AppBar(
-          iconTheme: IconThemeData(size: 30.0),
+
+
+        // appBar: AppBar(
+        //   iconTheme: IconThemeData(size: 30.0),
+        // ),
+
+        appBar:PreferredSize(
+          preferredSize: Size.fromHeight(60),
+          child:App_Bar(changeTheme: changeTheme,
+              changeColor: changeColor,
+              colorSelected: colorSelected, title: ""),
         ),
+
+
+
+
         drawer: LandlordSideNav(),
         body: isLoading.value || landlordDetails.value == {} ? Center(child: CircularProgressIndicator(),)
        : SingleChildScrollView(

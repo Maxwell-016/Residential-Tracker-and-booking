@@ -2,8 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_frontend/services/firebase_services.dart';
 import 'package:flutter_frontend/View/Screens/Admin/admin_settings.dart';
 
+import '../../../constants.dart';
+import '../../Components/SimpleAppBar.dart';
+
 class AdminDashboardScreen extends StatefulWidget {
-  const AdminDashboardScreen({super.key});
+  const AdminDashboardScreen({
+
+    super.key,
+    required this.changeTheme,
+    required this.changeColor,
+    required this.colorSelected,
+  });
+
+
+  final ColorSelection colorSelected;
+  final void Function(bool useLightMode) changeTheme;
+  final void Function(int value) changeColor;
+
 
   @override
   State<AdminDashboardScreen> createState() => _AdminDashboardScreenState();
@@ -40,9 +55,19 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Admin Dashboard"),
+
+
+      appBar:PreferredSize(
+        preferredSize: Size.fromHeight(60),
+        child:App_Bar(
+            changeTheme: widget.changeTheme,
+            changeColor: widget.changeColor,
+            colorSelected: widget.colorSelected,
+            title:"Admin Dashboard"),
       ),
+
+
+
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : Column(
@@ -75,7 +100,12 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const AdminSettingsPage(),
+                        builder: (context) =>  AdminSettingsPage(
+
+                          changeTheme: widget.changeTheme,
+                          changeColor: widget.changeColor,
+                          colorSelected: widget.colorSelected,
+                        ),
                       ),
                     );
                   },

@@ -29,7 +29,7 @@ class PasswordField extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final viewModelProvider = ref.watch(viewModel);
-    bool isDark = Theme.of(context).brightness == Brightness.dark;
+   bool isDark = Theme.of(context).brightness == Brightness.dark;
     Color borderColor =
         isDark ? AppColors.lightThemeBackground : AppColors.darkThemeBackground;
     return Padding(
