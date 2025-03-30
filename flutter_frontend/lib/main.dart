@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_frontend/View-Model/navigation/routes.dart';
+import 'package:flutter_frontend/View/Screens/Landlord/landlord_profile.dart';
 import 'package:flutter_frontend/View/Screens/Landlord/view_and_update_listings.dart';
 import 'package:flutter_frontend/constants.dart';
 import 'package:flutter_frontend/services/firebase_services.dart';
@@ -61,6 +62,7 @@ class ResidentialTrackerAndBooking extends ConsumerStatefulWidget {
 
 class _StateResidentialTrackerAndBooking
     extends ConsumerState<ResidentialTrackerAndBooking> {
+
   ThemeMode themeMode = ThemeMode.light;
   ColorSelection colorSelected = ColorSelection.blue;
 
@@ -119,16 +121,25 @@ class _StateResidentialTrackerAndBooking
               });
             },
             path: '/verification'),
+
         GoRoute(
             builder: (context, state) {
-              return StudentDashboardScreen();
+              return StudentDashboard();
             },
             path: '/student-dashboard'),
+
+
         GoRoute(
             builder: (context, state) {
-              return LandLoardDashboardScreen();
+              return LandLordDashboardScreen(
+               //   changeTheme: changeThemeMode,
+               //    changeColor: changeColor,
+               //    colorSelected: colorSelected,
+              );
             },
             path: '/landlord-dashboard'),
+
+
         GoRoute(
             builder: (context, state) {
               return ManageHouseListings();
@@ -151,6 +162,9 @@ class _StateResidentialTrackerAndBooking
                   path: 'view-and-update-listings',
                   builder: (context, state) => ViewAndUpdateListings())
             ]),
+        GoRoute(
+          builder: (context,state) => LandlordProfile(),
+            path: '/landlord-profile'),
         GoRoute(
             builder: (context, state) {
               return AdminDashboardScreen();

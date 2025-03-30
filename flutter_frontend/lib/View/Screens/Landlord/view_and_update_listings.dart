@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_frontend/View/Components/house_card.dart';
+import 'package:flutter_frontend/View/Components/image_builder.dart';
 import 'package:flutter_frontend/services/firebase_services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -22,6 +23,7 @@ class ViewAndUpdateListings extends StatefulWidget {
 class _ViewAndUpdateListingsState extends State<ViewAndUpdateListings> {
   @override
   Widget build(BuildContext context) {
+    Logger logger = Logger();
     final firebaseServicesProvider = FirebaseServices();
     return SafeArea(
       child: Scaffold(
@@ -75,13 +77,14 @@ class _ViewAndUpdateListingsState extends State<ViewAndUpdateListings> {
                         houseName: houses[index]['House Name'],
                         price: houses[index]['House Price'].toString(),
                         houseSize: houses[index]['House Size'],
+                        imageUrl: houses[index]['Images'][0],
                         onDeletePressed: () async {
                           await dialogBox(context, 'Delete',
                               'Are you sure you want to delete house ${houses[index]['House Name']}',
                               () async {
                             try {
                               await firebaseServicesProvider
-                                  .deleteDocById(houses[index]['Id']);
+                                  .deleteDocById(houses[index]['House Name']);
                               setState(() {});
                               if (!context.mounted) return;
                               SnackBars.showSuccessSnackBar(context,
@@ -130,6 +133,9 @@ class HouseDetails extends HookConsumerWidget {
     FocusNode descFocus = useFocusNode();
     Future.microtask(() {
       ref.read(selectedHouseSize.notifier).state = house['House Size'];
+      ref.read(houseLocationProvider.notifier).state = house['Location'];
+      ref.read(bookingStatusProvider.notifier).state =
+          house['isBooked'] ? 'Booked' : 'Not Booked';
     });
     String selectedSize = ref.watch(selectedHouseSize);
 
@@ -145,6 +151,23 @@ class HouseDetails extends HookConsumerWidget {
       'Electricity': selectedAmenities.value.contains('Electricity'),
     });
 
+    List<String> areas = [
+      'Mwiyala',
+      'Lurambi',
+      'Sichirayi',
+      'Amalemba',
+      'Kefinco',
+      'Milimani',
+      'Shinyalu',
+      'Koromatangi',
+      'Kakamega Town',
+      'Mudiri',
+      'Lubao',
+      'Stage Mandazi',
+      'Khayega'
+    ];
+    areas.sort((a, b) => a.compareTo(b));
+
     String imageName = 'Select images';
 
     bool isDark = Theme.of(context).brightness == Brightness.dark;
@@ -153,6 +176,9 @@ class HouseDetails extends HookConsumerWidget {
     final deviceWidth = MediaQuery.of(context).size.width;
 
     double width = deviceWidth > 800 ? deviceWidth / 2.2 : deviceWidth / 1.1;
+
+    String selectedLocation = ref.watch(houseLocationProvider);
+    String bookingStatus = ref.watch(bookingStatusProvider);
 
     return SafeArea(
       child: Scaffold(
@@ -169,29 +195,11 @@ class HouseDetails extends HookConsumerWidget {
                 spacing: 20.0,
                 runSpacing: 20.0,
                 children: [
-                  Column(
-                    spacing: 30.0,
-                    children: [
-                      //display the images of the house
-                      Image.asset(
-                        'assets/launch.png',
-                        fit: BoxFit.fill,
-                        filterQuality: FilterQuality.high,
+                  Center(
+                    child: ImageBuilder(
+                        imageUrls: house['Images'],
                         width: width,
-                      ),
-                      Image.asset(
-                        'assets/launch.png',
-                        fit: BoxFit.fill,
-                        filterQuality: FilterQuality.high,
-                        width: width,
-                      ),
-                      Image.asset(
-                        'assets/launch.png',
-                        fit: BoxFit.fill,
-                        filterQuality: FilterQuality.high,
-                        width: width,
-                      ),
-                    ],
+                        placeholderAsset: 'assets/launch.png'),
                   ),
                   //form
                   Card(
@@ -210,6 +218,41 @@ class HouseDetails extends HookConsumerWidget {
                                 fieldValidator: Validators.fieldValidator,
                                 focusNode: houseNameFocus,
                                 width: width),
+
+                            Column(
+                              spacing: 10,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Location'),
+                                Container(
+                                  decoration: BoxDecoration(
+                                      border: Border.all(
+                                        color: borderColor,
+                                        width: 1.0,
+                                      ),
+                                      borderRadius:
+                                          BorderRadius.circular(10.0)),
+                                  width: width,
+                                  child: DropdownButton(
+                                    padding: EdgeInsets.only(left: 20.0),
+                                    underline: SizedBox(),
+                                    menuWidth: width,
+                                    items: areas.map((entry) {
+                                      return DropdownMenuItem(
+                                        value: entry,
+                                        child: Text(entry),
+                                      );
+                                    }).toList(),
+                                    value: selectedLocation,
+                                    onChanged: (String? value) {
+                                      ref
+                                          .read(houseLocationProvider.notifier)
+                                          .state = value!;
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
                             //location selection
                             MyTextField(
                                 label: 'Price',
@@ -263,30 +306,40 @@ class HouseDetails extends HookConsumerWidget {
                                   // logger.i('Images field');
                                   // imagePickerService.pickImages();
                                 },
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  spacing: 10,
-                                  children: [
-                                    Text('Images'),
-                                    Container(
-                                      width: width,
-                                      decoration: BoxDecoration(
-                                        borderRadius:
-                                            BorderRadius.circular(10.0),
-                                        border: Border.all(
-                                            color: borderColor, width: 1.0),
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(15.0),
-                                        child: Text(
-                                          imageName,
-                                          style: TextStyle(
-                                              color: Colors.grey,
-                                              fontSize: 14.0),
+                                child: GestureDetector(
+                                  onTap: (){
+
+
+                                    //TODO: add image picking logic
+
+
+
+                                  },
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    spacing: 10,
+                                    children: [
+                                      Text('Images'),
+                                      Container(
+                                        width: width,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(10.0),
+                                          border: Border.all(
+                                              color: borderColor, width: 1.0),
                                         ),
-                                      ),
-                                    )
-                                  ],
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(15.0),
+                                          child: Text(
+                                            imageName,
+                                            style: TextStyle(
+                                                color: Colors.grey,
+                                                fontSize: 14.0),
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  ),
                                 )),
                             MyTextField(
                                 label: 'Description',
@@ -358,6 +411,42 @@ class HouseDetails extends HookConsumerWidget {
                                 ),
                               ],
                             ),
+
+                            Column(
+                              spacing: 10,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Booking Status'),
+                                Container(
+                                  decoration: BoxDecoration(
+                                      border: Border.all(
+                                        color: borderColor,
+                                        width: 1.0,
+                                      ),
+                                      borderRadius:
+                                          BorderRadius.circular(10.0)),
+                                  width: width,
+                                  child: DropdownButton(
+                                    padding: EdgeInsets.only(left: 20.0),
+                                    underline: SizedBox(),
+                                    menuWidth: width,
+                                    items:
+                                        ['Booked', 'Not Booked'].map((entry) {
+                                      return DropdownMenuItem(
+                                        value: entry,
+                                        child: Text(entry),
+                                      );
+                                    }).toList(),
+                                    value: bookingStatus,
+                                    onChanged: (String? value) {
+                                      ref
+                                          .read(bookingStatusProvider.notifier)
+                                          .state = value!;
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
                             FunctionButton(
                               text: 'Update Details',
                               onPressed: () async {
@@ -369,14 +458,17 @@ class HouseDetails extends HookConsumerWidget {
                                       String? message =
                                           await firebaseServicesProvider
                                               .updateListings(
-                                                  house['Id'],
-                                                  houseNameController.text,
-                                                  int.parse(
-                                                      priceController.text),
-                                                  selectedSize,
-                                                  null,
-                                                  descController.text,
-                                                  selectedAmenities.value);
+                                        houseNameController.text,
+                                        selectedLocation,
+                                        int.parse(priceController.text),
+                                        selectedSize,
+                                        null,
+                                        descController.text,
+                                        selectedAmenities.value,
+                                        bookingStatus == 'Booked'
+                                            ? true
+                                            : false,
+                                      );
                                       if (!context.mounted) return;
                                       if (message == null) {
                                         SnackBars.showSuccessSnackBar(context,
@@ -460,31 +552,9 @@ class HouseDetails extends HookConsumerWidget {
                                     houseName: houses[index]['House Name'],
                                     price:
                                         houses[index]['House Price'].toString(),
+                                    imageUrl: houses[index]['Images'][0],
                                     houseSize: houses[index]['House Size'],
-                                    // onDeletePressed: () async {
-                                    //   await dialogBox(context, 'Delete',
-                                    //       'Are you sure you want to delete house ${houses[index]['House Name']}',
-                                    //       () async {
-                                    //     try {
-                                    //       await firebaseServicesProvider
-                                    //           .deleteDocById(
-                                    //               houses[index]['Id']);
-                                    //       setState(() {
-                                    //         houses.removeAt(index);
-                                    //       });
-                                    //       if (!context.mounted) return;
-                                    //       SnackBars.showSuccessSnackBar(context,
-                                    //           'House ${houses[index]['House Name']} deleted successfully');
-                                    //       Navigator.pop(context);
-                                    //     } catch (e) {
-                                    //       if (!context.mounted) return;
-                                    //       SnackBars.showErrorSnackBar(context,
-                                    //           'An error occurred trying to delete house ${houses[index]['House Name']}');
-                                    //       Navigator.pop(context);
-                                    //     }
-                                    //   });
-                                    // }
-                                    )
+                                  )
                                 : null,
                           );
                         });

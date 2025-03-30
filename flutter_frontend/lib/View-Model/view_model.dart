@@ -8,6 +8,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final selectedNameProvider = StateProvider<String>((ref) => 'Student');
 final selectedHouseSize = StateProvider<String>((ref) => 'Single');
+final houseLocationProvider = StateProvider<String>((ref) => 'Kakamega Town');
+final bookingStatusProvider = StateProvider<String>((ref) => 'Not Booked');
 
 final viewModel =
     ChangeNotifierProvider.autoDispose<ViewModel>((ref) => ViewModel());
