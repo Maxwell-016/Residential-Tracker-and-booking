@@ -30,7 +30,7 @@ class ChatService {
           " 2 See all locations with available houses\n"
           " 3 Report for an emergency\n"
           " 4 Ask for help and related questions\n"
-          "\n"
+          " 5 Send feedback to the landlord\n\n"
           "Which option would you like me to assist you with? (Reply with one of the above options eg 1 or option 1)":
       "I see you haven't provided a name. Please enter your full name:";
 
@@ -86,7 +86,7 @@ class ChatService {
 
   Future<List<Map<String, dynamic>>> getHousesByLocation(String location) async {
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-        .collectionGroup('Houses') // Fetch houses from all landlords
+        .collectionGroup('Houses')
         .where('Location', isEqualTo: location)
         .where("isBooked",isEqualTo: false)
         .get();
@@ -94,7 +94,7 @@ class ChatService {
     return querySnapshot.docs.map((doc) {
       return {
         "id": doc.id, // House ID
-        "landlordId": doc.reference.parent.parent?.id, // Extract landlord ID
+        "landlordId": doc.reference.parent.parent?.id,
         ...doc.data() as Map<String, dynamic>
       };
     }).toList();
@@ -158,67 +158,53 @@ class ChatService {
   }
 
 
+  Future<List<String>> getAllLocations() async {
+    Set<String> uniqueLocations = {};
 
-// Future<void> bookHouse(String houseId, String landlordId, String paymentOption) async {
-  //   try {
-  //     // Reference to the specific house document in Firestore
-  //     DocumentReference houseRef = firestore
-  //         .collection("Landlords")
-  //         .doc(landlordId)
-  //         .collection("Houses")
-  //         .doc(houseId);
-  //
-  //     // Update the `isBooked` field in Firestore
-  //     await houseRef.update({"isBooked": true, "paymentOption": paymentOption});
-  //
-  //     print("House $houseId booked successfully!");
-  //   } catch (e) {
-  //     print("Error booking house: $e");
-  //   }
-  // }
-  //
-  //
-  // //
-  // Future<void> initiatePayment(Map<String, dynamic> house, String paymentOption) async {
-  //   String? email = auth.currentUser?.email;
-  //   if (email == null) return;
-  //
-  //   DocumentSnapshot landlordDoc = await firestore.collection("Landlords").doc(house["landlordId"]).get();
-  //   String landlordPhone = landlordDoc.get("Phone Number");
-  //   String name = landlordDoc.get("Name");
-  //
-  //   var response = await http.post(
-  //     Uri.parse("https://mpesaapi.onrender.com/stkpush"),
-  //     headers: {"Content-Type": "application/json"},
-  //     body: jsonEncode({
-  //       "phone": "STUDENT_PHONE_NUMBER",
-  //       "amount": house["House Price"]/1000,
-  //       "callbackUrl": "https://mpesaapi.onrender.com/callback",
-  //     }),
-  //   );
-  //
-  //   if (response.statusCode == 200) {
-  //     await http.get(Uri.parse("https://mpesaapi.onrender.com/callback"));
-  //
-  //     await firestore.collection("booked_students").doc(email).set({
-  //       "email": email,
-  //       "name": auth.currentUser?.displayName ?? "Unknown",
-  //       "stdContact": "STUDENT_PHONE_NUMBER",
-  //       "houseName": house["House Name"],
-  //       "houseLocation": house["Location"],
-  //       "payment_status": "Paid",
-  //       "amount_paid": house["House Price"],
-  //       "landlordContact": landlordPhone,
-  //       "landlord":name,
-  //     });
-  //
-  //     await firestore.collection("Landlords").doc(house["landlordId"])
-  //         .collection("Houses").doc(house["id"])
-  //         .update({"isBooked": true});
-  //   }
-  // }
-  //
-  //
+    try {
+      QuerySnapshot landlords = await firestore.collection("Landlords").get();
+
+      for (var landlord in landlords.docs) {
+        QuerySnapshot housesSnapshot =
+        await landlord.reference.collection("Houses").get();
+
+        for (var house in housesSnapshot.docs) {
+          var houseData = house.data() as Map<String, dynamic>;
+
+          if (!(houseData["isBooked"] ?? true) && houseData.containsKey("Location")) {
+            uniqueLocations.add(houseData["Location"]);
+          }
+        }
+      }
+
+      print("found $uniqueLocations");
+    } catch (e) {
+      print("Error fetching locations: $e");
+    }
+
+    return uniqueLocations.toList();
+  }
+
+
+
+
+  Future<String> handleOption2() async {
+    List<String> locations = await getAllLocations();
+
+    if (locations.isEmpty) {
+      return "Currently, there are no available houses in any location.";
+    }
+
+    String locationList =
+    locations.asMap().entries.map((e) => "${e.key + 1}. ${e.value}").join("\n");
+
+    return "Here are the locations with available houses:\n$locationList\n\n"
+        "Would you like to see the available houses in a specific location? (Reply with the location name)";
+  }
+
+
+
+
 
 
 

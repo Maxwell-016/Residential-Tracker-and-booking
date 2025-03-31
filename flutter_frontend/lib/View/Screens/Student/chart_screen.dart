@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_frontend/View-Model/view_model.dart';
 import 'package:flutter_frontend/View/Components/house_item.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
@@ -12,9 +13,12 @@ import '../../../chartbot_fun/ai_funs.dart';
 import '../../../constants.dart';
 import '../../../data/chart_provider.dart';
 import '../../../data/notifications.dart';
+import '../../../data/providers.dart';
 import '../../Components/SimpleAppBar.dart';
+import 'chart_app_bar.dart';
+import 'mapit.dart';
 
-class ChatScreen extends StatefulWidget {
+class ChatScreen extends ConsumerStatefulWidget {
   const ChatScreen({
     super.key,
     required this.changeTheme,
@@ -29,10 +33,10 @@ class ChatScreen extends StatefulWidget {
 
 
   @override
-  State<ChatScreen> createState() => _ChatScreenState();
+  ConsumerState<ChatScreen> createState() => _ChatScreenState();
 }
 
-class _ChatScreenState extends State<ChatScreen> {
+class _ChatScreenState extends ConsumerState<ChatScreen> {
   final TextEditingController _controller = TextEditingController();
   final ChatService chatService = ChatService();
   final ScrollController _scrollController = ScrollController();
@@ -47,12 +51,12 @@ class _ChatScreenState extends State<ChatScreen> {
 bool awaitingPhoneNumberInput=false;
   var showHouses=false;
 
-  String conversationStep = "select_option"; // Track user state: 'select_option' or 'enter_location'
+  String conversationStep = "select_option";
 
   List<Map<String, dynamic>> messages = [];
   bool isTyping = false;
 
-  String? awaitingLocationInput; // To track if we're expecting a location input
+  String? awaitingLocationInput;
    Map<String, dynamic> house={};
 
 
@@ -130,7 +134,8 @@ bool awaitingPhoneNumberInput=false;
             " 2 See all locations with available houses\n"
             " 3 Report for an emergency\n"
             " 4 Ask for help and related questions\n"
-            "\n"
+                  " 5 Send feedback to the landlord\n\n"
+
             "Which option would you like me to assist you with? (Reply with one of the above options eg 1 or option 1)"
             });
             isTyping=false;
@@ -197,6 +202,7 @@ bool awaitingPhoneNumberInput=false;
         aiResponse = "Sorry, I couldn't find a house with that name. Please try again.";
       }
     }
+
     else if (conversationStep == "select_option") {
 
       aiResponse = await validateOption(userMessage);
@@ -204,7 +210,22 @@ bool awaitingPhoneNumberInput=false;
         setState(() {
           conversationStep = "enter_location";
         });
+      }else if(aiResponse.contains("Viewing all locations with available houses.")) {
+
+
+
+          conversationStep = "view_locations";
+        aiResponse=await chatService.handleOption2();
+
+
+
+
+
       }
+
+
+
+
     }
     else if (conversationStep == "enter_location") {
       bool isValid = await validateLocation(userMessage);
@@ -237,7 +258,7 @@ bool awaitingPhoneNumberInput=false;
 
         }
 
-        conversationStep = "select_option";
+      //  conversationStep = "select_option";
       } else {
         aiResponse = "I couldn't find that location. Please enter a valid location.";
       }
@@ -410,6 +431,7 @@ bool awaitingPhoneNumberInput=false;
           "payment_status": "Paid",
           "amount_paid": amountToPay,
           "landlordContact": landlordPhone,
+          "landlordId":landlordId,
           "landlord": lname,
 
         });
@@ -455,12 +477,18 @@ bool awaitingPhoneNumberInput=false;
 
   @override
   Widget build(BuildContext context) {
-    bool isDark = Theme.of(context).brightness == Brightness.dark;
+    var screenWidth=MediaQuery.of(context).size.width;
+
     return Scaffold(
 
-      appBar:PreferredSize(
+      appBar:
+
+
+      PreferredSize(
         preferredSize: Size.fromHeight(60),
-        child:App_Bar(changeTheme: widget.changeTheme,
+        child:
+
+        Chat_Bar(changeTheme: widget.changeTheme,
             changeColor: widget.changeColor,
             colorSelected: widget.colorSelected,
 
@@ -469,95 +497,257 @@ bool awaitingPhoneNumberInput=false;
 
 
 
-      body: Column(
-        children: [
+      body:ref.watch(toggleMenu)?
           Expanded(
-            child: Stack(
-              children: [
+              child:
+              Row(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              border: Border(
+                right: BorderSide(
+                  color: Colors.grey,
+                  width: 3.0,
+                ),
+              ),
+            ),
+            width:180 ,
+           // height: double.infinity,
 
-                ListView.builder(
-                  controller: _scrollController,
-                  itemCount: messages.length + (isTyping ? 1 : 0),
-                  itemBuilder: (context, index) {
-
-                    if (isTyping && index == messages.length) {
-                      return Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text("Typing...", style: TextStyle(
-                            fontStyle: FontStyle.italic
-                        )),
-                      );
-                    }
-                    final message = messages[index];
-
-
-
-                    if (message.containsKey("house") && message["house"] != null && showHouses) {
-                      final house = message["house"];
-
-                      if (house is Map<String, dynamic>) {
-
-                   return HouseCard(house: house);
-
-                      }
-                    }
+            child: Column(
+                children: [
+                SizedBox(height: 20),
 
 
+  ] ),
+
+          ),
+Expanded(
+    child:
+AiPage()
+),
+
+        ],
+      )
+          ):
+          AiPage()
+
+
+
+
+    );
+  }
+
+  Widget AiPage() {
+    bool isDark = Theme.of(context).brightness == Brightness.dark;
+var screenWidth=MediaQuery.of(context).size.width;
+    var screenHeight=MediaQuery.of(context).size.width;
+    return Column(
+      children: [
+        Expanded(
+          child: Stack(
+            children: [
+              ListView.builder(
+                controller: _scrollController,
+                itemCount: messages.length + (isTyping ? 1 : 0),
+                itemBuilder: (context, index) {
+                  if (isTyping && index == messages.length) {
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        "Typing...",
+                        style: TextStyle(fontStyle: FontStyle.italic),
+                      ),
+                    );
+                  }
+
+                  final message = messages[index];
+
+                  // Show the map inside AI chat when viewing locations
+                  if (conversationStep == "view_locations" && index == messages.length - 1) {
                     return Align(
-                      alignment: message["role"] == "user" ? Alignment.centerRight : Alignment.centerLeft,
+                      alignment: Alignment.centerLeft,
                       child: Container(
                         margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                        padding: EdgeInsets.all(12),
+                        padding: EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color:
-                          message["role"] == "user" ?
-                                  isDark? Colors.blue:Colors.blue[200]
-                              :
-                          isDark? Colors.grey[900]:Colors.grey[300],
-
-
+                          color: isDark ? Colors.grey[900] : Colors.grey[300],
                           borderRadius: BorderRadius.circular(15),
                         ),
-                        child: Text(
-                          message['text']??"",
-                          style: TextStyle(fontSize: 16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Here are all available locations:",
+                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
+                            SizedBox(height: 10),
+                            SizedBox(
+                              width: screenWidth*0.6,
+                              height: screenHeight*0.3,
+                              child: MapScreen(),
+                            ),
+                          ],
                         ),
                       ),
                     );
-                  },
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.all(8.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
+                  }
 
-                    controller: _controller,
-                    textInputAction: TextInputAction.done,
-                    keyboardType:conversationStep == "enter_number"?TextInputType.phone:TextInputType.text,
-                    decoration: InputDecoration(
-                      label:  Text(awaitingPhoneNumberInput?"Enter number to pay eg 254000000000":"Type a message..."),
-                      hintText: awaitingPhoneNumberInput?"eg 254712845678":"Type a message...",
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                  // Show House Listings if applicable
+                  if (message.containsKey("house") && message["house"] != null && showHouses) {
+                    final house = message["house"];
+                    if (house is Map<String, dynamic>) {
+                      return HouseCard(house: house);
+                    }
+                  }
+
+                  // Show normal messages
+                  return Align(
+                    alignment: message["role"] == "user" ? Alignment.centerRight : Alignment.centerLeft,
+                    child: Container(
+                      margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                      padding: EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: message["role"] == "user"
+                            ? isDark ? Colors.blue : Colors.blue[200]
+                            : isDark ? Colors.grey[900] : Colors.grey[300],
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Text(
+                        message['text'] ?? "",
+                        style: TextStyle(fontSize: 16),
+                      ),
                     ),
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.all(8.0),
+          child: Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _controller,
+                  textInputAction: TextInputAction.done,
+                  keyboardType: conversationStep == "enter_number" ? TextInputType.phone : TextInputType.text,
+                  decoration: InputDecoration(
+                    label: Text(awaitingPhoneNumberInput ? "Enter number to pay e.g. 254000000000" : "Type a message..."),
+                    hintText: awaitingPhoneNumberInput ? "e.g. 254712845678" : "Type a message...",
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                   ),
                 ),
-                SizedBox(width: 10),
-                IconButton(
-                  icon: Icon(Icons.send, color: Colors.blue),
-                  onPressed: sendMessage,
-                )
-              ],
-            ),
-          )
-        ],
-      ),
+              ),
+              SizedBox(width: 10),
+              IconButton(
+                icon: Icon(Icons.send, color: Colors.blue),
+                onPressed: sendMessage,
+              )
+            ],
+          ),
+        )
+      ],
     );
   }
+
+
+// Widget AiPage(){
+  //
+  //   bool isDark = Theme.of(context).brightness == Brightness.dark;
+  //   return  Column(
+  //     children: [
+  //       Expanded(
+  //         child: Stack(
+  //           children: [
+  //
+  //             ListView.builder(
+  //               controller: _scrollController,
+  //               itemCount: messages.length + (isTyping ? 1 : 0),
+  //               itemBuilder: (context, index) {
+  //
+  //                 if (isTyping && index == messages.length) {
+  //                   return Padding(
+  //                     padding: const EdgeInsets.all(8.0),
+  //                     child: Text("Typing...", style: TextStyle(
+  //                         fontStyle: FontStyle.italic
+  //                     )),
+  //                   );
+  //                 }
+  //                 final message = messages[index];
+  //
+  //
+  //
+  //                 if (message.containsKey("house") && message["house"] != null && showHouses) {
+  //                   final house = message["house"];
+  //
+  //                   if (house is Map<String, dynamic>) {
+  //
+  //                     return HouseCard(house: house);
+  //
+  //                   }
+  //                 }
+  //
+  //
+  //                 return Align(
+  //                   alignment: message["role"] == "user" ? Alignment.centerRight : Alignment.centerLeft,
+  //                   child: Container(
+  //                     margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+  //                     padding: EdgeInsets.all(12),
+  //                     decoration: BoxDecoration(
+  //                       color:
+  //                       message["role"] == "user" ?
+  //                       isDark? Colors.blue:Colors.blue[200]
+  //                           :
+  //                       isDark? Colors.grey[900]:Colors.grey[300],
+  //
+  //
+  //                       borderRadius: BorderRadius.circular(15),
+  //                     ),
+  //                     child: Text(
+  //                       message['text']??"",
+  //                       style: TextStyle(fontSize: 16),
+  //                     ),
+  //                   ),
+  //                 );
+  //               },
+  //             ),
+  //           ],
+  //         ),
+  //       ),
+  //       Padding(
+  //         padding: EdgeInsets.all(8.0),
+  //         child: Row(
+  //           children: [
+  //             Expanded(
+  //               child: TextField(
+  //
+  //                 controller: _controller,
+  //                 textInputAction: TextInputAction.done,
+  //                 keyboardType:conversationStep == "enter_number"?TextInputType.phone:TextInputType.text,
+  //                 decoration: InputDecoration(
+  //                   label:  Text(awaitingPhoneNumberInput?"Enter number to pay eg 254000000000":"Type a message..."),
+  //                   hintText: awaitingPhoneNumberInput?"eg 254712845678":"Type a message...",
+  //                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+  //                 ),
+  //               ),
+  //             ),
+  //             SizedBox(width: 10),
+  //             IconButton(
+  //               icon: Icon(Icons.send, color: Colors.blue),
+  //               onPressed: sendMessage,
+  //             )
+  //           ],
+  //         ),
+  //       )
+  //     ],
+  //   );
+  //
+  //
+  // }
+
+
 }
 
 

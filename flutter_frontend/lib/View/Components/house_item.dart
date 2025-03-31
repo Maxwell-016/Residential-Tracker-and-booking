@@ -137,47 +137,7 @@ class _StateHouseCard extends ConsumerState<HouseCard> {
 
 
 
-  // void _showPaymentOptions() {
-  //   double housePrice = widget.house["House Price"] ?? 0.0;
-  //   double monthlyPayment = housePrice;
-  //   double semesterPayment = housePrice * 4;
-  //
-  //   showDialog(
-  //     context: context,
-  //     builder: (context) => AlertDialog(
-  //       title: Text("Select Payment Option"),
-  //       content: Column(
-  //         mainAxisSize: MainAxisSize.min,
-  //         children: [
-  //           ListTile(
-  //             title: Text("Pay for the first month - Ksh $monthlyPayment"),
-  //             leading: Radio<String>(
-  //               value: "first_month",
-  //               groupValue: selectedPayment,
-  //               onChanged: (value) {
-  //                 setState(() => selectedPayment = value);
-  //                 Navigator.pop(context);
-  //                 _processBooking("first_month");
-  //               },
-  //             ),
-  //           ),
-  //           ListTile(
-  //             title: Text("Pay per semester - Ksh $semesterPayment"),
-  //             leading: Radio<String>(
-  //               value: "semester",
-  //               groupValue: selectedPayment,
-  //               onChanged: (value) {
-  //                 setState(() => selectedPayment = value);
-  //                 Navigator.pop(context);
-  //                 _processBooking("semester");
-  //               },
-  //             ),
-  //           ),
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
+
 
   void _showPaymentOptions() {
     double housePrice = widget.house["House Price"]/1000 ?? 0.0;
@@ -315,6 +275,7 @@ class _StateHouseCard extends ConsumerState<HouseCard> {
           "payment_status": "Paid",
           "amount_paid": amountToPay,
           "landlordContact": landlordPhone,
+          "landlordId":landlordId,
           "landlord": landlordName,
         });
 
@@ -427,3 +388,4 @@ class _StateHouseCard extends ConsumerState<HouseCard> {
     );
   }
 }
+

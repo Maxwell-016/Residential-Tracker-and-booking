@@ -13,8 +13,10 @@ final houseLocationProvider = StateProvider<String>((ref) => 'kakamega town');
 final bookingStatusProvider = StateProvider<String>((ref) => 'Not Booked');
 final locationProvider = StateProvider<LatLng>((ref) => LatLng(0.2832, 34.7543));
 
-final viewModel =
-    ChangeNotifierProvider.autoDispose<ViewModel>((ref) => ViewModel());
+
+
+
+final viewModel = ChangeNotifierProvider.autoDispose<ViewModel>((ref) => ViewModel());
 
 class ViewModel extends ChangeNotifier {
   bool isObscured = true;
