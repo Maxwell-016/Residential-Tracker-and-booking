@@ -11,6 +11,7 @@ import 'package:http/http.dart' as http;
 import '../../../chartbot_fun/ai_funs.dart';
 import '../../../constants.dart';
 import '../../../data/chart_provider.dart';
+import '../../../data/notifications.dart';
 import '../../Components/SimpleAppBar.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -43,7 +44,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   bool nameAvailable=false;
 
-bool enterno=false;
+bool awaitingPhoneNumberInput=false;
   var showHouses=false;
 
   String conversationStep = "select_option"; // Track user state: 'select_option' or 'enter_location'
@@ -93,6 +94,27 @@ bool enterno=false;
     _controller.clear();
 
 
+    if ( conversationStep == "enter_number") {
+      if (await validatePhoneNumber(userMessage)) {
+        await chatService.savePhoneNumber(userMessage);
+        setState(() {
+          messages.add({"role": "ai", "text": "Phone number saved successfully. Proceeding with booking..."});
+          awaitingPhoneNumberInput = false;
+          showHouses=true;
+        });
+
+
+        bookHouse(houseop, paymentOP);
+      } else {
+        setState(() {
+          messages.add({"role": "ai", "text": "Invalid phone number. Please enter a valid 12-digit Kenyan number starting with 254."});
+        });
+      }
+      return;
+    }
+
+
+
     if (messages.isNotEmpty) {
       if (messages.any((map) =>
       map["text"]?.contains("Please enter your full name:") ?? false) &&
@@ -125,27 +147,16 @@ bool enterno=false;
 
 
 
+
+
+
+
     String aiResponse = "";
 
 
 
-     if (conversationStep == "enter_number") {
 
-    if(enterno){
-
-      aiResponse= "Please enter your phone number for payment:";
-
-
-    if(userMessage.isNotEmpty){
-    print(userMessage);
-    }
-
-
-    }
-
-
-    }
-    else if (showHouses) {
+     if (showHouses) {
       List<Map<String, dynamic>> houses = await chatService.getAllHouses();
       var selectedHouse = houses.firstWhere(
             (house) => house["House Name"].toLowerCase() == userMessage.toLowerCase(),
@@ -168,12 +179,14 @@ bool enterno=false;
 
         setState(() {
           conversationStep = "enter_number";
-        });
 
+        });
+       aiResponse="Please enter your phone number for payment (must start with 254).";
 
 
           setState(() {
-          showHouses = true;
+          showHouses = false;
+          isTyping=false;
         });
 
 
@@ -202,7 +215,7 @@ bool enterno=false;
           for (var house in houses) {
             messages.add({
               "role": "ai",
-              "text": "🏠 ${house["House Name"]} - ${house["House Price"]} Ksh\n📍 ${house["location"]}",
+              "text": "🏠 ${house["House Name"]} -> Booking",
               "house": house,
             });
           }
@@ -317,25 +330,19 @@ bool enterno=false;
 
     String? studentEmail = auth.currentUser?.email;
     String? studentName =await chatService.getUserName();
+    String? studentPhone = await chatService.getUserPhone();
 
 
-    DocumentSnapshot studentDoc = await fs.collection("applicants_details").doc(studentEmail).get();
-    String studentPhone = studentDoc.exists ? studentDoc.get("phone") ?? "" : "";
-
-
-    if (studentPhone.isEmpty) {
+    if (studentPhone == null || studentPhone.isEmpty) {
       setState(() {
-   enterno=true;
+
+        awaitingPhoneNumberInput = true;
       });
-      // Wait for user input
-      while (studentPhone.isEmpty) {
-        await Future.delayed(Duration(seconds: 1));
-        DocumentSnapshot updatedDoc = await fs.collection("applicants_details").doc(studentEmail).get();
-        studentPhone = updatedDoc.exists ? updatedDoc.get("phone") ?? "" : "";
-      }
+      return;
     }
 
-    // Save phone number in Firebase if not already stored
+
+
     await fs.collection("applicants_details").doc(studentEmail).set(
       {"phone": studentPhone},
       SetOptions(merge: true),
@@ -411,18 +418,32 @@ bool enterno=false;
             .doc(houseId)
             .update({"isBooked": true});
 
-        print(
-            "$houseName has been booked successfully with the '$paymentOption' option!");
+
+       String msg="$houseName has been booked successfully with the '$paymentOption' option!";
+       print(msg  );
+       trigernotification(null, msg, "House Booked Successfully");
 
         });
 
       } else {
-        print("Payment failed. Booking not completed.");
+
+
+
+
+        String msg="Booking not completed.";
+        print(msg);
+        trigernotification(null, msg, "Payment failed!!");
+
       }
 
 
     } else {
-      print("Error: M-Pesa request failed.");
+
+
+      String msg="Error: M-Pesa request failed.";
+      print(msg);
+      trigernotification(null, msg, "Payment failed!!");
+
     }
   }
 
@@ -515,8 +536,8 @@ bool enterno=false;
                     textInputAction: TextInputAction.done,
                     keyboardType:conversationStep == "enter_number"?TextInputType.phone:TextInputType.text,
                     decoration: InputDecoration(
-                      label:  Text(conversationStep == "enter_number"?"Enter number to pay eg 254000000000":"Type a message..."),
-                      hintText: conversationStep == "enter_number"?"eg 254712845678":"Type a message...",
+                      label:  Text(awaitingPhoneNumberInput?"Enter number to pay eg 254000000000":"Type a message..."),
+                      hintText: awaitingPhoneNumberInput?"eg 254712845678":"Type a message...",
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                     ),
                   ),

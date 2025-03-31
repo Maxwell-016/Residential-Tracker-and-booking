@@ -75,6 +75,9 @@ Future<bool> validatePhoneNumber(String phn) async {
 
 
 
+bool isValidKenyanPhoneNumber(String phoneNumber) {
+  return RegExp(r'^254\d{9}$').hasMatch(phoneNumber);
+}
 
 
 

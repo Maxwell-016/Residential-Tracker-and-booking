@@ -164,10 +164,21 @@ class _StateHouseCard extends ConsumerState<HouseCard> {
 
 
                   SizedBox(height: 8),
-                  Text("🏠 ${"House Name "+widget.house["House Name"]}\t\t-\t\t Ksh  ${widget.house["House Price"]}  per month",
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 16)),
-                  Text("📍 ${widget.house["Location"]}"),
+                  ListTile(
+                    leading:  Text("🏠 ${"House Name -> "+widget.house["House Name"]} ",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 16)
+                    ),
+                    trailing:  Text("Price Ksh  ${widget.house["House Price"]}  per month",
+                  style: TextStyle(
+                  fontWeight: FontWeight.bold, fontSize: 16)
+                    ),
+
+                  ),
+                  // Text("🏠 ${"House Name -> "+widget.house["House Name"]}   price\t\t Ksh  ${widget.house["House Price"]}  per month",
+                  //     style: TextStyle(
+                  //         fontWeight: FontWeight.bold, fontSize: 16)),
+                  Text("📍 ${widget.house["Location"]}"??""),
                   Text("📏 ${widget.house["House Size"]}"),
                   Text("📝 ${widget.house["Description"]}"),
                   if (widget.house.containsKey("Available Amenities"))

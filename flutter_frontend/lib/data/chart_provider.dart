@@ -136,9 +136,26 @@ class ChatService {
 
 
 
+  Future<void> savePhoneNumber(String phoneNumber) async {
+    String? email = FirebaseAuth.instance.currentUser?.email;
+    if (email != null) {
+      DocumentReference docRef = FirebaseFirestore.instance.collection("applicants_details").doc(email);
+
+      await docRef.set({
+        "phone": phoneNumber,
+      }, SetOptions(merge: true)); // Ensures existing data is not lost
+    }
+  }
 
 
 
+  Future<String?> getUserPhone() async {
+    String? email = FirebaseAuth.instance.currentUser?.email;
+    if (email == null) return null;
+
+    DocumentSnapshot doc = await FirebaseFirestore.instance.collection("applicants_details").doc(email).get();
+    return doc.exists ? doc["phone"] : null;
+  }
 
 
 
