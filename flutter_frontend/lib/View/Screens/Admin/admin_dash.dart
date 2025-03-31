@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_frontend/services/firebase_services.dart';
 import 'package:flutter_frontend/View/Screens/Admin/admin_settings.dart';
+import 'package:flutter_frontend/View/Screens/Admin/view_students_page.dart';
 
 class AdminDashboardScreen extends StatefulWidget {
   const AdminDashboardScreen({super.key});
@@ -42,47 +43,80 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Admin Dashboard"),
+        centerTitle: true,
       ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: residences.length,
-                    itemBuilder: (context, index) {
-                      final residence = residences[index];
-                      return Card(
-                        margin: const EdgeInsets.all(8.0),
-                        child: ListTile(
-                          title: Text(residence['houseName'] ?? 'Unknown'),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Location: ${residence['houseLocation'] ?? 'N/A'}'),
-                              Text('Landlord: ${residence['landlordName'] ?? 'N/A'}'),
-                              Text('Student: ${residence['name'] ?? 'N/A'}'),
-                              Text('Student Contact: ${residence['stdContact'] ?? 'N/A'}'),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              decoration: BoxDecoration(
+                color: Colors.blue,
+              ),
+              child: const Text(
+                'Admin Menu',
+                style: TextStyle(
+                  color: Colors.blue,
+                  fontSize: 24,
                 ),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const AdminSettingsPage(),
-                      ),
-                    );
-                  },
-                  child: const Text('Go to Admin Settings'),
-                ),
-              ],
+              ),
             ),
+            ListTile(
+              leading: const Icon(Icons.settings),
+              title: const Text('Admin Settings'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AdminSettingsPage(),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.person),
+              title: const Text('View Students'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ViewStudentsPage(), // we will replace with actual page
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.people),
+              title: const Text('View Landlords'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const Placeholder(), // we will put actual page
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.add),
+              title: const Text('Add Individuals'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const Placeholder(), // We will replace with actual page
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+      body: const Center(child: Text(
+        'Welcome to the Admin Dashboard!',
+        style: TextStyle(fontSize: 18)
+      ))
+          
     );
   }
 }
