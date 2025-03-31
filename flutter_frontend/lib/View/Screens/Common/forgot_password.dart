@@ -14,14 +14,26 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../../View-Model/utils/savecurrentpage.dart';
 
 class ForgotPassword extends HookConsumerWidget {
-  final double width;
+
   const ForgotPassword({
     super.key,
-    required this.width,
+
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+
+    var screenWidth=MediaQuery.of(context).size.width;
+    var width=0.0;
+    if (screenWidth > 800) {
+
+      width = screenWidth / 2;
+    } else {
+
+      width= screenWidth / 1.1;
+
+    }
+
     saveCurrentPage('/forgot-password');
     final formKey = GlobalKey<FormState>();
     TextEditingController emailController = useTextEditingController();

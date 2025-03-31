@@ -26,18 +26,18 @@ class HouseCard extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       child: Column(
         children: [
-          imageUrl == null
+          imageUrl == null || imageUrl!.isEmpty
               ? Image.asset(
                   'assets/launch.png',
                   height: 198.0,
-                  fit: BoxFit.fill,
+                  fit: BoxFit.cover,
                   filterQuality: FilterQuality.high,
                 )
-              : CachedNetworkImage(
-                  imageUrl: imageUrl!,
+              : Image.network(
+                  imageUrl!,
                   height: 198.0,
                   filterQuality: FilterQuality.high,
-                  fit: BoxFit.fill,
+                  fit: BoxFit.cover,
                 ),
           Padding(
             padding: const EdgeInsets.only(left: 10.0),

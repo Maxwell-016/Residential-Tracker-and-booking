@@ -5,9 +5,13 @@ import 'package:flutter_frontend/View-Model/utils/app_colors.dart';
 import 'package:flutter_frontend/View/Components/function_button.dart';
 import 'package:flutter_frontend/services/firebase_services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:latlong2/latlong.dart';
 
 final selectedNameProvider = StateProvider<String>((ref) => 'Student');
 final selectedHouseSize = StateProvider<String>((ref) => 'Single');
+final houseLocationProvider = StateProvider<String>((ref) => 'kakamega town');
+final bookingStatusProvider = StateProvider<String>((ref) => 'Not Booked');
+final locationProvider = StateProvider<LatLng>((ref) => LatLng(0.2832, 34.7543));
 
 final viewModel =
     ChangeNotifierProvider.autoDispose<ViewModel>((ref) => ViewModel());
