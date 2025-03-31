@@ -908,7 +908,7 @@
         <entry key="win32">
           <value>
             <list>
-              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/win32-5.10.1/lib" />
+              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/win32-5.12.0/lib" />
             </list>
           </value>
         </entry>
@@ -1047,7 +1047,7 @@
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/vector_math-2.1.4/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/vm_service-14.3.1/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/web-1.1.1/lib" />
-      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/win32-5.10.1/lib" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/win32-5.12.0/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/xdg_directories-1.1.0/lib" />
       <root url="file://$USER_HOME$/flutter/flutter/bin/cache/pkg/sky_engine/lib" />
       <root url="file://$USER_HOME$/flutter/flutter/packages/flutter/lib" />
