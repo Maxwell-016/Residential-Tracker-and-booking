@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_frontend/View-Model/navigation/routes.dart';
 import 'package:flutter_frontend/View/Screens/Landlord/landlord_profile.dart';
 import 'package:flutter_frontend/View/Screens/Landlord/view_and_update_listings.dart';
+import 'package:flutter_frontend/View/Screens/Student/mapit.dart';
 import 'package:flutter_frontend/constants.dart';
 import 'package:flutter_frontend/services/firebase_services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -199,7 +200,11 @@ class _StateResidentialTrackerAndBooking
               );
             },
             path: '/student-dashboard'),
-
+        GoRoute(
+            builder: (context, state) {
+              return  MapScreen();
+            },
+            path: '/mapit'),
 
 
 
