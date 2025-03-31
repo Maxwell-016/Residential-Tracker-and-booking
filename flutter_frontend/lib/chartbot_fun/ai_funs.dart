@@ -29,7 +29,7 @@ AIService aiService = AIService();
 
 
 Future<String> validateOption(String userMessage) async {
-  AIService aiService = AIService();
+
 
   String response = await aiService.getAIResponse(
       "Classify this response: '$userMessage'. Possible outputs: option_1, option_2, invalid. "
@@ -54,13 +54,29 @@ Future<String> validateOption(String userMessage) async {
 
 
 Future<bool> validateLocation(String location) async {
-  AIService aiService = AIService();
+
 
   String response = await aiService.getAIResponse(
       "Is '$location' a valid place name? Reply only with 'yes' or 'no'."
   );
 
   return response.trim().toLowerCase() == "yes";
+}
+
+Future<bool> validatePhoneNumber(String phn) async {
+
+
+  String response = await aiService.getAIResponse(
+      "Is '$phn' a valid kenyan number? having 12 digits,and starting with 254 .Reply only with 'yes' or 'no'."
+  );
+
+  return response.trim().toLowerCase() == "yes";
+}
+
+
+
+bool isValidKenyanPhoneNumber(String phoneNumber) {
+  return RegExp(r'^254\d{9}$').hasMatch(phoneNumber);
 }
 
 
