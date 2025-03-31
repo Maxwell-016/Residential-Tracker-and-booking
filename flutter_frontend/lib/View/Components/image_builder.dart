@@ -24,38 +24,17 @@ class ImageBuilder extends StatelessWidget {
     final count = imageUrls.length;
 
     if (count >= 3) {
-      if(width > 800) {
-        widgets.add(_buildNetworkImage(imageUrls[0], width));
-        widgets.add(_buildNetworkImage(imageUrls[1], width));
-        widgets.add(_buildNetworkImage(imageUrls[2], width));
-      }else{
-        widgets.add(_buildNetworkImage(imageUrls[0], width));
-      }
+      widgets.add(_buildNetworkImage(imageUrls[0], width));
+      widgets.add(_buildNetworkImage(imageUrls[1], width));
+      widgets.add(_buildNetworkImage(imageUrls[2], width));
     } else if (count == 2) {
-      if(width > 800) {
-        widgets.add(_buildNetworkImage(imageUrls[0], width));
-        widgets.add(_buildNetworkImage(imageUrls[1], width));
-        widgets.add(_buildNetworkImage(imageUrls[0], width));
-      }else{
-        widgets.add(_buildNetworkImage(imageUrls[0], width));
-      }
-      // Repeat first image
+      widgets.add(_buildNetworkImage(imageUrls[0], width));
+      widgets.add(_buildNetworkImage(imageUrls[1], width));
+      //Repeat first image
     } else if (count == 1) {
-      if(width > 800) {
-        widgets.add(_buildNetworkImage(imageUrls[0], width));
-        widgets.add(_buildNetworkImage(imageUrls[0], width));
-        widgets.add(_buildNetworkImage(imageUrls[0], width));
-      }else{
-        widgets.add(_buildNetworkImage(imageUrls[0], width));
-      }
+      widgets.add(_buildNetworkImage(imageUrls[0], width));
     } else {
-      if(width > 800) {
-        widgets.add(_buildAssetImage(placeholderAsset, width));
-        widgets.add(_buildAssetImage(placeholderAsset, width));
-        widgets.add(_buildAssetImage(placeholderAsset, width));
-      }else{
-        widgets.add(_buildAssetImage(placeholderAsset, width));
-      }
+      widgets.add(_buildAssetImage(placeholderAsset, width));
     }
 
     return widgets;
@@ -69,9 +48,7 @@ Widget _buildNetworkImage(String url, double width) {
     filterQuality: FilterQuality.high,
     width: width,
     loadingBuilder: (context, child, progress) {
-      return progress == null
-          ? child
-          : const CircularProgressIndicator();
+      return progress == null ? child : const CircularProgressIndicator();
     },
     errorBuilder: (context, error, stackTrace) {
       return _buildAssetImage('assets/launch.png', width);

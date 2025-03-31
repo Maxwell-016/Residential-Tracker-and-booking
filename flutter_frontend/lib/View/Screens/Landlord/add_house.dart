@@ -10,6 +10,7 @@ import 'package:flutter_frontend/View/Components/landlord_side_nav.dart';
 import 'package:flutter_frontend/View/Components/text_field.dart';
 import 'package:flutter_frontend/services/image_picker_service.dart';
 import 'package:flutter_frontend/services/firebase_services.dart';
+import 'package:flutter_frontend/services/location_services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
@@ -22,6 +23,7 @@ import '../../Components/snackbars.dart';
 
 final imageNameProvider = StateProvider<List<String>>((ref) => ['Select images'] );
 final imageFileProvider = StateProvider<List<Uint8List>>((ref) => [] );
+final isLoadingProvider = StateProvider<bool>((ref) => false);
 
 class AddHouse extends HookConsumerWidget {
 
@@ -78,27 +80,43 @@ class AddHouse extends HookConsumerWidget {
       'Electricity': false,
     });
     List<String> areas =[
-      'Myala',
-      'Lurambi',
-      'Sichirayi',
-      'Amalemba',
-      'Kefinco',
-      'Milimani',
-      'Shinyalu',
-      'Koromatangi',
-      'Kakamega Town',
-      'Mudiri',
-      'Lubao',
-      'Stage Mandazi',
-      'Khayega'
+      'myala',
+      'lurambi',
+      'sichirayi',
+      'amalemba',
+      'kefinco',
+      'milimani',
+      'shinyalu',
+      'koromatangi',
+      'kakamega town',
+      'mudiri',
+      'lubao',
+      'stage mandazi',
+      'khayega'
     ];
     areas.sort((a,b) => a.compareTo(b));
+
 
     final selectedAmenities = useState<List<String>>([]);
 
     bool isDark = Theme.of(context).brightness == Brightness.dark;
     Color borderColor =
         isDark ? AppColors.lightThemeBackground : AppColors.darkThemeBackground;
+
+
+    void openLocationPicker(){
+      showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          builder: (context) => SizedBox(
+            height: MediaQuery.of(context).size.height * 0.9,
+            width: double.infinity,
+            child: LandlordLocationSelection(),
+          ),
+      );
+    }
+
+
     return SafeArea(
       child: Scaffold(
 
@@ -132,6 +150,7 @@ class AddHouse extends HookConsumerWidget {
                           fieldValidator: Validators.fieldValidator,
                           focusNode: houseNameFocus,
                           width: width),
+                      //location selection
                       Column(
                         spacing: 10,
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -164,7 +183,32 @@ class AddHouse extends HookConsumerWidget {
                           ),
                         ],
                       ),
-                      //location selection
+                      //live location
+                      GestureDetector(
+                        onTap: (){
+                          openLocationPicker();
+                        },
+                        child: Column(
+                          spacing: 10,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Pin live location'),
+                            Container(
+                              decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: borderColor,
+                                    width: 1.0,
+                                  ),
+                                  borderRadius: BorderRadius.circular(10.0)),
+                              width: width,
+                              child: Padding(
+                                padding: const EdgeInsets.all(15.0),
+                                child: Text('${ref.watch(locationProvider)}'),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                       MyTextField(
                           label: 'Price',
                           placeHolder: 'e,g. 4000',
@@ -356,7 +400,7 @@ class AddHouse extends HookConsumerWidget {
                       FunctionButton(
                         text: 'Add House',
                         onPressed: () async {
-                          if (formKey.currentState!.validate()) {
+                         if (formKey.currentState!.validate()) {
 
                             if (const ListEquality().equals(ref.watch(imageNameProvider), ['Select images'])) {
                               SnackBars.showErrorSnackBar(context,
@@ -370,6 +414,8 @@ class AddHouse extends HookConsumerWidget {
                                     firebaseServices).addHouseListing(
                                   houseNameController.text,
                                   selectedLocation,
+                                  ref.watch(locationProvider).latitude,
+                                  ref.watch(locationProvider).longitude,
                                   int.parse(priceController.text),
                                   selectedSize,
                                   urls,

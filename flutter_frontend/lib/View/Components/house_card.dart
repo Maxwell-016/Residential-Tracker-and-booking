@@ -30,14 +30,14 @@ class HouseCard extends StatelessWidget {
               ? Image.asset(
                   'assets/launch.png',
                   height: 198.0,
-                  fit: BoxFit.fill,
+                  fit: BoxFit.cover,
                   filterQuality: FilterQuality.high,
                 )
               : Image.network(
                   imageUrl!,
                   height: 198.0,
                   filterQuality: FilterQuality.high,
-                  fit: BoxFit.fill,
+                  fit: BoxFit.cover,
                 ),
           Padding(
             padding: const EdgeInsets.only(left: 10.0),
