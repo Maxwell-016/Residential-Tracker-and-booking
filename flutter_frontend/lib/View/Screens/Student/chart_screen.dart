@@ -125,10 +125,13 @@ bool awaitingPhoneNumberInput=false;
             messages.add({
               "role": "ai",
               "text":  "Welcome $userMessage! I am your assistant to help you find the house of your choice.\n\n"
-                  "Here are the services we offer:\n"
-                  "1️⃣ List all available houses in a specific location\n"
-                  "2️⃣ See all locations with available houses\n\n"
-                  "Which option would you like me to assist you with? (Reply with 1 or 2)"
+            "Here are the services we offer:\n"
+            " 1 List all available houses in a specific location\n"
+            " 2 See all locations with available houses\n"
+            " 3 Report for an emergency\n"
+            " 4 Ask for help and related questions\n"
+            "\n"
+            "Which option would you like me to assist you with? (Reply with one of the above options eg 1 or option 1)"
             });
             isTyping=false;
           });
@@ -227,10 +230,11 @@ bool awaitingPhoneNumberInput=false;
 
 
         } else {
-          aiResponse = "Sorry, no houses found in $userMessage ,Kindly enter another place so that i help you to find your dream house.";
           setState(() {
             conversationStep = "enter_location";
           });
+          aiResponse = "Sorry, no houses found in $userMessage ,Kindly enter another place so that i help you to find your dream house.";
+
         }
 
         conversationStep = "select_option";

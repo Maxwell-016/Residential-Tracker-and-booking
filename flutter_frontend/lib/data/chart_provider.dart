@@ -31,7 +31,7 @@ class ChatService {
           " 3 Report for an emergency\n"
           " 4 Ask for help and related questions\n"
           "\n"
-          "Which option would you like me to assist you with? (Reply with 1 or 2)":
+          "Which option would you like me to assist you with? (Reply with one of the above options eg 1 or option 1)":
       "I see you haven't provided a name. Please enter your full name:";
 
     }
