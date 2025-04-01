@@ -38,11 +38,11 @@ Future<String> validateOption(String userMessage) async {
   } else if (response.trim() == "option_2") {
     return "Viewing all locations with available houses.";
   }else if (response.trim() == "option_3") {
-    return "You have selected option 3:  Report for an emergency.";
+    return "Report for an emergency.";
   }else if (response.trim() == "option_4") {
-    return "You have selected option 4: Ask for help and related questions.";
+    return "Ask for help and related questions.";
   }else if (response.trim() == "option_5") {
-    return "You have selected option 5: Send feedback to the landlord";
+    return "Send feedback to the landlord";
   }
   else {
     return "I didn't understand your choice. Please reply with a value 1 to 5 or correct option";

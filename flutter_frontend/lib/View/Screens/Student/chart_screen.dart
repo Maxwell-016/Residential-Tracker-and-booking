@@ -43,6 +43,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   final FirebaseAuth auth = FirebaseAuth.instance;
   final FirebaseFirestore fs = FirebaseFirestore.instance;
 
+  bool showMap=false;
+
   String paymentOP="";
   Map<String, dynamic> houseop={};
 
@@ -215,19 +217,52 @@ bool awaitingPhoneNumberInput=false;
 
 
           conversationStep = "view_locations";
-        aiResponse=await chatService.handleOption2();
+
+         setState(() {
+           showMap=true;
+         });
+
+         if(conversationStep == "view_locations") {
+           aiResponse = await chatService.handleOption2();
+           Future.delayed(Duration(seconds: 1), () async {
+
+             setState(() {
+               messages.add({
+                 "role": "ai",
+                 "text": aiResponse
+               });
+               conversationStep = "enter_location"; // Update step to location selection
+              });
+           });
+         }
+
+
+      }else if(aiResponse.contains("Report for an emergency.")) {
+
+        aiResponse="Which kind of emergency do you wish to report.";
 
 
 
+      }else if(aiResponse.contains("Ask for help and related questions.")) {
 
+        aiResponse="Ask any question that you want me to help you with ?";
+
+
+      }else if(aiResponse.contains( "Send feedback to the landlord")) {
+
+        aiResponse= "Send feedback to the landlord";
 
       }
 
 
 
 
+
     }
     else if (conversationStep == "enter_location") {
+      setState(() {
+        showMap=false;
+      });
       bool isValid = await validateLocation(userMessage);
 
       if (isValid) {
@@ -563,8 +598,8 @@ var screenWidth=MediaQuery.of(context).size.width;
 
                   final message = messages[index];
 
-                  // Show the map inside AI chat when viewing locations
-                  if (conversationStep == "view_locations" && index == messages.length - 1) {
+
+                  if (showMap && index == messages.length - 1 ) {
                     return Align(
                       alignment: Alignment.centerLeft,
                       child: Container(
