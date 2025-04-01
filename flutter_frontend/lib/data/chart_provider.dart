@@ -24,7 +24,7 @@ class ChatService {
 
 
       return name != null && name.isNotEmpty?
-      "Welcome $name! I am your assistant to help you find the house of your choice.\n\n"
+      "Welcome ${name.trim().split(" ").first}, I am your assistant to help you find the house of your choice.\n\n"
           "Here are the services we offer:\n"
           " 1 List all available houses in a specific location\n"
           " 2 See all locations with available houses\n"
@@ -59,10 +59,9 @@ class ChatService {
   }
 
 
-
   Future<String> getUserName() async {
     String? email = auth.currentUser?.email;
-    if (email == null) return "User";
+    if (email == null) return  "user";
 
     var snapshot = await firestore.collection("applicants_details")
         .where("email", isEqualTo: email)
@@ -73,14 +72,12 @@ class ChatService {
       String? name = snapshot.docs.first.get("name");
 
 
-      return name ?? "User";
+      return name != null && name.isNotEmpty?
+      name:"user";
+
     }
-    return "User";
+    return "user";
   }
-
-
-
-
 
 
 

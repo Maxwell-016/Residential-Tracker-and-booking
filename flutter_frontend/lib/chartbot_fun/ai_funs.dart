@@ -73,6 +73,15 @@ Future<bool> validatePhoneNumber(String phn) async {
 }
 
 
+Future<bool> validateFullName(String fullName) async {
+  String response = await aiService.getAIResponse(
+      "Is '$fullName' a valid human name? The name should consist of two meaningful words that resemble real names, and it should not be random characters, offensive words, or nonsense. Reply only with 'yes' or 'no'."
+  );
+
+  return response.trim().toLowerCase() == "yes";
+}
+
+
 
 bool isValidKenyanPhoneNumber(String phoneNumber) {
   return RegExp(r'^254\d{9}$').hasMatch(phoneNumber);

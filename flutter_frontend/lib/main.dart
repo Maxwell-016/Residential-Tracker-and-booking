@@ -26,6 +26,7 @@ import 'View/Screens/Landlord/landloard_dash.dart';
 import 'View/Screens/Landlord/manage_house_listings.dart';
 import 'View/Screens/Student/chart_screen.dart';
 import 'View/Screens/Student/student_dash.dart';
+import 'data/providers.dart';
 import 'firebase_options.dart';
 import 'View/Screens/Admin/admin_settings.dart';
 
@@ -43,6 +44,7 @@ Future<void> main() async {
   }
  // String initialRoute = await getLastVisitedPage();
 
+  // Request permission for notifications
 
   AwesomeNotifications().initialize(
     null,
@@ -55,9 +57,12 @@ Future<void> main() async {
     ],
     debug: true,
   );
-
+  final sharedPreferences = await SharedPreferences.getInstance();
 
   runApp(ProviderScope(
+      overrides: [
+        sharedPreferencesProvider.overrideWithValue(sharedPreferences),
+      ],
       child: ResidentialTrackerAndBooking()));
 }
 

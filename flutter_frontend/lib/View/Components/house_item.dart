@@ -226,6 +226,8 @@ class _StateHouseCard extends ConsumerState<HouseCard> {
     String houseName = widget.house["House Name"] ?? "Unknown House";
     String location = widget.house["Location"] ?? "Unknown Location";
     double price = widget.house["House Price"] ?? 0.0;
+    List<String> houseImage = widget.house["Images"] ?? [];
+
 
     if (landlordId == null || houseId == null) {
       print("Error: LandlordId or HouseId is null");
@@ -266,7 +268,7 @@ class _StateHouseCard extends ConsumerState<HouseCard> {
       if (callbackResponse.statusCode !=null) {
         print("Payment successful, proceeding with booking...");
 
-        await fs.collection("booked_students").doc(studentEmail).set({
+        await fs.collection("booked_students").doc().set({
           "email": studentEmail,
           "name": studentName ?? "Unknown",
           "stdContact": studentPhone,
@@ -277,6 +279,7 @@ class _StateHouseCard extends ConsumerState<HouseCard> {
           "landlordContact": landlordPhone,
           "landlordId":landlordId,
           "landlord": landlordName,
+          "images":houseImage
         });
 
         await fs
