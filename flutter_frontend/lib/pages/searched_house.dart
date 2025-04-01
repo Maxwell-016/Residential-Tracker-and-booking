@@ -13,10 +13,16 @@ class HousesInLocationScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: Text("Houses in $location")),
       body: StreamBuilder(
+
+
         stream: FirebaseFirestore.instance
-            .collection('houses')
-            .where('location', isEqualTo: location)
+            .collectionGroup('Houses')
+            .where('Location', isEqualTo: location)
+            .where("isBooked",isEqualTo: false)
             .snapshots(),
+
+
+
         builder: (context, snapshot) {
           if (!snapshot.hasData) return Center(child: CircularProgressIndicator());
 
@@ -30,8 +36,8 @@ class HousesInLocationScreen extends ConsumerWidget {
             itemBuilder: (context, index) {
               final house = houses[index];
               return ListTile(
-                title: Text(house['name']),
-                subtitle: Text("Price: \$${house['price']}"),
+                title: Text(house['House Name']),
+                subtitle: Text("Price: \$${house['House Price']}"),
               );
             },
           );

@@ -13,16 +13,17 @@ class MapScreen extends StatefulWidget {
 
 class _MapScreenState extends State<MapScreen> {
   final Map<String, Marker> _markers = {};
+  MapType _currentMapType = MapType.normal; // Default map type
 
   Future<void> _onMapCreated(GoogleMapController controller) async {
-    print("🔍 _onMapCreated triggered"); // Debugging
+    print("🔍 _onMapCreated triggered");
 
     final List<Map<String, dynamic>> toBeMarked = await getLocationsToBeMarked();
 
     setState(() {
       _markers.clear();
       for (final place in toBeMarked) {
-        print("📍 Adding Marker: ${place["name"]} at ${place["lat"]}, ${place["lng"]}"); // Debugging
+        print("📍 Adding Marker: ${place["name"]} at ${place["lat"]}, ${place["lng"]}");
 
         final marker = Marker(
           markerId: MarkerId(place["id"].toString()),
@@ -36,24 +37,49 @@ class _MapScreenState extends State<MapScreen> {
       }
     });
 
-    print("✅ Markers added: ${_markers.length}");
+    print("Markers added: ${_markers.length}");
+  }
+
+  void _changeMapType() {
+    setState(() {
+      // Cycle through different map types
+      _currentMapType = _currentMapType == MapType.normal
+          ? MapType.satellite
+          : _currentMapType == MapType.satellite
+          ? MapType.terrain
+          : _currentMapType == MapType.terrain
+          ? MapType.hybrid
+          : MapType.normal;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-
-return ClipRRect(
-    borderRadius: BorderRadius.circular(15),
-    child:
-    GoogleMap(
-          onMapCreated: _onMapCreated,
-          initialCameraPosition: const CameraPosition(
-            target: LatLng(0.288879, 34.765982),
-            zoom: 15,
+    return Stack(
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(15),
+          child: GoogleMap(
+            onMapCreated: _onMapCreated,
+            initialCameraPosition: const CameraPosition(
+              target: LatLng(0.2927501026141882, 34.762192913490594),
+              zoom: 14,
+            ),
+            markers: _markers.values.toSet(),
+            mapType: _currentMapType, // Apply selected map type
           ),
-          markers: _markers.values.toSet(),
-       )
+        ),
 
+        // Floating Button to Change Map Type
+        Positioned(
+          bottom: 20,
+          right: 20,
+          child: FloatingActionButton(
+            onPressed: _changeMapType,
+            child: const Icon(Icons.map),
+          ),
+        ),
+      ],
     );
   }
 }
