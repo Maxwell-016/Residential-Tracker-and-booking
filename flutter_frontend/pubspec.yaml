@@ -53,6 +53,7 @@ dependencies:
   json_annotation: ^4.9.0
   json_serializable: ^6.9.4
 
+  url_launcher: ^6.3.1
 
 
 
