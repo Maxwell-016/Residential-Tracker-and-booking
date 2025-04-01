@@ -1,0 +1,39 @@
+class Coordinates {
+  String name;
+  double latitude;
+  double longitude;
+
+  Coordinates(this.name, this.latitude, this.longitude);
+}
+
+List<Coordinates> realcode = [
+  Coordinates('masinde muliro university',0.2927501026141882, 34.762192913490594),
+  Coordinates('masinde muliro university of science and technology', 0.2927501026141882, 34.762192913490594),
+  Coordinates('myala', 0.3048743983659032, 34.77229263143681),
+  Coordinates('lurambi', 0.30803224385947375, 34.77411678108984),
+  Coordinates('sichirayi',0.3082730787748682, 34.762632219467),
+  Coordinates('amalemba', 0.2677207458835073, 34.75275498730513),
+  Coordinates('kefinco', 0.2944432897104468, 34.754673677551345),
+  Coordinates('milimani',0.28532141467142413, 34.765290208415415),
+  Coordinates('shinyalu', 0.2689642483535321, 34.843466493765035),
+  Coordinates('koromatangi', 0.2975863579202768, 34.759149892725006),
+  Coordinates('kakamega town',0.28306209679640687, 34.74578282447738),
+  Coordinates('mudiri', 0.2846070302019043, 34.75110432736586),
+  Coordinates('lubao',0.3349040553712373, 34.814096706559944),
+  Coordinates('stage mandazi',0.30806084414107615, 34.75391725353495),
+  Coordinates('khayega',0.21305210558183976, 34.76890346181994),
+  Coordinates('butere', 0.21234461215719272, 34.49393739571089),
+  Coordinates('ikolomani', 0.176028270475078, 34.706249548665824),
+  Coordinates('khwisero',0.16015398126195396, 34.60776340614625),
+  Coordinates('likuyani',0.7832776246128706, 35.08999029587909),
+  Coordinates('lugari',0.6511298303409696, 34.87586258579544),
+  Coordinates('malava',0.446529647338969, 34.8540401323358),
+  Coordinates('matungu',0.38743463794174743, 34.46257978137366),
+  Coordinates('mumias',0.33355758751630854, 34.48758593503893),
+  Coordinates('navakholo',0.41613986287194055, 34.68196758879511),
+  Coordinates('shivagala',0.20458838750879482, 34.71827455704834),
+  Coordinates('koyonzo', 0.4214891981397366, 34.42538025560651),
+  Coordinates('shibuli', 0.2833965580558255, 34.64996780807094),
+  Coordinates('ivakale',0.37628969831140024, 34.89450781524472),
+  Coordinates('kilingili', -1.3055365911082402, 38.158501023973564),
+];

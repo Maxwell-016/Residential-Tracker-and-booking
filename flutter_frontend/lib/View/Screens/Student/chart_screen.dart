@@ -723,8 +723,8 @@ var screenWidth=MediaQuery.of(context).size.width;
                             ),
                             SizedBox(height: 10),
                             SizedBox(
-                              width: screenWidth*0.6,
-                              height: screenHeight*0.3,
+                              width: screenWidth*0.7,
+                              height: screenHeight*0.5,
                               child: MapScreen(),
                             ),
                           ],
