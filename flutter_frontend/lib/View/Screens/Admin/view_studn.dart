@@ -111,30 +111,17 @@ class _ViewStudentdata extends ConsumerState<ViewStudentdt> {
   }
 }
 
-// import 'package:flutter/material.dart';
+
 // import 'package:cloud_firestore/cloud_firestore.dart';
 // import 'package:flutter_frontend/View/Components/SimpleAppBar.dart';
 // import 'package:flutter_frontend/constants.dart';
 // import 'package:flutter_riverpod/flutter_riverpod.dart';
 // import 'package:logger/logger.dart';
 
-// class ViewStudentdt extends ConsumerStatefulWidget {
-//   const ViewStudentdt({
-//     super.key,
-//     required this.changeTheme,
-//     required this.changeColor,
-//     required this.colorSelected,
-//   });
 
-//   final ColorSelection colorSelected;
-//   final void Function(bool useLightMode) changeTheme;
-//   final void Function(int value) changeColor;
 
-//   @override
-// ConsumerState  <ViewStudentdt> createState() => _ViewStudentdata();
 // }
 
-// class _ViewStudentdata extends ConsumerState<ViewStudentdt> {
 //   final FirebaseFirestore firestore = FirebaseFirestore.instance;
 //   final Logger logger = Logger();
 
