@@ -7,17 +7,15 @@ import 'package:flutter_frontend/services/firebase_services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-
 final selectedNameProvider = StateProvider<String>((ref) => 'Student');
 final selectedHouseSize = StateProvider<String>((ref) => 'Single');
 final houseLocationProvider = StateProvider<String>((ref) => 'kakamega town');
 final bookingStatusProvider = StateProvider<String>((ref) => 'Not Booked');
-final locationProvider = StateProvider<LatLng>((ref) => LatLng(0.2832, 34.7543));
+final locationProvider =
+    StateProvider<LatLng>((ref) => LatLng(0.2832, 34.7543));
 
-
-
-
-final viewModel = ChangeNotifierProvider.autoDispose<ViewModel>((ref) => ViewModel());
+final viewModel =
+    ChangeNotifierProvider.autoDispose<ViewModel>((ref) => ViewModel());
 
 class ViewModel extends ChangeNotifier {
   bool isObscured = true;
@@ -45,7 +43,7 @@ class ViewModel extends ChangeNotifier {
 }
 
 Future dialogBox(BuildContext context, String title, String body,
-    Future<void> Function() onOkPressed) {
+    Future<void> Function() onOkPressed, bool isLoading) {
   return showDialog(
     context: context,
     builder: (context) => AlertDialog(
@@ -62,12 +60,14 @@ Future dialogBox(BuildContext context, String title, String body,
               Navigator.pop(context);
             },
             btnColor: AppColors.deepBlue),
-        FunctionButton(
-            text: title,
-            onPressed: () async {
-              await onOkPressed();
-            },
-            btnColor: AppColors.deepBlue)
+        isLoading
+            ? CircularProgressIndicator()
+            : FunctionButton(
+                text: title,
+                onPressed: () async {
+                  await onOkPressed();
+                },
+                btnColor: AppColors.deepBlue)
       ],
     ),
   );
