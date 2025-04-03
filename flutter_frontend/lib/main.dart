@@ -13,6 +13,7 @@ import 'package:flutter_frontend/constants.dart';
 import 'package:flutter_frontend/services/firebase_services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'View-Model/utils/savecurrentpage.dart';
@@ -44,12 +45,13 @@ Future<void> main() async {
     print('Firebase initialisation error: $e');
   }
 
- String initialRoute = await getLastVisitedPage();
+  String initialRoute = await getLastVisitedPage();
 
-  Request permission for notifications
+  //Request permission for notifications
 
 
-  AwesomeNotifications().initialize(
+  await AwesomeNotifications
+  ().initialize(
     null,
     [
       NotificationChannel(
@@ -67,7 +69,6 @@ Future<void> main() async {
         sharedPreferencesProvider.overrideWithValue(sharedPreferences),
       ],
       child: ResidentialTrackerAndBooking()));
-
 }
 
 class CustomScrollBehavior extends MaterialScrollBehavior {
