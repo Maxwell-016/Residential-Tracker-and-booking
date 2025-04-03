@@ -589,15 +589,14 @@ class HouseDetails extends HookConsumerWidget {
                             },
                             child: index < houses.length
                                 ? HouseCard(
-                                        houseName: houses[index]['House Name'],
-                                        price: houses[index]['House Price']
-                                            .toString(),
-                                        imageUrl:
-                                            houses[index]['Images'].isNotEmpty
-                                                ? houses[index]['Images'][0]
-                                                : null,
-                                        houseSize: houses[index]['House Size'],
-                                      )
+                                    houseName: houses[index]['House Name'],
+                                    price:
+                                        houses[index]['House Price'].toString(),
+                                    imageUrl: houses[index]['Images'].isNotEmpty
+                                        ? houses[index]['Images'][0]
+                                        : null,
+                                    houseSize: houses[index]['House Size'],
+                                  )
                                 : null,
                           );
                         });

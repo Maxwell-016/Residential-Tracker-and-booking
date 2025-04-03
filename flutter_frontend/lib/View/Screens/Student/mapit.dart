@@ -1,8 +1,6 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../../chartbot_fun/ai_funs.dart';
-import '../../../src/locations.dart' as locations;
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
@@ -18,12 +16,14 @@ class _MapScreenState extends State<MapScreen> {
   Future<void> _onMapCreated(GoogleMapController controller) async {
     print("🔍 _onMapCreated triggered");
 
-    final List<Map<String, dynamic>> toBeMarked = await getLocationsToBeMarked();
+    final List<Map<String, dynamic>> toBeMarked =
+        await getLocationsToBeMarked();
 
     setState(() {
       _markers.clear();
       for (final place in toBeMarked) {
-        print("📍 Adding Marker: ${place["name"]} at ${place["lat"]}, ${place["lng"]}");
+        print(
+            "📍 Adding Marker: ${place["name"]} at ${place["lat"]}, ${place["lng"]}");
 
         final marker = Marker(
           markerId: MarkerId(place["id"].toString()),
@@ -46,10 +46,10 @@ class _MapScreenState extends State<MapScreen> {
       _currentMapType = _currentMapType == MapType.normal
           ? MapType.satellite
           : _currentMapType == MapType.satellite
-          ? MapType.terrain
-          : _currentMapType == MapType.terrain
-          ? MapType.hybrid
-          : MapType.normal;
+              ? MapType.terrain
+              : _currentMapType == MapType.terrain
+                  ? MapType.hybrid
+                  : MapType.normal;
     });
   }
 

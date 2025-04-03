@@ -6,6 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/providers.dart';
 
 class SearchedPlacesScreen extends ConsumerWidget {
+  const SearchedPlacesScreen({super.key});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final searchedPlaces = ref.watch(searchedPlacesProvider);
@@ -23,11 +25,9 @@ class SearchedPlacesScreen extends ConsumerWidget {
               // Navigate to a screen showing houses in this location
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => HousesInLocationScreen(place)),
+                MaterialPageRoute(
+                    builder: (_) => HousesInLocationScreen(place)),
               );
-
-
-
             },
           );
         },
@@ -39,6 +39,3 @@ class SearchedPlacesScreen extends ConsumerWidget {
 void onSearch(String place, WidgetRef ref) {
   ref.read(searchedPlacesProvider.notifier).addSearchedPlace(place);
 }
-
-
-

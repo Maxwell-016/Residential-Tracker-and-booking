@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class AdminHeader extends StatelessWidget {
+  const AdminHeader({super.key});
+
   @override
   Widget build(BuildContext context) {
     return AppBar(

@@ -1,5 +1,3 @@
-
-
 import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -96,7 +94,10 @@ class _StateHouseCard extends ConsumerState<HouseCard> {
 
     if (phoneNumber != null && phoneNumber.isNotEmpty) {
       setState(() => studentPhone = phoneNumber);
-      await fs.collection("applicants_details").doc(auth.currentUser?.email).set(
+      await fs
+          .collection("applicants_details")
+          .doc(auth.currentUser?.email)
+          .set(
         {"phone": studentPhone},
         SetOptions(merge: true),
       );
@@ -135,14 +136,10 @@ class _StateHouseCard extends ConsumerState<HouseCard> {
     setState(() => isBooking = false);
   }
 
-
-
-
-
   void _showPaymentOptions() {
-    double housePrice = widget.house["House Price"]/1000 ?? 0.0;
+    double housePrice = widget.house["House Price"] / 1000 ?? 0.0;
     double monthlyPayment = housePrice;
-    double semesterPayment = (housePrice * 4)/4000;
+    double semesterPayment = (housePrice * 4) / 4000;
 
     showDialog(
       context: context,
@@ -160,7 +157,7 @@ class _StateHouseCard extends ConsumerState<HouseCard> {
                   if (value != null) {
                     setState(() => selectedPayment = value);
                     Navigator.pop(context);
-                    _processBooking(value);  // Run after closing dialog
+                    _processBooking(value); // Run after closing dialog
                   }
                 },
               ),
@@ -174,7 +171,7 @@ class _StateHouseCard extends ConsumerState<HouseCard> {
                   if (value != null) {
                     setState(() => selectedPayment = value);
                     Navigator.pop(context);
-                    _processBooking(value);  // Run after closing dialog
+                    _processBooking(value); // Run after closing dialog
                   }
                 },
               ),
@@ -184,7 +181,6 @@ class _StateHouseCard extends ConsumerState<HouseCard> {
       ),
     );
   }
-
 
   Future<void> bookHouse(String paymentOption) async {
     setState(() => isBooking = true);
@@ -228,7 +224,6 @@ class _StateHouseCard extends ConsumerState<HouseCard> {
     double price = widget.house["House Price"] ?? 0.0;
     List<String> houseImage = widget.house["Images"] ?? [];
 
-
     if (landlordId == null || houseId == null) {
       print("Error: LandlordId or HouseId is null");
       setState(() => isBooking = false);
@@ -241,7 +236,7 @@ class _StateHouseCard extends ConsumerState<HouseCard> {
 
     if (studentPhone == null || studentPhone.isEmpty) {
       await _promptForPhoneNumber();
-      if (studentPhone == null || studentPhone!.isEmpty) {
+      if (studentPhone == null || studentPhone.isEmpty) {
         print("Phone number not provided.");
         setState(() => isBooking = false);
         return;
@@ -249,9 +244,12 @@ class _StateHouseCard extends ConsumerState<HouseCard> {
     }
 
     // Fetch landlord details
-    DocumentSnapshot landlordDoc = await fs.collection("Landlords").doc(landlordId).get();
-    String landlordPhone = landlordDoc.exists ? landlordDoc.get("Phone Number") : "Unknown";
-    String landlordName = landlordDoc.exists ? landlordDoc.get("Name") : "Unknown";
+    DocumentSnapshot landlordDoc =
+        await fs.collection("Landlords").doc(landlordId).get();
+    String landlordPhone =
+        landlordDoc.exists ? landlordDoc.get("Phone Number") : "Unknown";
+    String landlordName =
+        landlordDoc.exists ? landlordDoc.get("Name") : "Unknown";
 
     double amountToPay = paymentOption == "semester" ? price * 4 : price;
 
@@ -261,62 +259,45 @@ class _StateHouseCard extends ConsumerState<HouseCard> {
       body: jsonEncode({"phone": studentPhone, "amount": amountToPay}),
     );
 
-    if (response.statusCode != null) {
+    var callbackResponse =
+        await http.get(Uri.parse("https://mpesaapi.onrender.com/callback"));
 
-      var callbackResponse = await http.get(Uri.parse("https://mpesaapi.onrender.com/callback"));
+    if (callbackResponse.statusCode != null) {
+      print("Payment successful, proceeding with booking...");
 
-      if (callbackResponse.statusCode !=null) {
-        print("Payment successful, proceeding with booking...");
+      await fs.collection("booked_students").doc().set({
+        "email": studentEmail,
+        "name": studentName ?? "Unknown",
+        "stdContact": studentPhone,
+        "houseName": houseName,
+        "houseLocation": location,
+        "payment_status": "Paid",
+        "amount_paid": amountToPay,
+        "landlordContact": landlordPhone,
+        "landlordId": landlordId,
+        "landlord": landlordName,
+        "images": houseImage
+      });
 
-        await fs.collection("booked_students").doc().set({
-          "email": studentEmail,
-          "name": studentName ?? "Unknown",
-          "stdContact": studentPhone,
-          "houseName": houseName,
-          "houseLocation": location,
-          "payment_status": "Paid",
-          "amount_paid": amountToPay,
-          "landlordContact": landlordPhone,
-          "landlordId":landlordId,
-          "landlord": landlordName,
-          "images":houseImage
-        });
+      await fs
+          .collection("Landlords")
+          .doc(landlordId)
+          .collection("Houses")
+          .doc(houseId)
+          .update({"isBooked": true});
 
-        await fs
-            .collection("Landlords")
-            .doc(landlordId)
-            .collection("Houses")
-            .doc(houseId)
-            .update({"isBooked": true});
-
-
-        String msg="$houseName has been booked successfully with the '$paymentOption' option!";
-        print(msg  );
-        trigernotification(null, msg, "House Booked Successfully");
-
-      } else {
-        String msg="Booking not completed.";
-        print(msg);
-        trigernotification(null, msg, "Payment failed!!");
-
-      }
+      String msg =
+          "$houseName has been booked successfully with the '$paymentOption' option!";
+      print(msg);
+      trigernotification(null, msg, "House Booked Successfully");
     } else {
-
-      String msg="Error: M-Pesa request failed.";
+      String msg = "Booking not completed.";
       print(msg);
       trigernotification(null, msg, "Payment failed!!");
-
     }
 
     setState(() => isBooking = false);
-
   }
-
-
-
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -332,14 +313,15 @@ class _StateHouseCard extends ConsumerState<HouseCard> {
           child: Card(
             elevation: 4,
             margin: EdgeInsets.all(8),
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             child: Padding(
               padding: EdgeInsets.all(8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (widget.house.containsKey("Images") && widget.house["Images"] is List)
+                  if (widget.house.containsKey("Images") &&
+                      widget.house["Images"] is List)
                     SizedBox(
                       height: 200,
                       child: PageView.builder(
@@ -357,31 +339,33 @@ class _StateHouseCard extends ConsumerState<HouseCard> {
                         },
                       ),
                     ),
-
                   SizedBox(height: 8),
                   ListTile(
                     leading: Text(
-                      "🏠 ${"House Name -> "+widget.house["House Name"]} ",
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      "🏠 ${"House Name -> " + widget.house["House Name"]} ",
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                     ),
                     trailing: Text(
                       "Price Ksh ${widget.house["House Price"]} per month",
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                     ),
                   ),
                   Text("📍 ${widget.house["Location"]}" ?? ""),
                   Text("📏 ${widget.house["House Size"]}"),
                   Text("📝 ${widget.house["Description"]}"),
                   if (widget.house.containsKey("Available Amenities"))
-                    Text("🔹 Amenities: ${widget.house["Available Amenities"]?.join(", ") ?? "N/A"}"),
+                    Text(
+                        "🔹 Amenities: ${widget.house["Available Amenities"]?.join(", ") ?? "N/A"}"),
                   SizedBox(height: 10),
                   if (widget.house["isBooked"] == true)
                     ElevatedButton(
                       onPressed: () => cancelBooking(),
-                      style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                      style:
+                          ElevatedButton.styleFrom(backgroundColor: Colors.red),
                       child: Text("Cancel Booking"),
                     ),
-
                 ],
               ),
             ),
@@ -391,4 +375,3 @@ class _StateHouseCard extends ConsumerState<HouseCard> {
     );
   }
 }
-
