@@ -12,8 +12,9 @@ class CardButton extends StatelessWidget {
   Widget build(BuildContext context) {
     bool isDark = Theme.of(context).brightness == Brightness.dark;
     double deviceWidth = MediaQuery.of(context).size.width;
+    double width = deviceWidth > 800? deviceWidth / 2.5 : deviceWidth / 1.5;
     return SizedBox(
-      width: deviceWidth / 2.5,
+      width: width,
       child: Card(
         elevation: 5.0,
         shadowColor: isDark? Colors.white: Colors.black54,
