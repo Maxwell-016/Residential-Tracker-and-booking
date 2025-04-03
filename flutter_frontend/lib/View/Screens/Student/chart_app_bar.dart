@@ -43,8 +43,9 @@ class _StateAppBar extends ConsumerState<Chat_Bar> {
         title:  Text(widget.title),
         elevation: 24,
         leading: IconButton(
-          icon: const Icon(Icons.menu), // Hamburger menu
+          icon: const Icon(Icons.menu),
           onPressed: () {
+
             ref.read(toggleMenu.notifier).state = !ref.read(toggleMenu);
           },
         ),

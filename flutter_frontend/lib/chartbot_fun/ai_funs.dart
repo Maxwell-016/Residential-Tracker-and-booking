@@ -1,6 +1,9 @@
 import 'dart:convert';
 
+import 'package:flutter_frontend/data/binarySeachLocation.dart';
+
 import '../data/chart_provider.dart';
+import '../data/codinates.dart';
 
 AIService aiService = AIService();
 
@@ -38,11 +41,11 @@ Future<String> validateOption(String userMessage) async {
   } else if (response.trim() == "option_2") {
     return "Viewing all locations with available houses.";
   }else if (response.trim() == "option_3") {
-    return "You have selected option 3:  Report for an emergency.";
+    return "Report for an emergency.";
   }else if (response.trim() == "option_4") {
-    return "You have selected option 4: Ask for help and related questions.";
+    return "Ask for help and related questions.";
   }else if (response.trim() == "option_5") {
-    return "You have selected option 5: Send feedback to the landlord";
+    return "Send feedback to the landlord";
   }
   else {
     return "I didn't understand your choice. Please reply with a value 1 to 5 or correct option";
@@ -73,6 +76,15 @@ Future<bool> validatePhoneNumber(String phn) async {
 }
 
 
+Future<bool> validateFullName(String fullName) async {
+  String response = await aiService.getAIResponse(
+      "Is '$fullName' a valid human name? The name should consist of two meaningful words that resemble real names, and it should not be random characters, offensive words, or nonsense. Reply only with 'yes' or 'no'."
+  );
+
+  return response.trim().toLowerCase() == "yes";
+}
+
+
 
 bool isValidKenyanPhoneNumber(String phoneNumber) {
   return RegExp(r'^254\d{9}$').hasMatch(phoneNumber);
@@ -86,6 +98,7 @@ bool isValidKenyanPhoneNumber(String phoneNumber) {
     String response = await aiService.getAIResponse("Provide structured JSON details for the location: $location. "
         "Include: name, address, latitude (lat), longitude (lng), region, and a relevant image URL. "
         "in long and latitude be accurate as possible you and round of to 5 digit place"
+    "Start looking first in kakamega as your main focus before looking to other places"
         "Ensure the response is a valid JSON object **only**, without extra text or formatting like markdown.\n\n"
         "The JSON format should be:\n"
         "{\n"
@@ -129,9 +142,28 @@ Future<List<Map<String,dynamic>>> getLocationsToBeMarked() async {
  locations.addAll(await chatService.getAllLocations());
 
   for(var location in locations){
-    locateit.add(await getLocationDetails(location));
+
+  var codAi=  await getLocationDetails(location);
+print("am searchin"+location);
+  var markCode=realIsFound(realcode, location.toLowerCase());
+
+  print("binary $markCode");
+ if(markCode!=null){
+   codAi["lat"]=markCode.latitude;
+   codAi["lng"]=markCode.longitude;
+ }
+
+print("codeai $codAi");
+
+    locateit.add(codAi);
+
+
   }
 
+print ("I am locate it $locateit");
+
+  // [{id: Masinde Muliro University, name: Masinde Muliro University of Science and Technology, address: Kakamega-Webuye Rd, Kakamega, Kenya, lat: 0.28979, lng: 34.75052, region: Kakamega, Western Kenya, image: https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/MMUST_Administration_Block.jpg/1280px-MMUST_Administration_Block.jpg, vacant: 1},
+  // {id: lurambi, name: Lurambi, address: Lurambi, Kakamega County, Kenya, lat: 0.2825, lng: 34.75361, region: Kakamega County, image: https://example.com/lurambi.jpg, vacant: 1}]
 
 return locateit;
 }

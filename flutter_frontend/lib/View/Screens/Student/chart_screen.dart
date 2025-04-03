@@ -6,14 +6,18 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_frontend/View-Model/view_model.dart';
 import 'package:flutter_frontend/View/Components/house_item.dart';
+import 'package:flutter_frontend/pages/rate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../chartbot_fun/ai_funs.dart';
 import '../../../constants.dart';
 import '../../../data/chart_provider.dart';
 import '../../../data/notifications.dart';
 import '../../../data/providers.dart';
+import '../../../pages/help.dart';
+import '../../../pages/searched_places.dart';
 import '../../Components/SimpleAppBar.dart';
 import 'chart_app_bar.dart';
 import 'mapit.dart';
@@ -43,15 +47,22 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   final FirebaseAuth auth = FirebaseAuth.instance;
   final FirebaseFirestore fs = FirebaseFirestore.instance;
 
+  String onTapedScreen='ai';
+
+  bool showMap=false;
+  String pkey="pageKey";
+
+
+
   String paymentOP="";
   Map<String, dynamic> houseop={};
 
-  bool nameAvailable=false;
+
 
 bool awaitingPhoneNumberInput=false;
   var showHouses=false;
 
-  String conversationStep = "select_option";
+  String conversationStep="select_option";
 
   List<Map<String, dynamic>> messages = [];
   bool isTyping = false;
@@ -118,40 +129,56 @@ bool awaitingPhoneNumberInput=false;
     }
 
 
+    String name= await chatService.getUserName();
+    var nameAvailable= name=="user";
+    print(name);
+    if (nameAvailable) {
+    print(name);
+      if ( messages.any((map) =>
+      map["text"]?.contains("Please enter your full name:") ?? false) ) {
 
-    if (messages.isNotEmpty) {
-      if (messages.any((map) =>
-      map["text"]?.contains("Please enter your full name:") ?? false) &&
-          !nameAvailable) {
-        if (chatService.isValidFullName(userMessage)) {
-          await chatService.saveName(userMessage);
-          setState(() {
-            messages.add({
-              "role": "ai",
-              "text":  "Welcome $userMessage! I am your assistant to help you find the house of your choice.\n\n"
-            "Here are the services we offer:\n"
-            " 1 List all available houses in a specific location\n"
-            " 2 See all locations with available houses\n"
-            " 3 Report for an emergency\n"
-            " 4 Ask for help and related questions\n"
-                  " 5 Send feedback to the landlord\n\n"
+          if (await validateFullName(userMessage)) {
+            await chatService.saveName(userMessage);
 
-            "Which option would you like me to assist you with? (Reply with one of the above options eg 1 or option 1)"
+            setState(() {
+              messages.add({
+                "role": "ai",
+                "text": "Welcome ${userMessage.trim().split(" ").first}, I am your assistant to help you find the house of your choice.\n\n"
+                    "Here are the services we offer:\n"
+                    " 1 List all available houses in a specific location\n"
+                    " 2 See all locations with available houses\n"
+                    " 3 Report for an emergency\n"
+                    " 4 Ask for help and related questions\n"
+                    " 5 Send feedback to the landlord\n\n"
+                    "Which option would you like me to assist you with? (Reply with one of the above options eg 1 or option 1)"
+              });
+              isTyping = false;
+
+
+
+
             });
-            isTyping=false;
-          });
-        } else {
-          setState(() {
-            messages.add({
-              "role": "ai",
-              "text": "Invalid name. Please enter your full name (e.g., Otike Mandevu)."
+          } else {
+            print(name);
+            setState(() {
+              messages.add({
+                "role": "ai",
+                "text": "Invalid name. Please enter your full name (e.g., Otike Mandevu)."
+              });
+              isTyping = false;
             });
-            isTyping=false;
-          });
-        }
-        return;
+          }
+
+
+          return;
       }
+
+
+
+
     }
+
+
 
 
 
@@ -215,22 +242,58 @@ bool awaitingPhoneNumberInput=false;
 
 
           conversationStep = "view_locations";
-        aiResponse=await chatService.handleOption2();
+
+         setState(() {
+           showMap=true;
+         });
+
+         if(conversationStep == "view_locations") {
+           aiResponse = await chatService.handleOption2();
+           Future.delayed(Duration(seconds: 1), () async {
+
+             setState(() {
+               messages.add({
+                 "role": "ai",
+                 "text": aiResponse
+               });
+               conversationStep = "enter_location"; // Update step to location selection
+              });
+           });
+         }
+
+
+      }else if(aiResponse.contains("Report for an emergency.")) {
+
+        aiResponse="Which kind of emergency do you wish to report.";
 
 
 
+      }else if(aiResponse.contains("Ask for help and related questions.")) {
 
+        aiResponse="Ask any question that you want me to help you with ?";
+
+
+      }else if(aiResponse.contains( "Send feedback to the landlord")) {
+
+        aiResponse= "Send feedback to the landlord";
 
       }
 
 
 
 
+
     }
     else if (conversationStep == "enter_location") {
+      setState(() {
+        showMap=false;
+      });
       bool isValid = await validateLocation(userMessage);
 
       if (isValid) {
+        onSearch(userMessage,  ref) ;
+
+
         List<Map<String, dynamic>> houses = await chatService.getHousesByLocation(userMessage);
 
         if (houses.isNotEmpty) {
@@ -346,12 +409,14 @@ bool awaitingPhoneNumberInput=false;
     String houseName = house["House Name"]?? "Unknown House";
     String location = house["Location"]?? "Unknown Location";
     double price = house["House Price"]?? 0.0;
+    List<String> houseImages=house["Images"]??[];
 
     print("House ID: $houseId");
     print("Landlord ID: $landlordId");
     print("House Name: $houseName");
     print("Location: $location");
     print("Price: $price");
+    print("images: $houseImages");
 
     String? studentEmail = auth.currentUser?.email;
     String? studentName =await chatService.getUserName();
@@ -421,8 +486,7 @@ bool awaitingPhoneNumberInput=false;
        print("Wait for pay");
 
 
-        await fs.collection("booked_students").doc(
-            studentEmail).set({
+        await fs.collection("booked_students").doc().set({
           "email": studentEmail,
           "name": studentName ?? "Unknown",
           "stdContact": studentPhone,
@@ -433,6 +497,7 @@ bool awaitingPhoneNumberInput=false;
           "landlordContact": landlordPhone,
           "landlordId":landlordId,
           "landlord": lname,
+          "images":houseImages
 
         });
 
@@ -478,6 +543,8 @@ bool awaitingPhoneNumberInput=false;
   @override
   Widget build(BuildContext context) {
     var screenWidth=MediaQuery.of(context).size.width;
+    final prefs = ref.watch(sharedPreferencesProvider);
+
 
     return Scaffold(
 
@@ -515,22 +582,95 @@ bool awaitingPhoneNumberInput=false;
            // height: double.infinity,
 
             child: Column(
+              spacing: 5,
                 children: [
-                SizedBox(height: 20),
+                SizedBox(height: 5),
+                 ListTile(
+                   leading: Icon(Icons.mark_unread_chat_alt_outlined),
+
+                   title:Text("Services"),
+                   onTap: (){
+                     setState(()  {
+                       onTapedScreen='ai';
+                       prefs.setString(pkey, "ai");
+
+                     });
+                   },
+                 ),
+                  Divider(),
+                  ListTile(
+                    leading: Icon(Icons.house_outlined),
+
+                    title:Text("Booked House"),
+                    onTap: (){
+                      setState(() {
+                        onTapedScreen='booked';
+                        prefs.setString(pkey, "booked");
+                      });
+                    },
+                  ),
+                  Divider(),
+                  ListTile(
+                    leading: Icon(Icons.place_outlined),
+                    title:Text("Searched places"),
+                    onTap: (){
+                      setState(() {
+                        onTapedScreen='places';
+                        prefs.setString(pkey, "places");
+                      });
+                    },
+                  ),
+                  Divider(),
+                  ListTile(
+                    leading: Icon(Icons.assistant_photo_outlined),
+                    title:Text("Help and Manual"),
+                    onTap: (){
+                      setState(() {
+                        onTapedScreen='help';
+                        prefs.setString(pkey, "help");
+                      });
+                    },
+                  ),
+                  Divider(),
+                  ListTile(
+                    leading: Icon(Icons.star),
+                    title:Text("Rate us"),
+                    onTap: (){
+                      setState(() {
+                        onTapedScreen='rate';
+                        prefs.setString(pkey, "rate");
+                      });
+                    },
+                  ),
+                  Divider(),
 
 
-  ] ),
+
+
+
+                ] ),
 
           ),
 Expanded(
-    child:
-AiPage()
+    child: prefs.getString(pkey)=="ai"?AiPage():
+    prefs.getString(pkey)=="booked"?Center(child: Text("Booked screen"),):
+    prefs.getString(pkey)=="places"?SearchedPlacesScreen():
+    prefs.getString(pkey)=="help"?HelpAndManualPage():
+    prefs.getString(pkey)=="rate"?RateUsPage():
+    AiPage()
+
+
 ),
 
         ],
       )
           ):
-          AiPage()
+      prefs.getString(pkey)=="ai"?AiPage():
+      prefs.getString(pkey)=="booked"?Center(child: Text("Booked screen"),):
+      prefs.getString(pkey)=="places"?SearchedPlacesScreen():
+      prefs.getString(pkey)=="help"?HelpAndManualPage():
+      prefs.getString(pkey)=="rate"?RateUsPage():
+      AiPage()
 
 
 
@@ -563,8 +703,8 @@ var screenWidth=MediaQuery.of(context).size.width;
 
                   final message = messages[index];
 
-                  // Show the map inside AI chat when viewing locations
-                  if (conversationStep == "view_locations" && index == messages.length - 1) {
+
+                  if (showMap && index == messages.length - 1 ) {
                     return Align(
                       alignment: Alignment.centerLeft,
                       child: Container(
@@ -583,8 +723,8 @@ var screenWidth=MediaQuery.of(context).size.width;
                             ),
                             SizedBox(height: 10),
                             SizedBox(
-                              width: screenWidth*0.6,
-                              height: screenHeight*0.3,
+                              width: screenWidth*0.7,
+                              height: screenHeight*0.5,
                               child: MapScreen(),
                             ),
                           ],
@@ -601,7 +741,7 @@ var screenWidth=MediaQuery.of(context).size.width;
                     }
                   }
 
-                  // Show normal messages
+
                   return Align(
                     alignment: message["role"] == "user" ? Alignment.centerRight : Alignment.centerLeft,
                     child: Container(
