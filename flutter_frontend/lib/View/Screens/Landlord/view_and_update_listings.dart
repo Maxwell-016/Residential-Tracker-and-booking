@@ -19,22 +19,15 @@ import '../../Components/text_field.dart';
 
 class ViewAndUpdateListings extends StatefulWidget {
   const ViewAndUpdateListings({
-
     super.key,
     required this.changeTheme,
     required this.changeColor,
     required this.colorSelected,
   });
 
-
   final ColorSelection colorSelected;
   final void Function(bool useLightMode) changeTheme;
   final void Function(int value) changeColor;
-
-
-
-
-
 
   @override
   State<ViewAndUpdateListings> createState() => _ViewAndUpdateListingsState();
@@ -47,19 +40,14 @@ class _ViewAndUpdateListingsState extends State<ViewAndUpdateListings> {
     final firebaseServicesProvider = FirebaseServices();
     return SafeArea(
       child: Scaffold(
-
-
-        appBar:PreferredSize(
+        appBar: PreferredSize(
           preferredSize: Size.fromHeight(60),
-          child:App_Bar(
+          child: App_Bar(
               changeTheme: widget.changeTheme,
               changeColor: widget.changeColor,
               colorSelected: widget.colorSelected,
               title: "View Listings"),
         ),
-
-
-
         body: FutureBuilder(
             future: firebaseServicesProvider.getHouseListing(),
             builder: (context, snapshot) {
@@ -105,7 +93,9 @@ class _ViewAndUpdateListingsState extends State<ViewAndUpdateListings> {
                         houseName: houses[index]['House Name'],
                         price: houses[index]['House Price'].toString(),
                         houseSize: houses[index]['House Size'],
-                        imageUrl: houses[index]['Images'][0],
+                        imageUrl: houses[index]['Images'].isNotEmpty
+                            ? houses[index]['Images'][0]
+                            : null,
                         onDeletePressed: () async {
                           await dialogBox(context, 'Delete',
                               'Are you sure you want to delete house ${houses[index]['House Name']}',
@@ -135,9 +125,9 @@ class _ViewAndUpdateListingsState extends State<ViewAndUpdateListings> {
   }
 }
 
-final updatedImageNameProvider = StateProvider<List<String>>((ref) => ['Select images'] );
-final updatedImageFileProvider = StateProvider<List<Uint8List>>((ref) => [] );
-
+final updatedImageNameProvider =
+    StateProvider<List<String>>((ref) => ['Select images']);
+final updatedImageFileProvider = StateProvider<List<Uint8List>>((ref) => []);
 
 class HouseDetails extends HookConsumerWidget {
   final Map<String, dynamic> house;
@@ -163,13 +153,18 @@ class HouseDetails extends HookConsumerWidget {
     TextEditingController descController =
         useTextEditingController(text: house['Description']);
     FocusNode descFocus = useFocusNode();
-    Future.microtask(() {
-      ref.read(selectedHouseSize.notifier).state = house['House Size'];
-      ref.read(houseLocationProvider.notifier).state = house['Location'];
-      ref.read(bookingStatusProvider.notifier).state =
-          house['isBooked'] ? 'Booked' : 'Not Booked';
-    });
+    useEffect(() {
+      Future.microtask(() {
+        ref.read(selectedHouseSize.notifier).state = house['House Size'];
+        ref.read(houseLocationProvider.notifier).state = house['Location'];
+        ref.read(bookingStatusProvider.notifier).state =
+            house['isBooked'] ? 'Booked' : 'Not Booked';
+      });
+      return null;
+    }, []);
     String selectedSize = ref.watch(selectedHouseSize);
+    String selectedLocation = ref.watch(houseLocationProvider);
+    String bookingStatus = ref.watch(bookingStatusProvider);
 
     final selectedAmenities =
         useState<List<dynamic>>(house['Available Amenities']);
@@ -208,9 +203,6 @@ class HouseDetails extends HookConsumerWidget {
     final deviceWidth = MediaQuery.of(context).size.width;
 
     double width = deviceWidth > 800 ? deviceWidth / 2.2 : deviceWidth / 1.1;
-
-    String selectedLocation = ref.watch(houseLocationProvider);
-    String bookingStatus = ref.watch(bookingStatusProvider);
 
     return SafeArea(
       child: Scaffold(
@@ -337,29 +329,32 @@ class HouseDetails extends HookConsumerWidget {
                                   // imagePickerService.pickImages();
                                 },
                                 child: GestureDetector(
-                                  onTap: () async{
-
-
+                                  onTap: () async {
                                     List<Uint8List> imageFiles = [];
                                     List<String> imageNames = [];
 
-                                    final images = await imagePickerService.pickImages();
+                                    final images =
+                                        await imagePickerService.pickImages();
 
-                                    if(images != null && images.isNotEmpty) {
-
+                                    if (images != null && images.isNotEmpty) {
                                       for (final image in images) {
                                         imageFiles.add(image.bytes);
                                         imageNames.add(image.name);
 
-                                        ref.read(updatedImageNameProvider.notifier).state = imageNames;
-                                        ref.read(updatedImageFileProvider.notifier).state = imageFiles;
+                                        ref
+                                            .read(updatedImageNameProvider
+                                                .notifier)
+                                            .state = imageNames;
+                                        ref
+                                            .read(updatedImageFileProvider
+                                                .notifier)
+                                            .state = imageFiles;
                                       }
                                     }
-
-
                                   },
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     spacing: 10,
                                     children: [
                                       Text('Images'),
@@ -455,41 +450,41 @@ class HouseDetails extends HookConsumerWidget {
                               ],
                             ),
 
-                            Column(
-                              spacing: 10,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text('Booking Status'),
-                                Container(
-                                  decoration: BoxDecoration(
-                                      border: Border.all(
-                                        color: borderColor,
-                                        width: 1.0,
-                                      ),
-                                      borderRadius:
-                                          BorderRadius.circular(10.0)),
-                                  width: width,
-                                  child: DropdownButton(
-                                    padding: EdgeInsets.only(left: 20.0),
-                                    underline: SizedBox(),
-                                    menuWidth: width,
-                                    items:
-                                        ['Booked', 'Not Booked'].map((entry) {
-                                      return DropdownMenuItem(
-                                        value: entry,
-                                        child: Text(entry),
-                                      );
-                                    }).toList(),
-                                    value: bookingStatus,
-                                    onChanged: (String? value) {
-                                      ref
-                                          .read(bookingStatusProvider.notifier)
-                                          .state = value!;
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ),
+                            // Column(
+                            //   spacing: 10,
+                            //   crossAxisAlignment: CrossAxisAlignment.start,
+                            //   children: [
+                            //     Text('Booking Status'),
+                            //     Container(
+                            //       decoration: BoxDecoration(
+                            //           border: Border.all(
+                            //             color: borderColor,
+                            //             width: 1.0,
+                            //           ),
+                            //           borderRadius:
+                            //               BorderRadius.circular(10.0)),
+                            //       width: width,
+                            //       child: DropdownButton(
+                            //         padding: EdgeInsets.only(left: 20.0),
+                            //         underline: SizedBox(),
+                            //         menuWidth: width,
+                            //         items:
+                            //             ['Booked', 'Not Booked'].map((entry) {
+                            //           return DropdownMenuItem(
+                            //             value: entry,
+                            //             child: Text(entry),
+                            //           );
+                            //         }).toList(),
+                            //         value: bookingStatus,
+                            //         onChanged: (String? value) {
+                            //           ref
+                            //               .read(bookingStatusProvider.notifier)
+                            //               .state = value!;
+                            //         },
+                            //       ),
+                            //     ),
+                            //   ],
+                            // ),
                             FunctionButton(
                               text: 'Update Details',
                               onPressed: () async {
@@ -498,8 +493,10 @@ class HouseDetails extends HookConsumerWidget {
                                       'Are you sure you want to save the changes?',
                                       () async {
                                     try {
-                                      List<String>? updatedUrls = await imagePickerService
-                                          .uploadFiles(ref.watch(updatedImageFileProvider));
+                                      List<String>? updatedUrls =
+                                          await imagePickerService.uploadFiles(
+                                              ref.watch(
+                                                  updatedImageFileProvider));
 
                                       String? message =
                                           await firebaseServicesProvider
@@ -511,9 +508,6 @@ class HouseDetails extends HookConsumerWidget {
                                         updatedUrls,
                                         descController.text,
                                         selectedAmenities.value,
-                                        bookingStatus == 'Booked'
-                                            ? true
-                                            : false,
                                       );
                                       if (!context.mounted) return;
                                       if (message == null) {
@@ -595,12 +589,15 @@ class HouseDetails extends HookConsumerWidget {
                             },
                             child: index < houses.length
                                 ? HouseCard(
-                                    houseName: houses[index]['House Name'],
-                                    price:
-                                        houses[index]['House Price'].toString(),
-                                    imageUrl: houses[index]['Images'][0],
-                                    houseSize: houses[index]['House Size'],
-                                  )
+                                        houseName: houses[index]['House Name'],
+                                        price: houses[index]['House Price']
+                                            .toString(),
+                                        imageUrl:
+                                            houses[index]['Images'].isNotEmpty
+                                                ? houses[index]['Images'][0]
+                                                : null,
+                                        houseSize: houses[index]['House Size'],
+                                      )
                                 : null,
                           );
                         });

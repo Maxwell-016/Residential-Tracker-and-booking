@@ -247,7 +247,6 @@ class FirebaseServices extends ChangeNotifier {
       List? images,
       String description,
       List? amenities,
-      bool isBooked,
       ) async {
     Map<String, dynamic> previousDetails =
     await getIndividualListing(name) as Map<String, dynamic>;
@@ -257,8 +256,8 @@ class FirebaseServices extends ChangeNotifier {
         previousDetails['House Size'] == size &&
         previousDetails['Images'] == images &&
         previousDetails['Description'] == description &&
-        previousDetails['Available Amenities'] == amenities &&
-    previousDetails['isBooked'] == isBooked
+        previousDetails['Available Amenities'] == amenities
+    //previousDetails['isBooked'] == isBooked
     ) {
       return 'No Change';
     } else {
@@ -274,7 +273,7 @@ class FirebaseServices extends ChangeNotifier {
         'Images': images,
         'Description': description,
         'Available Amenities': amenities,
-        'isBooked' : isBooked,
+        'isBooked' : false,
       });
       return null;
     }
@@ -305,6 +304,17 @@ class FirebaseServices extends ChangeNotifier {
       }
     }
     return houses;
+  }
+
+
+  Future<int> getNoOfAllHouses()async{
+    QuerySnapshot houses = await landlordReference.doc(_auth.currentUser!.uid) .collection('Houses').get();
+    return houses.docs.length;
+  }
+
+  Future<int> getNoOfAllBookedHouses() async{
+    QuerySnapshot houses = await landlordReference.doc(_auth.currentUser!.uid) .collection('Houses').where('isBooked',isEqualTo: true).get();
+    return houses.docs.length;
   }
 
   Future<void> deleteDocById(String name) async {
@@ -396,15 +406,19 @@ class FirebaseServices extends ChangeNotifier {
 
 
   Future<List<Map<String, dynamic>>> fetchResidences() async {
-  try{
-    QuerySnapshot snapshot = await this.firestore.collection('booked_students').get();
-    return snapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
-  } catch(e){
-    this.logger.e('Error fetching residences: $e');
-    return [];
+    try {
+      QuerySnapshot snapshot = await firestore.collection('booked_students')
+          .get();
+      return snapshot.docs.map((doc) => doc.data() as Map<String, dynamic>)
+          .toList();
+    } catch (e) {
+      logger.e('Error fetching residences: $e');
+      return [];
+    }
   }
 }
-}
+
+
 
 
 

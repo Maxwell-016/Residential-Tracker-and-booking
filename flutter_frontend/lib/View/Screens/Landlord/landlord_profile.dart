@@ -113,7 +113,7 @@ class LandlordProfile extends HookConsumerWidget {
         ),
 
         drawer: LandlordSideNav(),
-        body: isLoading.value || landlordDetails.value == {}
+        body: isLoading.value
             ? Center(
                 child: CircularProgressIndicator(),
               )
@@ -155,6 +155,7 @@ class LandlordProfile extends HookConsumerWidget {
 
                                 ref.read(profileUrl.notifier).state =
                                     profilePhoto;
+                                logger.i(ref.watch(profileUrl));
                               },
                               child: CircleAvatar(
                                 radius: 80.0,
