@@ -6,15 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_frontend/View-Model/navigation/routes.dart';
 import 'package:flutter_frontend/View/Screens/Landlord/landlord_profile.dart';
-import 'package:flutter_frontend/View/Screens/Landlord/students_bookings.dart';
-import 'package:flutter_frontend/View/Screens/Landlord/update_house_status.dart';
 import 'package:flutter_frontend/View/Screens/Landlord/view_and_update_listings.dart';
 import 'package:flutter_frontend/View/Screens/Student/mapit.dart';
 import 'package:flutter_frontend/constants.dart';
 import 'package:flutter_frontend/services/firebase_services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'View-Model/utils/savecurrentpage.dart';
@@ -29,6 +26,7 @@ import 'View/Screens/Landlord/landloard_dash.dart';
 import 'View/Screens/Landlord/manage_house_listings.dart';
 import 'View/Screens/Student/chart_screen.dart';
 import 'View/Screens/Student/student_dash.dart';
+import 'data/payment.dart';
 import 'data/providers.dart';
 import 'firebase_options.dart';
 import 'View/Screens/Admin/admin_settings.dart';
@@ -45,24 +43,21 @@ Future<void> main() async {
   } catch (e) {
     print('Firebase initialisation error: $e');
   }
+  // String initialRoute = await getLastVisitedPage();
 
-  String initialRoute = await getLastVisitedPage();
+  // Request permission for notifications
 
-  //Request permission for notifications
-
-
-  await AwesomeNotifications
-  ().initialize(
+  AwesomeNotifications().initialize(
     null,
     [
       NotificationChannel(
           channelKey: "app_status",
           channelName: "booking",
-          channelDescription: "Booking status")
+          channelDescription: "Booking status"
+      )
     ],
     debug: true,
   );
-
   final sharedPreferences = await SharedPreferences.getInstance();
 
   runApp(ProviderScope(
@@ -75,10 +70,10 @@ Future<void> main() async {
 class CustomScrollBehavior extends MaterialScrollBehavior {
   @override
   Set<PointerDeviceKind> get dragDevices => {
-        PointerDeviceKind.touch,
-        PointerDeviceKind.mouse,
-        PointerDeviceKind.trackpad
-      };
+    PointerDeviceKind.touch,
+    PointerDeviceKind.mouse,
+    PointerDeviceKind.trackpad
+  };
 }
 
 class ResidentialTrackerAndBooking extends ConsumerStatefulWidget {
@@ -92,13 +87,17 @@ class ResidentialTrackerAndBooking extends ConsumerStatefulWidget {
 
 class _StateResidentialTrackerAndBooking
     extends ConsumerState<ResidentialTrackerAndBooking> {
+
   ThemeMode themeMode = ThemeMode.light;
+
 
   ColorSelection colorSelected = ColorSelection.blue;
 
   void changeThemeMode(bool useLightMode) {
     setState(() {
-      themeMode = useLightMode ? ThemeMode.light : ThemeMode.dark;
+      themeMode = useLightMode
+          ? ThemeMode.light
+          : ThemeMode.dark;
     });
   }
 
@@ -108,19 +107,28 @@ class _StateResidentialTrackerAndBooking
     });
   }
 
+
   late final _router = GoRouter(
     initialLocation: "/login",
     redirect: _appRedirect,
     routes: [
-      GoRoute(builder: (context, state) => LoginPage(), path: '/login'),
+      //  GoRoute(builder: (context, state) => LoginPage(), path: '/login'),
+
+
+      GoRoute(
+          builder: (context, state) => LoginPage(),
+          path: '/login'),
+
       GoRoute(
           builder: (context, state) => RegistrationPage(),
           path: '/registration'),
       GoRoute(
-          builder: (context, state) => ForgotPassword(),
+          builder: (context, state)=> ForgotPassword(),
+
           path: '/forgot-password'),
       GoRoute(
           builder: (context, state) => EmailVerificationPage(),
+
           path: '/verification'),
 
       // GoRoute(
@@ -128,6 +136,7 @@ class _StateResidentialTrackerAndBooking
       //       return StudentDashboard();
       //     },
       //     path: '/student-dashboard'),
+
 
       GoRoute(
           builder: (context, state) {
@@ -138,6 +147,7 @@ class _StateResidentialTrackerAndBooking
             );
           },
           path: '/landlord-dashboard'),
+
 
       GoRoute(
           builder: (context, state) {
@@ -156,32 +166,22 @@ class _StateResidentialTrackerAndBooking
                 changeColor: changeColor,
                 colorSelected: colorSelected,
               ),
+
             ),
             GoRoute(
                 path: 'view-and-update-listings',
                 builder: (context, state) => ViewAndUpdateListings(
-                      changeTheme: changeThemeMode,
-                      changeColor: changeColor,
-                      colorSelected: colorSelected,
-                    ),),
-            GoRoute(
-              path: 'update-house-status',
-              builder: (context , state) => UpdateHouseStatus(colorSelected: colorSelected, changeTheme: changeThemeMode, changeColor: changeColor)
-            )
+                  changeTheme: changeThemeMode,
+                  changeColor: changeColor,
+                  colorSelected: colorSelected,
+                ))
           ]),
       GoRoute(
-          path: '/student-bookings',
-          builder: (context, state) => StudentsBookings(
-                changeTheme: changeThemeMode,
-                changeColor: changeColor,
-                colorSelected: colorSelected,
-              )),
-      GoRoute(
-          builder: (context, state) => LandlordProfile(
-                changeTheme: changeThemeMode,
-                changeColor: changeColor,
-                colorSelected: colorSelected,
-              ),
+          builder: (context,state) => LandlordProfile(
+            changeTheme: changeThemeMode,
+            changeColor: changeColor,
+            colorSelected: colorSelected,
+          ),
           path: '/landlord-profile'),
       GoRoute(
           builder: (context, state) {
@@ -199,22 +199,26 @@ class _StateResidentialTrackerAndBooking
           changeColor: changeColor,
           colorSelected: colorSelected,
         ),
+
       ),
 
       GoRoute(
           builder: (context, state) {
-            return ChatScreen(
+            return  ChatScreen(
               changeTheme: changeThemeMode,
               changeColor: changeColor,
               colorSelected: colorSelected,
             );
           },
           path: '/student-dashboard'),
-      GoRoute(
-          builder: (context, state) {
-            return MapScreen();
-          },
-          path: '/mapit'),
+      // GoRoute(
+      //     builder: (context, state) {
+      //       return  MapScreen();
+      //     },
+      //     path: '/mapit'),
+
+
+
     ],
     errorPageBuilder: (context, state) {
       return MaterialPage(
@@ -227,6 +231,7 @@ class _StateResidentialTrackerAndBooking
       );
     },
   );
+
 
   Future<String?> _appRedirect(
       BuildContext context, GoRouterState state) async {
@@ -269,7 +274,7 @@ class _StateResidentialTrackerAndBooking
       scrollBehavior: CustomScrollBehavior(),
       themeMode: themeMode,
       theme:
-          ThemeData(colorSchemeSeed: colorSelected.color, useMaterial3: true),
+      ThemeData(colorSchemeSeed: colorSelected.color, useMaterial3: true),
       darkTheme: ThemeData(
           colorSchemeSeed: colorSelected.color,
           useMaterial3: true,
