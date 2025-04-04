@@ -45,7 +45,6 @@ Future<void> main() async {
   }
   // String initialRoute = await getLastVisitedPage();
 
-  // Request permission for notifications
 
   AwesomeNotifications().initialize(
     null,
