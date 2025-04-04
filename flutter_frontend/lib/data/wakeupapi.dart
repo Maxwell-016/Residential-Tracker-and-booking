@@ -24,7 +24,7 @@ Future<void> WakeUpServer() async {
 
 
       } else {
-        print('Server responded, but not ready yet.');
+        print('Server responded, but not ready yet. ');
       }
     } catch (e) {
       print('Error waking up server: $e');
