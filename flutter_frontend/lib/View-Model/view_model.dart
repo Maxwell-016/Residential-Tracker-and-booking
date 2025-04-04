@@ -42,7 +42,7 @@ class ViewModel extends ChangeNotifier {
 }
 
 Future dialogBox(BuildContext context, String title, String body,
-    Future<void> Function() onOkPressed) {
+    Future<void> Function() onOkPressed, bool isLoading) {
   return showDialog(
     context: context,
     builder: (context) => AlertDialog(
@@ -59,12 +59,14 @@ Future dialogBox(BuildContext context, String title, String body,
               Navigator.pop(context);
             },
             btnColor: AppColors.deepBlue),
-        FunctionButton(
-            text: title,
-            onPressed: () async {
-              await onOkPressed();
-            },
-            btnColor: AppColors.deepBlue)
+        isLoading
+            ? CircularProgressIndicator()
+            : FunctionButton(
+                text: title,
+                onPressed: () async {
+                  await onOkPressed();
+                },
+                btnColor: AppColors.deepBlue)
       ],
     ),
   );
