@@ -211,12 +211,6 @@ class _StateResidentialTrackerAndBooking
               );
             },
             path: '/student-dashboard'),
-        // GoRoute(
-        //     builder: (context, state) {
-        //       return  MapScreen();
-        //     },
-        //     path: '/mapit'),
-
 
 
       ],
