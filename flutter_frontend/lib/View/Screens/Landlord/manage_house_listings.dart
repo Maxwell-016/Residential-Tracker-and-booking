@@ -72,7 +72,7 @@ class ManageHouseListings extends ConsumerWidget {
                   ),
                 ),
                 GestureDetector(
-                  onTap: ()  {
+                  onTap: () async {
                     context.go('/manageListings/view-and-update-listings');
                   },
                   child: CardButton(
@@ -85,18 +85,13 @@ class ManageHouseListings extends ConsumerWidget {
                     ),
                   ),
                 ),
-                GestureDetector(
-                  onTap: (){
-                    context.go('/manageListings/update-house-status');
-                  },
-                  child: CardButton(
-                    bgColor: AppColors.manage,
-                    title: 'Mark House as Available',
-                    icon: Icon(
-                      color: Colors.black,
-                      Icons.calendar_month_outlined,
-                      size: 30.0,
-                    ),
+                CardButton(
+                  bgColor: AppColors.manage,
+                  title: 'Mark House as Booked / Not Booked',
+                  icon: Icon(
+                    color: Colors.black,
+                    Icons.calendar_month_outlined,
+                    size: 30.0,
                   ),
                 ),
               ],

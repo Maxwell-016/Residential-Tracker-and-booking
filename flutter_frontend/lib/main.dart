@@ -7,7 +7,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_frontend/View-Model/navigation/routes.dart';
 import 'package:flutter_frontend/View/Screens/Landlord/landlord_profile.dart';
 import 'package:flutter_frontend/View/Screens/Landlord/students_bookings.dart';
-import 'package:flutter_frontend/View/Screens/Landlord/update_house_status.dart';
 import 'package:flutter_frontend/View/Screens/Landlord/view_and_update_listings.dart';
 import 'package:flutter_frontend/View/Screens/Student/mapit.dart';
 import 'package:flutter_frontend/constants.dart';
@@ -163,11 +162,7 @@ class _StateResidentialTrackerAndBooking
                       changeTheme: changeThemeMode,
                       changeColor: changeColor,
                       colorSelected: colorSelected,
-                    ),),
-            GoRoute(
-              path: 'update-house-status',
-              builder: (context , state) => UpdateHouseStatus(colorSelected: colorSelected, changeTheme: changeThemeMode, changeColor: changeColor)
-            )
+                    ))
           ]),
       GoRoute(
           path: '/student-bookings',

@@ -6,7 +6,6 @@ class HouseCard extends StatelessWidget {
   final String price;
   final String houseSize;
   final String? imageUrl;
-  final bool? isNotMoney;
   final Future Function()? onDeletePressed;
   const HouseCard(
       {super.key,
@@ -14,8 +13,7 @@ class HouseCard extends StatelessWidget {
       required this.price,
       required this.houseSize,
       this.imageUrl,
-      this.onDeletePressed,
-      this.isNotMoney});
+      this.onDeletePressed});
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +55,7 @@ class HouseCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     UseFont(
-                      text: isNotMoney != null ? price :'Ksh.$price' ,
+                      text: 'Ksh.$price',
                       myFont: 'Roboto',
                       size: 16.0,
                       weight: FontWeight.bold,
