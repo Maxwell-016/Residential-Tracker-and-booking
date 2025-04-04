@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_frontend/View/Screens/Admin/admin_search_page.dart';
+import 'package:flutter_frontend/View/Screens/Admin/search_individuals_page.dart';
+import 'package:flutter_frontend/View/Screens/Admin/view_students_page.dart';
+import 'package:flutter_frontend/View/Screens/Admin/view_studn.dart';
 import 'package:flutter_frontend/services/firebase_services.dart';
 import 'package:flutter_frontend/View/Screens/Admin/admin_settings.dart';
-import 'package:flutter_frontend/View/Screens/Admin/view_students_page.dart';
 import 'package:flutter_frontend/View/Screens/Admin/view_landlords_page.dart';
 import 'package:flutter_frontend/View/Screens/Admin/add_individuals_page.dart';
-import 'package:flutter_frontend/View/Screens/Admin/search_individuals_page.dart';
 
 import '../../../constants.dart';
 import '../../Components/SimpleAppBar.dart';
@@ -104,7 +106,11 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const ViewStudentsPage(),
+                    builder: (context) => ViewStudentdt(
+                      changeTheme: widget.changeTheme,
+                      changeColor: widget.changeColor,
+                      colorSelected: widget.colorSelected,
+                    ),
                   ),
                 );
               },
@@ -140,7 +146,11 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const SearchIndividualsPage(),
+                    builder: (context) => AdminSearchPg(
+                      changeTheme: widget.changeTheme,
+                      changeColor: widget.changeColor,
+                      colorSelected: widget.colorSelected,
+                    ),
                   ),
                 );
               },

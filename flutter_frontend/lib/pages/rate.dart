@@ -4,26 +4,21 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/providers.dart';
 
-
-
-
 class RateUsPage extends ConsumerStatefulWidget {
-
-
-
+  const RateUsPage({super.key});
 
   @override
   ConsumerState<RateUsPage> createState() => _RateUsPageState();
 }
 
 class _RateUsPageState extends ConsumerState<RateUsPage> {
-  int _selectedRating = 0;
+  final int _selectedRating = 0;
   final TextEditingController _feedbackController = TextEditingController();
-
 
   void _submitFeedback() async {
     if (ref.watch(rateus) == 0) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please select a rating!")));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("Please select a rating!")));
       return;
     }
 
@@ -33,27 +28,22 @@ class _RateUsPageState extends ConsumerState<RateUsPage> {
       'timestamp': FieldValue.serverTimestamp(),
     });
 
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Thank you for your feedback!")));
 
-
-
-    ref.read(rateus.notifier).state=0;
-    _feedbackController.text='';
-   // ref.read(optionString.notifier).state="";
-
-
+    ref.read(rateus.notifier).state = 0;
+    ref.read(optionString.notifier).state = "";
   }
 
   @override
   Widget build(BuildContext context) {
-   // ref.read(optionString.notifier).state= _feedbackController.text;
+
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text("How would you rate your experience?", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Text("How would you rate your experience?",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             SizedBox(height: 10),
             _buildStarRating(),
             SizedBox(height: 20),
@@ -77,23 +67,19 @@ class _RateUsPageState extends ConsumerState<RateUsPage> {
     );
   }
 
-
   Widget _buildStarRating() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(5, (index) {
         return IconButton(
-          icon: Icon(
-            Icons.star,
-            size: 40,
-            color: index < ref.watch(rateus) ? Colors.orange : Colors.grey,
-          ),
-          onPressed:() {
-            ref
-                .read(rateus.notifier)
-                .state = index + 1;
-          }
-        );
+            icon: Icon(
+              Icons.star,
+              size: 40,
+              color: index < ref.watch(rateus) ? Colors.orange : Colors.grey,
+            ),
+            onPressed: () {
+              ref.read(rateus.notifier).state = index + 1;
+            });
       }),
     );
   }

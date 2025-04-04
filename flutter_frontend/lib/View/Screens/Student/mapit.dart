@@ -1,8 +1,6 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../../chartbot_fun/ai_funs.dart';
-import '../../../src/locations.dart' as locations;
 
 class MapScreen extends StatefulWidget {
    MapScreen({super.key, required this.locations});
@@ -19,11 +17,22 @@ class _MapScreenState extends State<MapScreen> {
   Future<void> _onMapCreated(GoogleMapController controller) async {
     print("🔍 _onMapCreated triggered");
 
-    final List<Map<String, dynamic>> toBeMarked = await getLocationsToBeMarked(widget.locations);
+// <<<<<<< gamma
+//     final List<Map<String, dynamic>> toBeMarked = await getLocationsToBeMarked(widget.locations);
+// =======
+// //     final List<Map<String, dynamic>> toBeMarked =
+// //         await getLocationsToBeMarked();
+// >>>>>>> main
 
     setState(() {
       _markers.clear();
       for (final place in toBeMarked) {
+// <<<<<<< gamma
+// =======
+// //         print(
+// //             "📍 Adding Marker: ${place["name"]} at ${place["lat"]}, ${place["lng"]}");
+
+// >>>>>>> main
         final marker = Marker(
           markerId: MarkerId(place["id"].toString()),
           position: LatLng(place["lat"], place["lng"]),
@@ -84,11 +93,18 @@ class _MapScreenState extends State<MapScreen> {
       _currentMapType = _currentMapType == MapType.normal
           ? MapType.satellite
           : _currentMapType == MapType.satellite
-          ? MapType.terrain
-          : _currentMapType == MapType.terrain
-          ? MapType.hybrid
-          : MapType.normal;
-      print(_currentMapType);
+// <<<<<<< gamma
+//           ? MapType.terrain
+//           : _currentMapType == MapType.terrain
+//           ? MapType.hybrid
+//           : MapType.normal;
+//       print(_currentMapType);
+//  =======
+// //               ? MapType.terrain
+// //               : _currentMapType == MapType.terrain
+// //                   ? MapType.hybrid
+// //                   : MapType.normal;
+// >>>>>>> main
     });
   }
 

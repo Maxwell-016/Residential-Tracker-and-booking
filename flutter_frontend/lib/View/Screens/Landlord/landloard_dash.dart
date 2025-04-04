@@ -34,6 +34,21 @@ class LandLordDashboardScreen extends ConsumerStatefulWidget {
 
 class _LandLordDashboardScreenState extends ConsumerState<LandLordDashboardScreen> {
 
+  late Future<Map<String,int>> _houseDataFuture;
+
+  FirebaseServices firebaseService = FirebaseServices();
+  @override
+  void initState() {
+    super.initState();
+    _houseDataFuture = _fetchHouseData();
+  }
+  Future<Map<String,int>> _fetchHouseData() async{
+    final total = await firebaseService.getNoOfAllHouses();
+    final booked = await firebaseService.getNoOfAllBookedHouses();
+    final notBooked = total - booked;
+    return {'total' : total, 'booked' : booked, 'notBooked' : notBooked};
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -55,29 +70,42 @@ class _LandLordDashboardScreenState extends ConsumerState<LandLordDashboardScree
 
 
         drawer: LandlordSideNav(),
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.only(left: 100.0),
-            child: Wrap(
-              spacing: 40.0,
-              runSpacing: 40.0,
-              children: [
-                // display
-                CardButton(
-                    quantity: 89,
-                    bgColor: AppColors.totalListings,
-                    title: 'Total Listings'),
-                CardButton(
-                    quantity: 50,
-                    bgColor: AppColors.booked,
-                    title: 'Booked Houses'),
-                CardButton(
-                    quantity: 39,
-                    bgColor: AppColors.availableListings,
-                    title: 'Available Houses'),
-              ],
-            ),
-          ),
+        body: FutureBuilder(
+          future:  _houseDataFuture,
+          builder: (context,snapshot) {
+            if(snapshot.connectionState == ConnectionState.waiting){
+              return Center(child: CircularProgressIndicator(),);
+            }
+            if(snapshot.hasError){
+              return Center(child: Text('Error loading data. Check your connection and try again'),);
+            }
+            final data = snapshot.data!;
+            return SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.only(left: 100.0),
+                child: Wrap(
+                  spacing: 40.0,
+                  runSpacing: 40.0,
+                  children: [
+                    // display
+                    CardButton(
+                        quantity: data['total'],
+                        bgColor: AppColors.totalListings,
+                        title: 'Total Listings'),
+                    CardButton(
+                        quantity: data['booked'],
+                        bgColor: AppColors.booked,
+                        title: 'Booked Houses'),
+                    CardButton(
+                        quantity: data['notBooked'],
+                        bgColor: AppColors.availableListings,
+                        title: 'Available Houses'),
+                  ],
+                ),
+              ),
+            );
+
+          },
         ),
       ),
     );

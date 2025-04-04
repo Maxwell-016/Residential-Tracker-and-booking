@@ -10,14 +10,13 @@ import '../../../constants.dart';
 import '../../../data/providers.dart';
 import '../../Components/color_button.dart';
 
-
-class Chat_Bar extends ConsumerStatefulWidget{
+class Chat_Bar extends ConsumerStatefulWidget {
   final ColorSelection colorSelected;
   final void Function(bool useLightMode) changeTheme;
   final void Function(int value) changeColor;
   final title;
 
-  Chat_Bar({
+  const Chat_Bar({
     super.key,
     required this.changeTheme,
     required this.changeColor,
@@ -26,47 +25,36 @@ class Chat_Bar extends ConsumerStatefulWidget{
   });
   @override
   ConsumerState<Chat_Bar> createState() => _StateAppBar();
-
-
 }
+
 class _StateAppBar extends ConsumerState<Chat_Bar> {
   @override
   Widget build(BuildContext context) {
     final fb = ref.watch(firebaseServices);
 
-
-
-    return
-
-
-      AppBar(
-        title:  Text(widget.title),
-        elevation: 24,
-        leading: IconButton(
-          icon: const Icon(Icons.menu),
-          onPressed: () {
-
-            ref.read(toggleMenu.notifier).state = !ref.read(toggleMenu);
+    return AppBar(
+      title: Text(widget.title),
+      elevation: 24,
+      leading: IconButton(
+        icon: const Icon(Icons.menu),
+        onPressed: () {
+          ref.read(toggleMenu.notifier).state = !ref.read(toggleMenu);
+        },
+      ),
+      actions: [
+        ThemeButton(changeThemeMode: widget.changeTheme),
+        ColorButton(
+            changeColor: widget.changeColor,
+            colorSelected: widget.colorSelected),
+        IconButton(
+          onPressed: () async {
+            fb.signOut(context);
+            await Future.delayed(Duration(milliseconds: 1));
+            context.go('/login');
           },
+          icon: Icon(Icons.logout_sharp),
         ),
-          actions: [
-            ThemeButton(changeThemeMode: widget.changeTheme),
-            ColorButton(changeColor: widget.changeColor,
-                colorSelected: widget.colorSelected),
-            IconButton(
-              onPressed: () async {
-                fb.signOut(context);
-                await Future.delayed(Duration(milliseconds: 1));
-                context.go('/login');
-              },
-              icon: Icon(Icons.logout_sharp),
-            ),
-          ],
-      );
-
-
-
+      ],
+    );
   }
-
 }
-
