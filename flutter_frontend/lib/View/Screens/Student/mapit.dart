@@ -12,6 +12,7 @@ class MapScreen extends StatefulWidget {
   State<MapScreen> createState() => _MapScreenState();
 }
 
+
 class _MapScreenState extends State<MapScreen> {
   final Map<String, Marker> _markers = {};
   MapType _currentMapType = MapType.normal;
