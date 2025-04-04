@@ -90,7 +90,7 @@ class ChatService {
 
     return querySnapshot.docs.map((doc) {
       return {
-        "id": doc.id, // House ID
+        "id": doc.id,
         "landlordId": doc.reference.parent.parent?.id,
         ...doc.data() as Map<String, dynamic>
       };

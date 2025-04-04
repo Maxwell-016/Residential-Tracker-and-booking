@@ -59,7 +59,7 @@ Future<bool> validateLocation(String location) async {
 
 
   String response = await aiService.getAIResponse(
-      "Is '$location' a valid place name? Reply only with 'yes' or 'no'."
+      "Is '$location' a valid place name?check first in kakamega before the rest of the world if it is a real place or name of a place. Reply only with 'yes' or 'no'."
   );
 
   return response.trim().toLowerCase() == "yes";
@@ -99,6 +99,7 @@ bool isValidKenyanPhoneNumber(String phoneNumber) {
         "Include: name, address, latitude (lat), longitude (lng), region, and a relevant image URL. "
         "in long and latitude be accurate as possible you and round of to 5 digit place"
     "Start looking first in kakamega as your main focus before looking to other places"
+
         "Ensure the response is a valid JSON object **only**, without extra text or formatting like markdown.\n\n"
         "The JSON format should be:\n"
         "{\n"
@@ -135,11 +136,11 @@ bool isValidKenyanPhoneNumber(String phoneNumber) {
   }
 
 
-Future<List<Map<String,dynamic>>> getLocationsToBeMarked() async {
+Future<List<Map<String,dynamic>>> getLocationsToBeMarked(Future<List<String>> many_location) async {
  List<Map<String,dynamic>> locateit=[];
   List<String> locations=["Masinde Muliro University"];
 
- locations.addAll(await chatService.getAllLocations());
+ locations.addAll(await many_location);
 
   for(var location in locations){
 

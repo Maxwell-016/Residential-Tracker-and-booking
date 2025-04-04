@@ -4,6 +4,7 @@ import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_frontend/data/payment.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
@@ -140,9 +141,9 @@ class _StateHouseCard extends ConsumerState<HouseCard> {
 
 
   void _showPaymentOptions() {
-    double housePrice = widget.house["House Price"]/1000 ?? 0.0;
+    double housePrice = widget.house["House Price"]?? 0.0;
     double monthlyPayment = housePrice;
-    double semesterPayment = (housePrice * 4)/4000;
+    double semesterPayment = (housePrice * 4);
 
     showDialog(
       context: context,
@@ -160,7 +161,7 @@ class _StateHouseCard extends ConsumerState<HouseCard> {
                   if (value != null) {
                     setState(() => selectedPayment = value);
                     Navigator.pop(context);
-                    _processBooking(value);  // Run after closing dialog
+                    _processBooking(value);
                   }
                 },
               ),
@@ -224,11 +225,13 @@ class _StateHouseCard extends ConsumerState<HouseCard> {
     String? landlordId = widget.house["landlordId"] as String?;
     String? houseId = widget.house["id"] as String?;
     String houseName = widget.house["House Name"] ?? "Unknown House";
+    double lat =  widget.house["Live Latitude"]?? 0.0;
+    double long =  widget.house["Live Longitude"]?? 0.0;
     String location = widget.house["Location"] ?? "Unknown Location";
     double price = widget.house["House Price"] ?? 0.0;
-    List<String> houseImage = widget.house["Images"] ?? [];
-
-
+    // var houseImage = widget.house["Images"].toString() ?? [];
+    // List<String> houseImage = widget.house["Images"].map((item) => item.toString()).toList();
+    List<String> houseImage = widget.house["Images"].cast<String>()??[];
     if (landlordId == null || houseId == null) {
       print("Error: LandlordId or HouseId is null");
       setState(() => isBooking = false);
@@ -255,58 +258,73 @@ class _StateHouseCard extends ConsumerState<HouseCard> {
 
     double amountToPay = paymentOption == "semester" ? price * 4 : price;
 
-    var response = await http.post(
-      Uri.parse("https://mpesaapi.onrender.com/stkpush"),
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode({"phone": studentPhone, "amount": amountToPay}),
-    );
+    initiatePayment(studentPhone,
+        amountToPay,
+        studentEmail!,
+        studentName,
+        houseName,
+        location,
+        landlordPhone,
+        landlordId,
+        landlordName,
+        houseId,
+        houseImage,
+        paymentOption,lat,long);
 
-    if (response.statusCode != null) {
-
-      var callbackResponse = await http.get(Uri.parse("https://mpesaapi.onrender.com/callback"));
-
-      if (callbackResponse.statusCode !=null) {
-        print("Payment successful, proceeding with booking...");
-
-        await fs.collection("booked_students").doc().set({
-          "email": studentEmail,
-          "name": studentName ?? "Unknown",
-          "stdContact": studentPhone,
-          "houseName": houseName,
-          "houseLocation": location,
-          "payment_status": "Paid",
-          "amount_paid": amountToPay,
-          "landlordContact": landlordPhone,
-          "landlordId":landlordId,
-          "landlord": landlordName,
-          "images":houseImage
-        });
-
-        await fs
-            .collection("Landlords")
-            .doc(landlordId)
-            .collection("Houses")
-            .doc(houseId)
-            .update({"isBooked": true});
-
-
-        String msg="$houseName has been booked successfully with the '$paymentOption' option!";
-        print(msg  );
-        trigernotification(null, msg, "House Booked Successfully");
-
-      } else {
-        String msg="Booking not completed.";
-        print(msg);
-        trigernotification(null, msg, "Payment failed!!");
-
-      }
-    } else {
-
-      String msg="Error: M-Pesa request failed.";
-      print(msg);
-      trigernotification(null, msg, "Payment failed!!");
-
-    }
+    // var response = await http.post(
+    //   Uri.parse("https://mpesaapi.onrender.com/stkpush"),
+    //   headers: {"Content-Type": "application/json"},
+    //   body: jsonEncode({"phone": studentPhone, "amount": amountToPay}),
+    // );
+    //
+    // if (response.statusCode != null) {
+    //
+    //   var callbackResponse = await http.get(Uri.parse("https://mpesaapi.onrender.com/callback"));
+    //
+    //   if (callbackResponse.statusCode !=null) {
+    //     print("Payment successful, proceeding with booking...");
+    //
+    //     await fs.collection("booked_students").doc().set({
+    //       "email": studentEmail,
+    //       "name": studentName ?? "Unknown",
+    //       "stdContact": studentPhone,
+    //       "houseName": houseName,
+    //       "houseLocation": location,
+    //       "payment_status": "Paid",
+    //       "paymentOption":paymentOption,
+    //       'timestamp': FieldValue.serverTimestamp(),
+    //       "amount_paid": amountToPay,
+    //       "landlordContact": landlordPhone,
+    //       "landlordId":landlordId,
+    //       "landlord": landlordName,
+    //       "images":houseImage
+    //     });
+    //
+    //     await fs
+    //         .collection("Landlords")
+    //         .doc(landlordId)
+    //         .collection("Houses")
+    //         .doc(houseId)
+    //         .update({"isBooked": true});
+    //
+    //
+    //     String msg="$houseName has been booked successfully with the '$paymentOption' option!";
+    //     print(msg  );
+    //     trigernotification(null, msg, "House Booked Successfully");
+    //
+    //   } else {
+    //     String msg="Booking not completed.";
+    //     print(msg);
+    //     trigernotification(null, msg, "Payment failed!!");
+    //
+    //   }
+    // } else {
+    //
+    //   String msg="Error: M-Pesa request failed.";
+    //   print(msg);
+    //   trigernotification(null, msg, "Payment failed!!");
+    //
+    // }
 
     setState(() => isBooking = false);
 

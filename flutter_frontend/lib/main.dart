@@ -26,6 +26,7 @@ import 'View/Screens/Landlord/landloard_dash.dart';
 import 'View/Screens/Landlord/manage_house_listings.dart';
 import 'View/Screens/Student/chart_screen.dart';
 import 'View/Screens/Student/student_dash.dart';
+import 'data/payment.dart';
 import 'data/providers.dart';
 import 'firebase_options.dart';
 import 'View/Screens/Admin/admin_settings.dart';
@@ -107,12 +108,17 @@ class _StateResidentialTrackerAndBooking
   }
 
 
-
   late final _router = GoRouter(
       initialLocation: "/login",
       redirect: _appRedirect,
       routes: [
-        GoRoute(builder: (context, state) => LoginPage(), path: '/login'),
+      //  GoRoute(builder: (context, state) => LoginPage(), path: '/login'),
+
+
+        GoRoute(
+            builder: (context, state) => LoginPage(),
+            path: '/login'),
+
         GoRoute(
             builder: (context, state) => RegistrationPage(),
             path: '/registration'),
@@ -205,11 +211,11 @@ class _StateResidentialTrackerAndBooking
               );
             },
             path: '/student-dashboard'),
-        GoRoute(
-            builder: (context, state) {
-              return  MapScreen();
-            },
-            path: '/mapit'),
+        // GoRoute(
+        //     builder: (context, state) {
+        //       return  MapScreen();
+        //     },
+        //     path: '/mapit'),
 
 
 

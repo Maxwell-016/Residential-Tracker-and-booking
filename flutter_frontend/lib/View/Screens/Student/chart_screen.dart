@@ -6,6 +6,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_frontend/View-Model/view_model.dart';
 import 'package:flutter_frontend/View/Components/house_item.dart';
+import 'package:flutter_frontend/data/payment.dart';
+import 'package:flutter_frontend/data/wakeupapi.dart';
 import 'package:flutter_frontend/pages/rate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
@@ -16,6 +18,7 @@ import '../../../constants.dart';
 import '../../../data/chart_provider.dart';
 import '../../../data/notifications.dart';
 import '../../../data/providers.dart';
+import '../../../pages/booked.dart';
 import '../../../pages/help.dart';
 import '../../../pages/searched_places.dart';
 import '../../Components/SimpleAppBar.dart';
@@ -91,7 +94,7 @@ bool awaitingPhoneNumberInput=false;
       });
     });
 
-
+    WakeUpServer();
 
   }
 
@@ -248,17 +251,18 @@ bool awaitingPhoneNumberInput=false;
          });
 
          if(conversationStep == "view_locations") {
-           aiResponse = await chatService.handleOption2();
-           Future.delayed(Duration(seconds: 1), () async {
+          aiResponse = await chatService.handleOption2();
+         //  Future.delayed(Duration(seconds: 1), () async {
 
              setState(() {
+
                messages.add({
                  "role": "ai",
                  "text": aiResponse
                });
-               conversationStep = "enter_location"; // Update step to location selection
+               conversationStep = "enter_location";
               });
-           });
+          // });
          }
 
 
@@ -290,7 +294,7 @@ bool awaitingPhoneNumberInput=false;
       });
       bool isValid = await validateLocation(userMessage);
 
-      if (isValid) {
+      if (true) {
         onSearch(userMessage,  ref) ;
 
 
@@ -409,8 +413,10 @@ bool awaitingPhoneNumberInput=false;
     String houseName = house["House Name"]?? "Unknown House";
     String location = house["Location"]?? "Unknown Location";
     double price = house["House Price"]?? 0.0;
-    List<String> houseImages=house["Images"]??[];
-
+    double lat = house["Live Latitude"]?? 0.0;
+    double long = house["Live Longitude"]?? 0.0;
+    // List<String> houseImages=house["Images"]??[];
+    List<String> houseImages = house["Images"].cast<String>()??[];
     print("House ID: $houseId");
     print("Landlord ID: $landlordId");
     print("House Name: $houseName");
@@ -462,81 +468,19 @@ bool awaitingPhoneNumberInput=false;
 
 
 
-    double amountToPay = paymentOption == "per_semester" ? (price * 4 )/1000: price/8000;
+    double amountToPay = paymentOption == "per_semester" ? (price * 4 )/1000: price/1000;
+
+    initiatePayment(studentPhone, amountToPay,
+      studentEmail, studentName, houseName, location,
+      landlordPhone, landlordId, lname, houseId,
+      houseImages, paymentOption,lat,long);
 
 
-    var response = await http.post(
-      Uri.parse("https://mpesaapi.onrender.com/stkpush"),
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode({
-        "phone": studentPhone,
-        "amount": amountToPay,
-
-      }),
-    );
-
-    if (response.statusCode !=null) {
-
-
-
-      var callbackResponse = await http.get(Uri.parse("https://mpesaapi.onrender.com/callback"));
-
-      if (callbackResponse.statusCode !=null) {
-        Future.delayed(Duration(seconds: 5), () async {
-       print("Wait for pay");
-
-
-        await fs.collection("booked_students").doc().set({
-          "email": studentEmail,
-          "name": studentName ?? "Unknown",
-          "stdContact": studentPhone,
-          "houseName": houseName,
-          "houseLocation": location,
-          "payment_status": "Paid",
-          "amount_paid": amountToPay,
-          "landlordContact": landlordPhone,
-          "landlordId":landlordId,
-          "landlord": lname,
-          "images":houseImages
-
-        });
-
-
-        await fs
-            .collection("Landlords")
-            .doc(landlordId)
-            .collection("Houses")
-            .doc(houseId)
-            .update({"isBooked": true});
-
-
-       String msg="$houseName has been booked successfully with the '$paymentOption' option!";
-       print(msg  );
-       trigernotification(null, msg, "House Booked Successfully");
-
-        });
-
-      } else {
-
-
-
-
-        String msg="Booking not completed.";
-        print(msg);
-        trigernotification(null, msg, "Payment failed!!");
-
-      }
-
-
-    } else {
-
-
-      String msg="Error: M-Pesa request failed.";
-      print(msg);
-      trigernotification(null, msg, "Payment failed!!");
-
-    }
   }
+
+
+
+
 
 
 
@@ -653,7 +597,7 @@ bool awaitingPhoneNumberInput=false;
           ),
 Expanded(
     child: prefs.getString(pkey)=="ai"?AiPage():
-    prefs.getString(pkey)=="booked"?Center(child: Text("Booked screen"),):
+    prefs.getString(pkey)=="booked"?BookedHousesScreen():
     prefs.getString(pkey)=="places"?SearchedPlacesScreen():
     prefs.getString(pkey)=="help"?HelpAndManualPage():
     prefs.getString(pkey)=="rate"?RateUsPage():
@@ -666,7 +610,7 @@ Expanded(
       )
           ):
       prefs.getString(pkey)=="ai"?AiPage():
-      prefs.getString(pkey)=="booked"?Center(child: Text("Booked screen"),):
+      prefs.getString(pkey)=="booked"?BookedHousesScreen():
       prefs.getString(pkey)=="places"?SearchedPlacesScreen():
       prefs.getString(pkey)=="help"?HelpAndManualPage():
       prefs.getString(pkey)=="rate"?RateUsPage():
@@ -690,7 +634,7 @@ var screenWidth=MediaQuery.of(context).size.width;
               ListView.builder(
                 controller: _scrollController,
                 itemCount: messages.length + (isTyping ? 1 : 0),
-                itemBuilder: (context, index) {
+                itemBuilder: (context, index)  {
                   if (isTyping && index == messages.length) {
                     return Padding(
                       padding: const EdgeInsets.all(8.0),
@@ -725,7 +669,7 @@ var screenWidth=MediaQuery.of(context).size.width;
                             SizedBox(
                               width: screenWidth*0.7,
                               height: screenHeight*0.5,
-                              child: MapScreen(),
+                              child: MapScreen(locations:  chatService.getAllLocations()),
                             ),
                           ],
                         ),
@@ -733,7 +677,7 @@ var screenWidth=MediaQuery.of(context).size.width;
                     );
                   }
 
-                  // Show House Listings if applicable
+
                   if (message.containsKey("house") && message["house"] != null && showHouses) {
                     final house = message["house"];
                     if (house is Map<String, dynamic>) {
@@ -793,99 +737,7 @@ var screenWidth=MediaQuery.of(context).size.width;
   }
 
 
-// Widget AiPage(){
-  //
-  //   bool isDark = Theme.of(context).brightness == Brightness.dark;
-  //   return  Column(
-  //     children: [
-  //       Expanded(
-  //         child: Stack(
-  //           children: [
-  //
-  //             ListView.builder(
-  //               controller: _scrollController,
-  //               itemCount: messages.length + (isTyping ? 1 : 0),
-  //               itemBuilder: (context, index) {
-  //
-  //                 if (isTyping && index == messages.length) {
-  //                   return Padding(
-  //                     padding: const EdgeInsets.all(8.0),
-  //                     child: Text("Typing...", style: TextStyle(
-  //                         fontStyle: FontStyle.italic
-  //                     )),
-  //                   );
-  //                 }
-  //                 final message = messages[index];
-  //
-  //
-  //
-  //                 if (message.containsKey("house") && message["house"] != null && showHouses) {
-  //                   final house = message["house"];
-  //
-  //                   if (house is Map<String, dynamic>) {
-  //
-  //                     return HouseCard(house: house);
-  //
-  //                   }
-  //                 }
-  //
-  //
-  //                 return Align(
-  //                   alignment: message["role"] == "user" ? Alignment.centerRight : Alignment.centerLeft,
-  //                   child: Container(
-  //                     margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-  //                     padding: EdgeInsets.all(12),
-  //                     decoration: BoxDecoration(
-  //                       color:
-  //                       message["role"] == "user" ?
-  //                       isDark? Colors.blue:Colors.blue[200]
-  //                           :
-  //                       isDark? Colors.grey[900]:Colors.grey[300],
-  //
-  //
-  //                       borderRadius: BorderRadius.circular(15),
-  //                     ),
-  //                     child: Text(
-  //                       message['text']??"",
-  //                       style: TextStyle(fontSize: 16),
-  //                     ),
-  //                   ),
-  //                 );
-  //               },
-  //             ),
-  //           ],
-  //         ),
-  //       ),
-  //       Padding(
-  //         padding: EdgeInsets.all(8.0),
-  //         child: Row(
-  //           children: [
-  //             Expanded(
-  //               child: TextField(
-  //
-  //                 controller: _controller,
-  //                 textInputAction: TextInputAction.done,
-  //                 keyboardType:conversationStep == "enter_number"?TextInputType.phone:TextInputType.text,
-  //                 decoration: InputDecoration(
-  //                   label:  Text(awaitingPhoneNumberInput?"Enter number to pay eg 254000000000":"Type a message..."),
-  //                   hintText: awaitingPhoneNumberInput?"eg 254712845678":"Type a message...",
-  //                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-  //                 ),
-  //               ),
-  //             ),
-  //             SizedBox(width: 10),
-  //             IconButton(
-  //               icon: Icon(Icons.send, color: Colors.blue),
-  //               onPressed: sendMessage,
-  //             )
-  //           ],
-  //         ),
-  //       )
-  //     ],
-  //   );
-  //
-  //
-  // }
+
 
 
 }

@@ -38,14 +38,15 @@ class _RateUsPageState extends ConsumerState<RateUsPage> {
 
 
     ref.read(rateus.notifier).state=0;
-    ref.read(optionString.notifier).state="";
+    _feedbackController.text='';
+   // ref.read(optionString.notifier).state="";
 
 
   }
 
   @override
   Widget build(BuildContext context) {
-    ref.read(optionString.notifier).state= _feedbackController.text;
+   // ref.read(optionString.notifier).state= _feedbackController.text;
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(16.0),

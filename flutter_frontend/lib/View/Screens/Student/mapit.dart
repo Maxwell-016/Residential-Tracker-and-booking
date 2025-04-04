@@ -5,34 +5,40 @@ import '../../../chartbot_fun/ai_funs.dart';
 import '../../../src/locations.dart' as locations;
 
 class MapScreen extends StatefulWidget {
-  const MapScreen({super.key});
+   MapScreen({super.key, required this.locations});
+  final Future<List<String>> locations;
 
   @override
-  _MapScreenState createState() => _MapScreenState();
+  State<MapScreen> createState() => _MapScreenState();
 }
 
 class _MapScreenState extends State<MapScreen> {
   final Map<String, Marker> _markers = {};
-  MapType _currentMapType = MapType.normal; // Default map type
+  MapType _currentMapType = MapType.normal;
 
   Future<void> _onMapCreated(GoogleMapController controller) async {
     print("🔍 _onMapCreated triggered");
 
-    final List<Map<String, dynamic>> toBeMarked = await getLocationsToBeMarked();
+    final List<Map<String, dynamic>> toBeMarked = await getLocationsToBeMarked(widget.locations);
 
     setState(() {
       _markers.clear();
       for (final place in toBeMarked) {
-        print("📍 Adding Marker: ${place["name"]} at ${place["lat"]}, ${place["lng"]}");
-
         final marker = Marker(
           markerId: MarkerId(place["id"].toString()),
           position: LatLng(place["lat"], place["lng"]),
           infoWindow: InfoWindow(
             title: place["name"],
-            snippet: place["address"],
+            snippet: "${place["address"]}\nRegion: ${place["region"]}\nVacant: ${place["vacant"] == 1 ? 'Yes' : 'No'}",
+            onTap: () {
+              _showModalBottomSheet(place);
+            },
           ),
         );
+
+
+
+
         _markers[place["name"]] = marker;
       }
     });
@@ -40,9 +46,41 @@ class _MapScreenState extends State<MapScreen> {
     print("Markers added: ${_markers.length}");
   }
 
+
+
+ Widget _showModalBottomSheet( Map<String, dynamic>place) {
+   return SizedBox(
+     height: 300,
+     child: Column(
+       children: [
+         Image.network(
+           place["image"],
+           height: 150,
+           width: double.infinity,
+           fit: BoxFit.cover,
+         ),
+         Padding(
+           padding: const EdgeInsets.all(8.0),
+           child: Column(
+             crossAxisAlignment: CrossAxisAlignment.start,
+             children: [
+               Text(place["name"],
+                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+               Text("Address: ${place["address"]}"),
+               Text("Region: ${place["region"]}"),
+               Text("Vacant: ${place["vacant"] == 1 ? 'Yes' : 'No'}"),
+             ],
+           ),
+         ),
+       ],
+     ),
+   );
+ }
+
+
   void _changeMapType() {
     setState(() {
-      // Cycle through different map types
+
       _currentMapType = _currentMapType == MapType.normal
           ? MapType.satellite
           : _currentMapType == MapType.satellite
@@ -50,6 +88,7 @@ class _MapScreenState extends State<MapScreen> {
           : _currentMapType == MapType.terrain
           ? MapType.hybrid
           : MapType.normal;
+      print(_currentMapType);
     });
   }
 
@@ -65,20 +104,21 @@ class _MapScreenState extends State<MapScreen> {
               target: LatLng(0.2927501026141882, 34.762192913490594),
               zoom: 14,
             ),
+
             markers: _markers.values.toSet(),
-            mapType: _currentMapType, // Apply selected map type
+            mapType: MapType.hybrid,
           ),
         ),
 
         // Floating Button to Change Map Type
-        Positioned(
-          bottom: 20,
-          right: 20,
-          child: FloatingActionButton(
-            onPressed: _changeMapType,
-            child: const Icon(Icons.map),
-          ),
-        ),
+        // Positioned(
+        //   bottom: 20,
+        //   right: 20,
+        //   child: FloatingActionButton(
+        //     onPressed: _changeMapType,
+        //     child: const Icon(Icons.map),
+        //   ),
+        // ),
       ],
     );
   }
