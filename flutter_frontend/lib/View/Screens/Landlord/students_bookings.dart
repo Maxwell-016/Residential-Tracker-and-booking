@@ -122,7 +122,8 @@ class BookingDetails extends StatelessWidget {
                     UseFont(
                         text: 'House Name: ${houseDetails['houseName']}',
                         myFont: 'Open Sans',
-                        size: 20.0),
+                        size: 20.0,
+                    ),
                     UseFont(
                         text: 'Tenant : ${houseDetails['name']}',
                         myFont: 'Open Sans',
