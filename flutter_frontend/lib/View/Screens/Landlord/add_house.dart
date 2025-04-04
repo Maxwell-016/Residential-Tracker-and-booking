@@ -64,7 +64,7 @@ class AddHouse extends HookConsumerWidget {
     FocusNode descFocus = useFocusNode();
     String selectedSize = ref.watch(selectedHouseSize);
     String selectedLocation = ref.watch(houseLocationProvider);
-    String bookingStatus = ref.watch(bookingStatusProvider);
+    //String bookingStatus = ref.watch(bookingStatusProvider);
     Logger logger = Logger();
     ImagePickerService imagePickerService = ImagePickerService();
 
@@ -365,38 +365,38 @@ class AddHouse extends HookConsumerWidget {
                           ),
                         ],
                       ),
-                      Column(
-                        spacing: 10,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Booking Status'),
-                          Container(
-                            decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: borderColor,
-                                  width: 1.0,
-                                ),
-                                borderRadius: BorderRadius.circular(10.0)),
-                            width: width,
-                            child: DropdownButton(
-                              padding: EdgeInsets.only(left: 20.0),
-                              underline: SizedBox(),
-                              menuWidth: width,
-                              items: ['Booked', 'Not Booked'].map((entry) {
-                                return DropdownMenuItem(
-                                  value: entry,
-                                  child: Text(entry),
-                                );
-                              }).toList(),
-                              value: bookingStatus,
-                              onChanged: (String? value) {
-                                ref.read(bookingStatusProvider.notifier).state =
-                                    value!;
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
+                      // Column(
+                      //   spacing: 10,
+                      //   crossAxisAlignment: CrossAxisAlignment.start,
+                      //   children: [
+                      //     Text('Booking Status'),
+                      //     Container(
+                      //       decoration: BoxDecoration(
+                      //           border: Border.all(
+                      //             color: borderColor,
+                      //             width: 1.0,
+                      //           ),
+                      //           borderRadius: BorderRadius.circular(10.0)),
+                      //       width: width,
+                      //       child: DropdownButton(
+                      //         padding: EdgeInsets.only(left: 20.0),
+                      //         underline: SizedBox(),
+                      //         menuWidth: width,
+                      //         items: ['Booked', 'Not Booked'].map((entry) {
+                      //           return DropdownMenuItem(
+                      //             value: entry,
+                      //             child: Text(entry),
+                      //           );
+                      //         }).toList(),
+                      //         value: bookingStatus,
+                      //         onChanged: (String? value) {
+                      //           ref.read(bookingStatusProvider.notifier).state =
+                      //               value!;
+                      //         },
+                      //       ),
+                      //     ),
+                      //   ],
+                      // ),
                       FunctionButton(
                         text: 'Add House',
                         onPressed: () async {
@@ -421,7 +421,7 @@ class AddHouse extends HookConsumerWidget {
                                   urls,
                                   descController.text,
                                   selectedAmenities.value,
-                                  bookingStatus == 'Booked' ? true : false,
+                                  false,
                                 );
                                 if (!context.mounted) return;
                                 if (message == 'exists') {

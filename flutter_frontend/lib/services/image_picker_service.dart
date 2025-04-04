@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
@@ -16,8 +15,7 @@ class ImagePickerService {
     FilePickerResult? result = await FilePicker.platform
         .pickFiles(type: FileType.image, allowMultiple: true);
     return result?.files
-        .map(
-            (file) => (bytes: file.bytes!, name: file.name.split('/').last))
+        .map((file) => (bytes: file.bytes!, name: file.name.split('/').last))
         .toList();
   }
 
@@ -27,21 +25,22 @@ class ImagePickerService {
     String presetName = 'Residential Tracker';
     String name = 'dk10knkfh';
     String resourceType = 'image';
-    String uploadUrl = 'https://api.cloudinary.com/v1_1/$name/$resourceType/upload';
+    String uploadUrl =
+        'https://api.cloudinary.com/v1_1/$name/$resourceType/upload';
 
     try {
       for (final file in files) {
         final fileName = 'file-${DateTime.now().millisecondsSinceEpoch}';
-            //file.name.split("/").last;
+        //file.name.split("/").last;
         FormData formData = FormData();
 
         formData = FormData.fromMap({
-          'file' : MultipartFile.fromBytes(file,filename: fileName),
-          'upload_preset' : presetName,
+          'file': MultipartFile.fromBytes(file, filename: fileName),
+          'upload_preset': presetName,
         });
 
-        Response response = await dio.post(uploadUrl,data: formData);
-        if(response.statusCode == 200){
+        Response response = await dio.post(uploadUrl, data: formData);
+        if (response.statusCode == 200) {
           uploadedUrls.add(response.data['secure_url']);
         }
       }
