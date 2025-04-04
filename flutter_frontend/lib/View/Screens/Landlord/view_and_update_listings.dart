@@ -77,7 +77,6 @@ class _ViewAndUpdateListingsState extends State<ViewAndUpdateListings> {
                       mainAxisSpacing: 30,
                       crossAxisSpacing: 30),
                   itemBuilder: (context, index) {
-                    logger.i(houses[index]);
                     return GestureDetector(
                       onTap: () {
                         Navigator.push(
@@ -115,9 +114,7 @@ class _ViewAndUpdateListingsState extends State<ViewAndUpdateListings> {
                                   'An error occurred trying to delete house ${houses[index]['House Name']}');
                               Navigator.pop(context);
                             }
-                          },
-                            firebaseServicesProvider.isDeleting,
-                          );
+                          });
                         },
                       ),
                     );
@@ -372,7 +369,7 @@ class HouseDetails extends HookConsumerWidget {
                                         child: Padding(
                                           padding: const EdgeInsets.all(15.0),
                                           child: Text(
-                                            ref.watch(updatedImageNameProvider).toString(),
+                                            imageName,
                                             style: TextStyle(
                                                 color: Colors.grey,
                                                 fontSize: 14.0),
@@ -453,6 +450,41 @@ class HouseDetails extends HookConsumerWidget {
                               ],
                             ),
 
+                            // Column(
+                            //   spacing: 10,
+                            //   crossAxisAlignment: CrossAxisAlignment.start,
+                            //   children: [
+                            //     Text('Booking Status'),
+                            //     Container(
+                            //       decoration: BoxDecoration(
+                            //           border: Border.all(
+                            //             color: borderColor,
+                            //             width: 1.0,
+                            //           ),
+                            //           borderRadius:
+                            //               BorderRadius.circular(10.0)),
+                            //       width: width,
+                            //       child: DropdownButton(
+                            //         padding: EdgeInsets.only(left: 20.0),
+                            //         underline: SizedBox(),
+                            //         menuWidth: width,
+                            //         items:
+                            //             ['Booked', 'Not Booked'].map((entry) {
+                            //           return DropdownMenuItem(
+                            //             value: entry,
+                            //             child: Text(entry),
+                            //           );
+                            //         }).toList(),
+                            //         value: bookingStatus,
+                            //         onChanged: (String? value) {
+                            //           ref
+                            //               .read(bookingStatusProvider.notifier)
+                            //               .state = value!;
+                            //         },
+                            //       ),
+                            //     ),
+                            //   ],
+                            // ),
                             FunctionButton(
                               text: 'Update Details',
                               onPressed: () async {
@@ -494,9 +526,7 @@ class HouseDetails extends HookConsumerWidget {
                                           'An error occurred trying to update House ${houseNameController.text}. Please try again');
                                       Navigator.pop(context);
                                     }
-                                  },
-                                    firebaseServicesProvider.isUpdating,
-                                  );
+                                  });
                                 }
                               },
                               btnColor: AppColors.deepBlue,
