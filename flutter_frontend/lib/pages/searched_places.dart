@@ -21,36 +21,57 @@ class SearchedPlacesScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(title: Text("Searched Places")),
-      body: Padding(
-          padding:EdgeInsets.all(16),
-         child: MapScreen(locations: searchedPlaces),
-          )
+// <<<<<<< gamma
+//       body: Padding(
+//           padding:EdgeInsets.all(16),
+//          child: MapScreen(locations: searchedPlaces),
+//           )
 
 
 
-      // ListView.builder(
-      //   itemCount: searchedPlaces.length,
-      //   itemBuilder: (context, index) {
-      //     final place = searchedPlaces[index];
-      //     return ListTile(
-      //       title: Text(place),
-      //       subtitle: Text("Tap to check available houses"),
-      //       onTap: () {
-      //         // Navigate to a screen showing houses in this location
-      //         Navigator.push(
-      //           context,
-      //           MaterialPageRoute(builder: (_) => HousesInLocationScreen(place)),
-      //         );
-      //
-      //
-      //
-      //       },
-      //     );
-      //   },
-      // ),
+//       // ListView.builder(
+//       //   itemCount: searchedPlaces.length,
+//       //   itemBuilder: (context, index) {
+//       //     final place = searchedPlaces[index];
+//       //     return ListTile(
+//       //       title: Text(place),
+//       //       subtitle: Text("Tap to check available houses"),
+//       //       onTap: () {
+//       //         // Navigate to a screen showing houses in this location
+//       //         Navigator.push(
+//       //           context,
+//       //           MaterialPageRoute(builder: (_) => HousesInLocationScreen(place)),
+//       //         );
+//       //
+//       //
+//       //
+//       //       },
+//       //     );
+//       //   },
+//       // ),
 
 
 
+// =======
+//       body: ListView.builder(
+//         itemCount: searchedPlaces.length,
+//         itemBuilder: (context, index) {
+//           final place = searchedPlaces[index];
+//           return ListTile(
+//             title: Text(place),
+//             subtitle: Text("Tap to check available houses"),
+//             onTap: () {
+//               // Navigate to a screen showing houses in this location
+//               Navigator.push(
+//                 context,
+//                 MaterialPageRoute(
+//                     builder: (_) => HousesInLocationScreen(place)),
+//               );
+//             },
+//           );
+//         },
+//       ),
+// >>>>>>> main
     );
   }
 }
@@ -58,6 +79,3 @@ class SearchedPlacesScreen extends ConsumerWidget {
 void onSearch(String place, WidgetRef ref) {
   ref.read(searchedPlacesProvider.notifier).addSearchedPlace(place);
 }
-
-
-

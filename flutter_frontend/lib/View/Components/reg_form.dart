@@ -1,12 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_frontend/View-Model/utils/savecurrentpage.dart';
 import 'package:flutter_frontend/View/Components/password_field.dart';
 import 'package:flutter_frontend/View/Components/snackbars.dart';
 import 'package:flutter_frontend/View/Components/text_field.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -19,11 +16,8 @@ import 'function_button.dart';
 import 'google_fonts.dart';
 import 'link_button.dart';
 
-class RegForm extends HookConsumerWidget{
+class RegForm extends HookConsumerWidget {
   const RegForm({super.key});
-
-
-
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -40,12 +34,9 @@ class RegForm extends HookConsumerWidget{
     FocusNode confirmPassFocus = FocusNode();
     bool isDark = Theme.of(context).brightness == Brightness.dark;
 
-    var width = MediaQuery
-        .of(context)
-        .size
-        .width / 1.1;
+    var width = MediaQuery.of(context).size.width / 1.1;
 
-    return  SingleChildScrollView(
+    return SingleChildScrollView(
       child: Center(
         child: SizedBox(
           width: width,
@@ -82,31 +73,25 @@ class RegForm extends HookConsumerWidget{
                       //   ),
                       //   width: width,
                       //   child:
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                            children: [
-
-                        Text("Select the role to register as  "),
-                        DropdownButton<String>(
-
-                            value: selectedUser,
-                            items: <String>['Student', 'Landlord', "Admin"]
-                                .map<DropdownMenuItem<String>>((String user) {
-                              return DropdownMenuItem<String>(
-                                value: user,
-                                child: Text(user),
-                              );
-                            }).toList(),
-                            onChanged: (newValue) {
-
-                              ref.read(selectedNameProvider.notifier).state =
-                              newValue!;
-                            }),
-
-                    ] ,
-                  ),
-
-
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text("Select the role to register as  "),
+                          DropdownButton<String>(
+                              value: selectedUser,
+                              items: <String>['Student', 'Landlord', "Admin"]
+                                  .map<DropdownMenuItem<String>>((String user) {
+                                return DropdownMenuItem<String>(
+                                  value: user,
+                                  child: Text(user),
+                                );
+                              }).toList(),
+                              onChanged: (newValue) {
+                                ref.read(selectedNameProvider.notifier).state =
+                                    newValue!;
+                              }),
+                        ],
+                      ),
 
                       MyTextField(
                         label: 'Email',
@@ -142,38 +127,36 @@ class RegForm extends HookConsumerWidget{
                       ),
 
                       Center(
-                        child: firebaseServicesProvider.isLoading? CircularProgressIndicator()
-                            :FunctionButton(
-                          text: 'Register',
-                          onPressed: () async {
-                            if (formKey.currentState!.validate()) {
-                              try {
-
-                                await firebaseServicesProvider.createUser(
-                                  context,
-                                  ref,
-                                  emailController.text,
-                                  hashPassword(passController.text),
-                                  ref.watch(selectedNameProvider),
-                                );
-
-
-
-                              }catch(e){
-                                if (!context.mounted) return;
-                                SnackBars.showErrorSnackBar(
-                                    context,
-                                    firebaseServicesProvider
-                                        .handleFirebaseAuthErrors(
-                                        e as FirebaseAuthException));
-                              }finally{
-                                firebaseServicesProvider.setIsLoading(false);
-                              }
-                            }
-                          },
-                          btnColor: AppColors.deepBlue,
-                          width: width,
-                        ),
+                        child: firebaseServicesProvider.isLoading
+                            ? CircularProgressIndicator()
+                            : FunctionButton(
+                                text: 'Register',
+                                onPressed: () async {
+                                  if (formKey.currentState!.validate()) {
+                                    try {
+                                      await firebaseServicesProvider.createUser(
+                                        context,
+                                        ref,
+                                        emailController.text,
+                                        hashPassword(passController.text),
+                                        ref.watch(selectedNameProvider),
+                                      );
+                                    } catch (e) {
+                                      if (!context.mounted) return;
+                                      SnackBars.showErrorSnackBar(
+                                          context,
+                                          firebaseServicesProvider
+                                              .handleFirebaseAuthErrors(
+                                                  e as FirebaseAuthException));
+                                    } finally {
+                                      firebaseServicesProvider
+                                          .setIsLoading(false);
+                                    }
+                                  }
+                                },
+                                btnColor: AppColors.deepBlue,
+                                width: width,
+                              ),
                       ),
                       SizedBox(
                         width: width,
@@ -196,4 +179,5 @@ class RegForm extends HookConsumerWidget{
         ),
       ),
     );
-  }}
+  }
+}

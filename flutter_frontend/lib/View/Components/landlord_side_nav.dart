@@ -20,13 +20,18 @@ class LandlordSideNav extends StatelessWidget {
                 context.go('/manageListings');
               },
               child: SideNavItem(text: 'Manage House Listings')),
-          SideNavItem(text: 'Students Bookings'),
+          GestureDetector(
+              onTap: () {
+                context.go('/student-bookings');
+              },
+              child: SideNavItem(text: 'Students Bookings')),
           SideNavItem(text: 'Reviews and Feedback'),
           GestureDetector(
-            onTap: (){
+            onTap: () {
               context.go('/landlord-profile');
             },
-              child: SideNavItem(text: 'Profile'),),
+            child: SideNavItem(text: 'Profile'),
+          ),
         ],
       ),
     );

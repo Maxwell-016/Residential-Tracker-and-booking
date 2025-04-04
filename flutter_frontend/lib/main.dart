@@ -6,12 +6,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_frontend/View-Model/navigation/routes.dart';
 import 'package:flutter_frontend/View/Screens/Landlord/landlord_profile.dart';
+import 'package:flutter_frontend/View/Screens/Landlord/students_bookings.dart';
 import 'package:flutter_frontend/View/Screens/Landlord/view_and_update_listings.dart';
 import 'package:flutter_frontend/View/Screens/Student/mapit.dart';
 import 'package:flutter_frontend/constants.dart';
 import 'package:flutter_frontend/services/firebase_services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'View-Model/utils/savecurrentpage.dart';
@@ -43,21 +45,24 @@ Future<void> main() async {
   } catch (e) {
     print('Firebase initialisation error: $e');
   }
- // String initialRoute = await getLastVisitedPage();
 
-  // Request permission for notifications
+  String initialRoute = await getLastVisitedPage();
 
-  AwesomeNotifications().initialize(
+  //Request permission for notifications
+
+
+  await AwesomeNotifications
+  ().initialize(
     null,
     [
       NotificationChannel(
           channelKey: "app_status",
           channelName: "booking",
-          channelDescription: "Booking status"
-      )
+          channelDescription: "Booking status")
     ],
     debug: true,
   );
+
   final sharedPreferences = await SharedPreferences.getInstance();
 
   runApp(ProviderScope(
@@ -87,17 +92,13 @@ class ResidentialTrackerAndBooking extends ConsumerStatefulWidget {
 
 class _StateResidentialTrackerAndBooking
     extends ConsumerState<ResidentialTrackerAndBooking> {
-
   ThemeMode themeMode = ThemeMode.light;
-
 
   ColorSelection colorSelected = ColorSelection.blue;
 
   void changeThemeMode(bool useLightMode) {
     setState(() {
-      themeMode = useLightMode
-          ? ThemeMode.light
-          : ThemeMode.dark;
+      themeMode = useLightMode ? ThemeMode.light : ThemeMode.dark;
     });
   }
 
@@ -107,125 +108,174 @@ class _StateResidentialTrackerAndBooking
     });
   }
 
+// <<<<<<< gamma
 
-  late final _router = GoRouter(
-      initialLocation: "/login",
-      redirect: _appRedirect,
-      routes: [
-      //  GoRoute(builder: (context, state) => LoginPage(), path: '/login'),
-
-
-        GoRoute(
-            builder: (context, state) => LoginPage(),
-            path: '/login'),
-
-        GoRoute(
-            builder: (context, state) => RegistrationPage(),
-            path: '/registration'),
-        GoRoute(
-            builder: (context, state)=> ForgotPassword(),
-
-            path: '/forgot-password'),
-        GoRoute(
-            builder: (context, state) => EmailVerificationPage(),
-
-            path: '/verification'),
-
-        // GoRoute(
-        //     builder: (context, state) {
-        //       return StudentDashboard();
-        //     },
-        //     path: '/student-dashboard'),
+//   late final _router = GoRouter(
+//       initialLocation: "/login",
+//       redirect: _appRedirect,
+//       routes: [
+//       //  GoRoute(builder: (context, state) => LoginPage(), path: '/login'),
 
 
-        GoRoute(
-            builder: (context, state) {
-              return LandLordDashboardScreen(
+//         GoRoute(
+//             builder: (context, state) => LoginPage(),
+//             path: '/login'),
+
+//         GoRoute(
+//             builder: (context, state) => RegistrationPage(),
+//             path: '/registration'),
+//         GoRoute(
+//             builder: (context, state)=> ForgotPassword(),
+
+//             path: '/forgot-password'),
+//         GoRoute(
+//             builder: (context, state) => EmailVerificationPage(),
+
+//             path: '/verification'),
+
+//         // GoRoute(
+//         //     builder: (context, state) {
+//         //       return StudentDashboard();
+//         //     },
+//         //     path: '/student-dashboard'),
+
+
+//         GoRoute(
+//             builder: (context, state) {
+//               return LandLordDashboardScreen(
+// =======
+//   late final _router = GoRouter(
+//     initialLocation: "/login",
+//     redirect: _appRedirect,
+//     routes: [
+//       GoRoute(builder: (context, state) => LoginPage(), path: '/login'),
+//       GoRoute(
+//           builder: (context, state) => RegistrationPage(),
+//           path: '/registration'),
+//       GoRoute(
+//           builder: (context, state) => ForgotPassword(),
+//           path: '/forgot-password'),
+//       GoRoute(
+//           builder: (context, state) => EmailVerificationPage(),
+//           path: '/verification'),
+
+//       // GoRoute(
+//       //     builder: (context, state) {
+//       //       return StudentDashboard();
+//       //     },
+//       //     path: '/student-dashboard'),
+
+//       GoRoute(
+//           builder: (context, state) {
+//             return LandLordDashboardScreen(
+//               changeTheme: changeThemeMode,
+//               changeColor: changeColor,
+//               colorSelected: colorSelected,
+//             );
+//           },
+//           path: '/landlord-dashboard'),
+
+//       GoRoute(
+//           builder: (context, state) {
+//             return ManageHouseListings(
+//               changeTheme: changeThemeMode,
+//               changeColor: changeColor,
+//               colorSelected: colorSelected,
+//             );
+//           },
+//           path: '/manageListings',
+//           routes: [
+//             GoRoute(
+//               path: 'add-house',
+//               builder: (context, state) => AddHouse(
+// >>>>>>> main
                 changeTheme: changeThemeMode,
                 changeColor: changeColor,
                 colorSelected: colorSelected,
-              );
-            },
-            path: '/landlord-dashboard'),
-
-
-        GoRoute(
-            builder: (context, state) {
-              return ManageHouseListings(
-                changeTheme: changeThemeMode,
-                changeColor: changeColor,
-                colorSelected: colorSelected,
-              );
-            },
-            path: '/manageListings',
-            routes: [
-              GoRoute(
-                path: 'add-house',
-                builder: (context, state) => AddHouse(
-                  changeTheme: changeThemeMode,
-                  changeColor: changeColor,
-                  colorSelected: colorSelected,
-                ),
-
               ),
-              GoRoute(
-                  path: 'view-and-update-listings',
-                  builder: (context, state) => ViewAndUpdateListings(
-                    changeTheme: changeThemeMode,
-                    changeColor: changeColor,
-                    colorSelected: colorSelected,
-                  ))
-            ]),
-        GoRoute(
-          builder: (context,state) => LandlordProfile(
-            changeTheme: changeThemeMode,
-            changeColor: changeColor,
-            colorSelected: colorSelected,
-          ),
-            path: '/landlord-profile'),
-        GoRoute(
-            builder: (context, state) {
-              return AdminDashboardScreen(
-                changeTheme: changeThemeMode,
-                changeColor: changeColor,
-                colorSelected: colorSelected,
-              );
-            },
-            path: '/admin-dashboard'),
-        GoRoute(
-          path: '/admin-settings',
-          builder: (context, state) => AdminSettingsPage(
-            changeTheme: changeThemeMode,
-            changeColor: changeColor,
-            colorSelected: colorSelected,
-          ),
-          
-        ),
-
-        GoRoute(
-            builder: (context, state) {
-              return  ChatScreen(
-                changeTheme: changeThemeMode,
-                changeColor: changeColor,
-                colorSelected: colorSelected,
-              );
-            },
-            path: '/student-dashboard'),
-
-
-      ],
-      errorPageBuilder: (context, state) {
-        return MaterialPage(
-          key: state.pageKey,
-          child: Scaffold(
-            body: Center(
-              child: Text("404 error:${state.error}"),
             ),
-          ),
-        );
-      },
-    );
+            GoRoute(
+                path: 'view-and-update-listings',
+                builder: (context, state) => ViewAndUpdateListings(
+                      changeTheme: changeThemeMode,
+                      changeColor: changeColor,
+                      colorSelected: colorSelected,
+                    ))
+          ]),
+      GoRoute(
+          path: '/student-bookings',
+          builder: (context, state) => StudentsBookings(
+                changeTheme: changeThemeMode,
+                changeColor: changeColor,
+                colorSelected: colorSelected,
+              )),
+      GoRoute(
+          builder: (context, state) => LandlordProfile(
+                changeTheme: changeThemeMode,
+                changeColor: changeColor,
+                colorSelected: colorSelected,
+// <<<<<<< gamma
+//               );
+//             },
+//             path: '/student-dashboard'),
 
+
+//       ],
+//       errorPageBuilder: (context, state) {
+//         return MaterialPage(
+//           key: state.pageKey,
+//           child: Scaffold(
+//             body: Center(
+//               child: Text("404 error:${state.error}"),
+//             ),
+// =======
+//               ),
+//           path: '/landlord-profile'),
+//       GoRoute(
+//           builder: (context, state) {
+//             return AdminDashboardScreen(
+//               changeTheme: changeThemeMode,
+//               changeColor: changeColor,
+//               colorSelected: colorSelected,
+//             );
+//           },
+//           path: '/admin-dashboard'),
+//       GoRoute(
+//         path: '/admin-settings',
+//         builder: (context, state) => AdminSettingsPage(
+//           changeTheme: changeThemeMode,
+//           changeColor: changeColor,
+//           colorSelected: colorSelected,
+//         ),
+//       ),
+
+//       GoRoute(
+//           builder: (context, state) {
+//             return ChatScreen(
+//               changeTheme: changeThemeMode,
+//               changeColor: changeColor,
+//               colorSelected: colorSelected,
+//             );
+//           },
+//           path: '/student-dashboard'),
+//       GoRoute(
+//           builder: (context, state) {
+//             return MapScreen();
+//           },
+//           path: '/mapit'),
+//     ],
+//     errorPageBuilder: (context, state) {
+//       return MaterialPage(
+//         key: state.pageKey,
+//         child: Scaffold(
+//           body: Center(
+//             child: Text("404 error:${state.error}"),
+// >>>>>>> main
+          ),
+        ),
+      );
+    },
+  );
 
   Future<String?> _appRedirect(
       BuildContext context, GoRouterState state) async {
