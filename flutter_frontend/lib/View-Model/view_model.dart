@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_frontend/View-Model/utils/app_colors.dart';
 import 'package:flutter_frontend/View/Components/function_button.dart';
-import 'package:flutter_frontend/services/firebase_services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 

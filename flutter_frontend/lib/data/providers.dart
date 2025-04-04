@@ -1,9 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
-
 
 final hasNameProvider = StateProvider<bool>((ref) => false);
 
@@ -11,13 +8,12 @@ final toggleMenu = StateProvider<bool>((ref) => true);
 
 final counterProvider = StateProvider<int>((ref) => 0);
 
-final rateus = StateProvider<int>((ref)=>0);
+final rateus = StateProvider<int>((ref) => 0);
 
-final optionString = StateProvider<String>((ref)=>"");
+final optionString = StateProvider<String>((ref) => "");
 
-
-
-final searchedPlacesProvider = StateNotifierProvider<SearchedPlacesNotifier, List<String>>((ref) {
+final searchedPlacesProvider =
+    StateNotifierProvider<SearchedPlacesNotifier, List<String>>((ref) {
   return SearchedPlacesNotifier();
 });
 
@@ -41,11 +37,13 @@ class SearchedPlacesNotifier extends StateNotifier<List<String>> {
   }
 
   Future<void> _listenForNewHouses() async {
-    FirebaseFirestore.instance.collection('houses').snapshots().listen((snapshot) {
+    FirebaseFirestore.instance
+        .collection('houses')
+        .snapshots()
+        .listen((snapshot) {
       for (var doc in snapshot.docs) {
         String location = doc['location'];
         if (state.contains(location)) {
-
           _notifyUser(location);
         }
       }
@@ -53,7 +51,6 @@ class SearchedPlacesNotifier extends StateNotifier<List<String>> {
   }
 
   void _notifyUser(String location) {
-
     print("House added in $location! Check it out.");
   }
 }

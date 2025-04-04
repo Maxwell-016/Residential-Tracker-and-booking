@@ -8,14 +8,14 @@ import 'package:go_router/go_router.dart';
 import '../../constants.dart';
 import 'color_button.dart';
 
-class App_Bar extends ConsumerStatefulWidget{
+class App_Bar extends ConsumerStatefulWidget {
   final ColorSelection colorSelected;
   final void Function(bool useLightMode) changeTheme;
   final void Function(int value) changeColor;
   final String title;
   final Widget? search;
 
-  App_Bar( {
+  const App_Bar({
     super.key,
     required this.changeTheme,
     required this.changeColor,
@@ -27,8 +27,8 @@ class App_Bar extends ConsumerStatefulWidget{
   ConsumerState<App_Bar> createState() {
     return _StateAppBar();
   }
-
 }
+
 class _StateAppBar extends ConsumerState<App_Bar> {
   @override
   Widget build(BuildContext context) {
@@ -65,5 +65,4 @@ class _StateAppBar extends ConsumerState<App_Bar> {
       );
 
   }
-
 }
