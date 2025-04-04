@@ -7,6 +7,9 @@ import 'package:logger/logger.dart';
 
 import '../../../constants.dart';
 import '../../Components/SimpleAppBar.dart';
+import '../../Components/function_button.dart';
+import '../../Components/google_fonts.dart';
+import '../../Components/image_builder.dart';
 
 class StudentsBookings extends HookConsumerWidget {
   final ColorSelection colorSelected;
@@ -73,7 +76,7 @@ class StudentsBookings extends HookConsumerWidget {
                         ),
                         trailing: Icon(Icons.arrow_forward_ios),
                         onTap: (){
-                          logger.i('show more details');
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => BookingDetails(houseDetails: booking,),),);
                         },
                       ),
                     );
@@ -83,3 +86,65 @@ class StudentsBookings extends HookConsumerWidget {
     );
   }
 }
+
+class BookingDetails extends StatelessWidget {
+  final Map<String,dynamic> houseDetails;
+  const BookingDetails({super.key, required this.houseDetails});
+
+  @override
+  Widget build(BuildContext context) {
+    final deviceWidth = MediaQuery.of(context).size.width;
+    Logger logger = Logger();
+
+    double width = deviceWidth > 800 ? deviceWidth / 2.2 : deviceWidth / 1.3;
+    return SafeArea(child: Scaffold(
+      appBar: AppBar(),
+      body: SingleChildScrollView(
+        child: Wrap(
+          spacing: 60.0,
+          runSpacing: 60.0,
+          children: [
+            ImageBuilder(
+              imageUrls: houseDetails['images'],
+              width: width,
+              placeholderAsset: 'assets/launch.png',
+            ),
+            Padding(
+              padding: deviceWidth < 800
+                  ? const EdgeInsets.only(left: 50.0)
+                  : const EdgeInsets.all(10.0),
+              child: SizedBox(
+                width: width,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  spacing: 30.0,
+                  children: [
+                    UseFont(
+                        text: 'House Name: ${houseDetails['houseName']}',
+                        myFont: 'Open Sans',
+                        size: 20.0,
+                    ),
+                    UseFont(
+                        text: 'Tenant : ${houseDetails['name']}',
+                        myFont: 'Open Sans',
+                        size: 20.0),
+                    UseFont(
+                        text: 'Location: ${houseDetails['houseLocation']}',
+                        myFont: 'Open Sans',
+                        size: 20.0),
+                    UseFont(
+                        text: 'House Price: ${houseDetails['amount_paid']}',
+                        myFont: 'Open Sans',
+                        size: 20.0),
+                  ],
+                ),
+              ),
+            )
+          ],
+        ),
+      ),
+    ),
+    );
+  }
+}
+
