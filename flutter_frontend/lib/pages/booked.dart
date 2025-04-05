@@ -240,7 +240,8 @@ class _BookedHousesScreenState extends State<BookedHousesScreen> {
                             leading:
                             ElevatedButton.icon(
                               onPressed: () {
-                                _showHouseOnMap(data['lat'], data['long'], houseName, images[0], location);
+
+                                showHouseOnMap( [{"houseName": houseName, "lat": data['lat'], "long": data['long'], "image":  images[0], "location": location}],"My Booked house",context);
                               },
                               icon: Icon(Icons.map),
                               label: Text("Show Surroundings"),
@@ -351,17 +352,24 @@ class _BookedHousesScreenState extends State<BookedHousesScreen> {
     );
   }
 
-  void _showHouseOnMap(double lat, double long, String houseName, String imageUrl, String location) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => MapScreenHouses(
-          title: "My Booked house",
-          houses: [
-            {"houseName": houseName, "lat": lat, "long": long, "image": imageUrl, "location": location}
-          ],
-        ),
+
+}
+
+
+
+void showHouseOnMap(List<Map<String,dynamic>> houses ,String title,BuildContext context) {
+
+// void showHouseOnMap(double lat, double long, String houseName, String imageUrl, String location,title,context) {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => MapScreenHouses(
+        title: title,
+        houses: houses
+        // [
+        //   {"houseName": houseName, "lat": lat, "long": long, "image": imageUrl, "location": location}
+        // ],
       ),
-    );
-  }
+    ),
+  );
 }

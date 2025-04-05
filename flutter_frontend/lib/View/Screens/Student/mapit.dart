@@ -1,12 +1,17 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_frontend/View/Screens/Student/haoperlocation.dart';
+import 'package:flutter_frontend/data/chart_provider.dart';
+import 'package:flutter_frontend/pages/booked.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../../chartbot_fun/ai_funs.dart';
 import '../../../src/locations.dart' as locations;
+import 'mapscreen.dart';
 
 class MapScreen extends StatefulWidget {
   MapScreen({super.key, required this.locations});
   final Future<List<String>> locations;
+
 
   @override
   State<MapScreen> createState() => _MapScreenState();
@@ -16,67 +21,104 @@ class MapScreen extends StatefulWidget {
 class _MapScreenState extends State<MapScreen> {
   final Map<String, Marker> _markers = {};
   MapType _currentMapType = MapType.normal;
+  final ChatService chatService = ChatService();
+
 
   Future<void> _onMapCreated(GoogleMapController controller) async {
     print("🔍 _onMapCreated triggered");
 
     final List<Map<String, dynamic>> toBeMarked = await getLocationsToBeMarked(widget.locations);
 
+    final Map<String, Marker> newMarkers = {};
+
+    for (final place in toBeMarked) {
+      int availableHouses = await AvailableHousesPerArea(place["name"].split(',')[0].toLowerCase());
+      print("Available houses at ${place["name"]}: $availableHouses");
+
+      final marker = Marker(
+        markerId: MarkerId(place["id"].toString()),
+        position: LatLng(place["lat"], place["lng"]),
+        infoWindow: InfoWindow(
+          title: place["name"],
+          snippet:
+          "${place["address"]}\nRegion: ${place["region"]}\nVacant Houses: $availableHouses",
+          onTap: () {
+            if (availableHouses > 0) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      AvailableHousesScreen(location: place["name"].split(',')[0].toLowerCase()),
+                ),
+              );
+            }
+          },
+        ),
+      );
+
+      newMarkers[place["name"]] = marker;
+    }
+
     setState(() {
       _markers.clear();
-      for (final place in toBeMarked) {
-        final marker = Marker(
-          markerId: MarkerId(place["id"].toString()),
-          position: LatLng(place["lat"], place["lng"]),
-          infoWindow: InfoWindow(
-            title: place["name"],
-            snippet: "${place["address"]}\nRegion: ${place["region"]}\nVacant: ${place["vacant"] == 1 ? 'Yes' : 'No'}",
-            onTap: () {
-              _showModalBottomSheet(place);
-            },
-          ),
-        );
-
-
-
-
-        _markers[place["name"]] = marker;
-      }
+      _markers.addAll(newMarkers);
     });
 
     print("Markers added: ${_markers.length}");
   }
 
 
+  // Future<void> _onMapCreated(GoogleMapController controller) async {
+  //
+  //
+  //   final List<Map<String, dynamic>> toBeMarked = await getLocationsToBeMarked(widget.locations);
+  //
+  //
+  //   setState(()  async {
+  //     _markers.clear();
+  //     for (final place in toBeMarked) {
+  //   int  availableHouses =  await AvailableHousesPerArea(place["name"]);
+  //   print("available houses $availableHouses");
+  //       final marker = Marker(
+  //         markerId: MarkerId(place["id"].toString()),
+  //         position: LatLng(place["lat"], place["lng"]),
+  //         infoWindow: InfoWindow(
+  //           title: place["name"],
+  //           snippet: "${place["address"]}\nRegion: ${place["region"]}\n Vacant Houses : $availableHouses",
+  //           onTap: ()  {
+  //             availableHouses>0?
+  //             Navigator.push(
+  //               context,
+  //               MaterialPageRoute(
+  //                 builder: (context) =>  AvailableHousesScreen(location: place["name"].toLowerCase())
+  //               ),
+  //             ):null;
+  //           },
+  //         ),
+  //       );
+  //
+  //
+  //
+  //
+  //       _markers[place["name"]] = marker;
+  //     }
+  //   });
+  //
+  //   print("Markers added: ${_markers.length}");
+  // }
+  //
 
-  Widget _showModalBottomSheet( Map<String, dynamic>place) {
-    return SizedBox(
-      height: 300,
-      child: Column(
-        children: [
-          Image.network(
-            place["image"],
-            height: 150,
-            width: double.infinity,
-            fit: BoxFit.cover,
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(place["name"],
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                Text("Address: ${place["address"]}"),
-                Text("Region: ${place["region"]}"),
-                Text("Vacant: ${place["vacant"] == 1 ? 'Yes' : 'No'}"),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
+
+
+  Future<int> AvailableHousesPerArea(String Location) async {
+    List<Map<String, dynamic>> houseNo=await chatService.getHousesByLocation(Location.toLowerCase());
+
+    return houseNo.length;
+
   }
+
+
+
 
 
   void _changeMapType() {
