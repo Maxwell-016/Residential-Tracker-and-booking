@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_frontend/View-Model/navigation/routes.dart';
 import 'package:flutter_frontend/View/Screens/Landlord/landlord_profile.dart';
+import 'package:flutter_frontend/View/Screens/Landlord/students_bookings.dart';
+import 'package:flutter_frontend/View/Screens/Landlord/update_house_status.dart';
 import 'package:flutter_frontend/View/Screens/Landlord/view_and_update_listings.dart';
 import 'package:flutter_frontend/View/Screens/Student/mapit.dart';
 import 'package:flutter_frontend/constants.dart';
@@ -45,34 +47,30 @@ Future<void> main() async {
   }
   // String initialRoute = await getLastVisitedPage();
 
-
   AwesomeNotifications().initialize(
     null,
     [
       NotificationChannel(
           channelKey: "app_status",
           channelName: "booking",
-          channelDescription: "Booking status"
-      )
+          channelDescription: "Booking status")
     ],
     debug: true,
   );
   final sharedPreferences = await SharedPreferences.getInstance();
 
-  runApp(ProviderScope(
-      overrides: [
-        sharedPreferencesProvider.overrideWithValue(sharedPreferences),
-      ],
-      child: ResidentialTrackerAndBooking()));
+  runApp(ProviderScope(overrides: [
+    sharedPreferencesProvider.overrideWithValue(sharedPreferences),
+  ], child: ResidentialTrackerAndBooking()));
 }
 
 class CustomScrollBehavior extends MaterialScrollBehavior {
   @override
   Set<PointerDeviceKind> get dragDevices => {
-    PointerDeviceKind.touch,
-    PointerDeviceKind.mouse,
-    PointerDeviceKind.trackpad
-  };
+        PointerDeviceKind.touch,
+        PointerDeviceKind.mouse,
+        PointerDeviceKind.trackpad
+      };
 }
 
 class ResidentialTrackerAndBooking extends ConsumerStatefulWidget {
@@ -86,17 +84,13 @@ class ResidentialTrackerAndBooking extends ConsumerStatefulWidget {
 
 class _StateResidentialTrackerAndBooking
     extends ConsumerState<ResidentialTrackerAndBooking> {
-
   ThemeMode themeMode = ThemeMode.light;
-
 
   ColorSelection colorSelected = ColorSelection.blue;
 
   void changeThemeMode(bool useLightMode) {
     setState(() {
-      themeMode = useLightMode
-          ? ThemeMode.light
-          : ThemeMode.dark;
+      themeMode = useLightMode ? ThemeMode.light : ThemeMode.dark;
     });
   }
 
@@ -106,28 +100,22 @@ class _StateResidentialTrackerAndBooking
     });
   }
 
-
   late final _router = GoRouter(
     initialLocation: "/login",
     redirect: _appRedirect,
     routes: [
       //  GoRoute(builder: (context, state) => LoginPage(), path: '/login'),
 
-
-      GoRoute(
-          builder: (context, state) => LoginPage(),
-          path: '/login'),
+      GoRoute(builder: (context, state) => LoginPage(), path: '/login'),
 
       GoRoute(
           builder: (context, state) => RegistrationPage(),
           path: '/registration'),
       GoRoute(
-          builder: (context, state)=> ForgotPassword(),
-
+          builder: (context, state) => ForgotPassword(),
           path: '/forgot-password'),
       GoRoute(
           builder: (context, state) => EmailVerificationPage(),
-
           path: '/verification'),
 
       // GoRoute(
@@ -135,7 +123,6 @@ class _StateResidentialTrackerAndBooking
       //       return StudentDashboard();
       //     },
       //     path: '/student-dashboard'),
-
 
       GoRoute(
           builder: (context, state) {
@@ -146,7 +133,6 @@ class _StateResidentialTrackerAndBooking
             );
           },
           path: '/landlord-dashboard'),
-
 
       GoRoute(
           builder: (context, state) {
@@ -165,22 +151,38 @@ class _StateResidentialTrackerAndBooking
                 changeColor: changeColor,
                 colorSelected: colorSelected,
               ),
-
             ),
             GoRoute(
-                path: 'view-and-update-listings',
-                builder: (context, state) => ViewAndUpdateListings(
-                  changeTheme: changeThemeMode,
-                  changeColor: changeColor,
-                  colorSelected: colorSelected,
-                ))
+              path: 'view-and-update-listings',
+              builder: (context, state) => ViewAndUpdateListings(
+                changeTheme: changeThemeMode,
+                changeColor: changeColor,
+                colorSelected: colorSelected,
+              ),
+            ),
+            GoRoute(
+              path: 'update-house-status',
+              builder: (context, state) => UpdateHouseStatus(
+                changeTheme: changeThemeMode,
+                changeColor: changeColor,
+                colorSelected: colorSelected,
+              ),
+            ),
           ]),
       GoRoute(
-          builder: (context,state) => LandlordProfile(
-            changeTheme: changeThemeMode,
-            changeColor: changeColor,
-            colorSelected: colorSelected,
-          ),
+        path: '/student-bookings',
+        builder: (context, state) => StudentsBookings(
+          changeTheme: changeThemeMode,
+          changeColor: changeColor,
+          colorSelected: colorSelected,
+        ),
+      ),
+      GoRoute(
+          builder: (context, state) => LandlordProfile(
+                changeTheme: changeThemeMode,
+                changeColor: changeColor,
+                colorSelected: colorSelected,
+              ),
           path: '/landlord-profile'),
       GoRoute(
           builder: (context, state) {
@@ -198,12 +200,11 @@ class _StateResidentialTrackerAndBooking
           changeColor: changeColor,
           colorSelected: colorSelected,
         ),
-
       ),
 
       GoRoute(
           builder: (context, state) {
-            return  ChatScreen(
+            return ChatScreen(
               changeTheme: changeThemeMode,
               changeColor: changeColor,
               colorSelected: colorSelected,
@@ -215,9 +216,6 @@ class _StateResidentialTrackerAndBooking
       //       return  MapScreen();
       //     },
       //     path: '/mapit'),
-
-
-
     ],
     errorPageBuilder: (context, state) {
       return MaterialPage(
@@ -230,7 +228,6 @@ class _StateResidentialTrackerAndBooking
       );
     },
   );
-
 
   Future<String?> _appRedirect(
       BuildContext context, GoRouterState state) async {
@@ -273,7 +270,7 @@ class _StateResidentialTrackerAndBooking
       scrollBehavior: CustomScrollBehavior(),
       themeMode: themeMode,
       theme:
-      ThemeData(colorSchemeSeed: colorSelected.color, useMaterial3: true),
+          ThemeData(colorSchemeSeed: colorSelected.color, useMaterial3: true),
       darkTheme: ThemeData(
           colorSchemeSeed: colorSelected.color,
           useMaterial3: true,

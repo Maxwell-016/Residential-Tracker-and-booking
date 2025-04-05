@@ -5,6 +5,7 @@ import 'package:flutter_frontend/View/Components/google_fonts.dart';
 import 'package:flutter_frontend/View/Components/house_card.dart';
 import 'package:flutter_frontend/View/Components/image_builder.dart';
 import 'package:flutter_frontend/View/Components/snackbars.dart';
+import 'package:flutter_frontend/View/Screens/Landlord/search_page.dart';
 import 'package:flutter_frontend/services/firebase_services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
@@ -40,28 +41,34 @@ class UpdateHouseStatus extends HookConsumerWidget {
             changeColor: changeColor,
             colorSelected: colorSelected,
             title: "Update House Status",
-            search: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10.0),
-                  border: Border.all(
-                    color: borderColor,
-                    width: 1.0,
+            search: GestureDetector(
+              onTap: (){
+                Navigator.push(context, MaterialPageRoute(builder: (context) => SearchPage()));
+              },
+              child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10.0),
+                    border: Border.all(
+                      color: borderColor,
+                      width: 1.0,
+                    ),
                   ),
-                ),
-                child: Padding(
-                  padding: EdgeInsets.only(
-                      top: 5.0, bottom: 5.0, left: 5.0, right: 15.0),
-                  child: Row(
-                    spacing: 5.0,
-                    children: [
-                      Icon(Icons.search),
-                      Text(
-                        'Search room by room name',
-                        style: TextStyle(fontSize: 15.0),
-                      ),
-                    ],
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                        top: 5.0, bottom: 5.0, left: 5.0, right: 15.0),
+                    child: Row(
+                      spacing: 5.0,
+                      children: [
+                        Icon(Icons.search),
+                        Text(
+                          'Search house by house name',
+                          style: TextStyle(fontSize: 15.0),
+                        ),
+                      ],
+                    ),
                   ),
-                )),
+              ),
+            ),
           ),
         ),
         body: FutureBuilder(
