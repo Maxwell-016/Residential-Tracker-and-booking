@@ -201,10 +201,11 @@ class FirebaseServices extends ChangeNotifier {
   }
 
   bool isAdding = false;
-  void setIsAdding(bool value){
+  void setIsAdding(bool value) {
     isAdding = value;
     notifyListeners();
   }
+
   //Adding house to the database
   Future<String> addHouseListing(
     String name,
@@ -249,9 +250,8 @@ class FirebaseServices extends ChangeNotifier {
     }
   }
 
-
   bool isUpdating = false;
-  void setIsUpdating(bool value){
+  void setIsUpdating(bool value) {
     isUpdating = value;
     notifyListeners();
   }
@@ -308,6 +308,17 @@ class FirebaseServices extends ChangeNotifier {
         .get();
     if (snapshot.exists) {
       return snapshot.data();
+    }
+    return null;
+  }
+
+  Future<Map<String, dynamic>?> getSearchedHouse(String name) async {
+    QuerySnapshot snapshot = await firestore
+        .collection('booked_students')
+        .where('houseName', isEqualTo: name)
+        .get();
+    if (snapshot.docs.isNotEmpty) {
+      return snapshot.docs.first.data() as Map<String, dynamic>;
     }
     return null;
   }
