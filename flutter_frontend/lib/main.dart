@@ -27,7 +27,6 @@ import 'View/Screens/Landlord/add_house.dart';
 import 'View/Screens/Landlord/landloard_dash.dart';
 import 'View/Screens/Landlord/manage_house_listings.dart';
 import 'View/Screens/Student/chart_screen.dart';
-import 'View/Screens/Student/student_dash.dart';
 import 'data/payment.dart';
 import 'data/providers.dart';
 import 'firebase_options.dart';

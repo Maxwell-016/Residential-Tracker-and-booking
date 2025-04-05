@@ -28,7 +28,7 @@ Future<String> validateOption(String userMessage) async {
           " 2 See all locations with available houses\n"
           " 3 Report for an emergency\n"
           " 4 Ask for help and related questions\n"
-          " 5 Send feedback to the landlord\n\n"
+          " 5 See all vacant houses\n\n"
           "Which option would you like me to assist you with? "
           "  also return the correct option "
           "Do NOT return any extra text or explanation."
@@ -168,3 +168,8 @@ Future<List<Map<String,dynamic>>> getLocationsToBeMarked(Future<List<String>> ma
 
   return locateit;
 }
+
+
+
+
+

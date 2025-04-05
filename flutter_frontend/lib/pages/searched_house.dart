@@ -18,8 +18,9 @@ class HousesInLocationScreen extends ConsumerWidget {
             .where("isBooked", isEqualTo: false)
             .snapshots(),
         builder: (context, snapshot) {
-          if (!snapshot.hasData)
+          if (!snapshot.hasData) {
             return Center(child: CircularProgressIndicator());
+          }
 
           final houses = snapshot.data!.docs;
           if (houses.isEmpty) {

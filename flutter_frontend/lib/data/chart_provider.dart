@@ -26,7 +26,7 @@ class ChatService {
               " 2 See all locations with available houses\n"
               " 3 Report for an emergency\n"
               " 4 Ask for help and related questions\n"
-              " 5 Send feedback to the landlord\n\n"
+              " 5 See all vacant houses\n\n"
               "Which option would you like me to assist you with? (Reply with one of the above options eg 1 or option 1)"
           : "I see you haven't provided a name. Please enter your full name:";
     }
