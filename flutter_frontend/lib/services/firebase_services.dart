@@ -16,12 +16,15 @@ final firebaseServices =
 final userState =
     StateProvider<User?>((ref) => FirebaseAuth.instance.currentUser);
 
+final verifiedLandlord = StateProvider<bool>(
+    (ref) => FirebaseAuth.instance.currentUser!.emailVerified);
+
 class FirebaseServices extends ChangeNotifier {
   Logger logger = Logger();
-  final _auth = FirebaseAuth.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
-  CollectionReference houseReference =
-      FirebaseFirestore.instance.collection('Houses');
+  CollectionReference landlordReference =
+      FirebaseFirestore.instance.collection('Landlords');
 
   User? get isLoggedIn => _auth.currentUser;
 
@@ -44,14 +47,14 @@ class FirebaseServices extends ChangeNotifier {
     await _auth.createUserWithEmailAndPassword(
         email: email, password: password);
 
-    _auth.currentUser!.sendEmailVerification();
+    await _auth.currentUser!.sendEmailVerification();
 
     await firestore.collection("users").doc(_auth.currentUser!.uid).set({
       "email": email,
       "role": role,
     });
 
-    // viewModelProvider.startTimer();
+    viewModelProvider.startTimer();
 
     if (!context.mounted) return;
     context.go('/verification');
@@ -95,14 +98,16 @@ class FirebaseServices extends ChangeNotifier {
       }
     } else {
       //go to email verification page
-      sendEmailVerification();
+      await _auth.currentUser!.sendEmailVerification();
+      //   sendEmailVerification();
       viewModelProvider.startTimer();
       if (!context.mounted) return;
       context.go('/verification');
-      saveCurrentPage("/verification");
     }
   }
 
+
+  //fetching the authenticated user role
   Future<String?> getUserRole() async {
     if (_auth.currentUser == null) return null;
 
@@ -123,11 +128,8 @@ class FirebaseServices extends ChangeNotifier {
   //sign out of the app
   Future<void> signOut(BuildContext context) async {
     await _auth.signOut();
-    // await GoogleSignIn().signOut();
-    Future.microtask(() {
-      if (!context.mounted) return;
-      Navigator.of(context).pushReplacementNamed('/login');
-    });
+    if(!context.mounted) return;
+    context.go('/login');
   }
 
   //email verification
@@ -166,68 +168,148 @@ class FirebaseServices extends ChangeNotifier {
     return message;
   }
 
-  //Adding house to the database
-  Future<void> addHouseListing(
+
+  //landlords Profile
+  Future<void> createLandlordProfile(
+    WidgetRef ref,
     String name,
-    int price,
-    String size,
-    List? images,
-    String description,
-    List? amenities,
+    String email,
+    String phoneNo,
+    String location,
+    String? profilePhoto,
   ) async {
-    await houseReference
-        .doc(_auth.currentUser!.uid)
-        .collection('House Details')
-        .add({
-      'House Name': name,
-      'House Price': price,
-      'House Size': size,
-      'Images': images,
-      'Description': description,
-      'Available Amenities': amenities
-    });
+    await landlordReference.doc(_auth.currentUser!.uid).set({
+      'Name': name,
+      'Email': email,
+      'Phone Number': phoneNo,
+      'Created at': FieldValue.serverTimestamp(),
+      'isVerified': _auth.currentUser!.emailVerified,
+      'Location': location,
+      'Profile Photo': profilePhoto,
+    }, SetOptions(merge: true));
   }
 
-  Future<String?> updateListings(
-    String id,
+
+  //fetching the landlords details
+  Future<Map<String, dynamic>?> getLandlordProfile() async {
+    DocumentSnapshot profile =
+        await landlordReference.doc(_auth.currentUser!.uid).get();
+    if (profile.exists) {
+      return profile.data() as Map<String, dynamic>;
+    }
+    return null;
+  }
+
+  bool isAdding = false;
+  void setIsAdding(bool value) {
+    isAdding = value;
+    notifyListeners();
+  }
+
+
+  //Adding house to the database
+  Future<String> addHouseListing(
     String name,
+    String location,
+    double liveLatitude,
+    double liveLongitude,
     int price,
     String size,
     List? images,
     String description,
     List? amenities,
+    bool isBooked,
   ) async {
-    Map<String, dynamic> previousDetails =
-        await getIndividualListing(id) as Map<String, dynamic>;
-    if (previousDetails['House Name'] == name &&
-        previousDetails['House Price'] == price &&
-        previousDetails['House Size'] == size &&
-        previousDetails['Images'] == images &&
-        previousDetails['Description'] == description &&
-        previousDetails['Available Amenities'] == amenities) {
-      return 'No Change';
+    setIsAdding(true);
+    DocumentSnapshot houseSnapshot = await landlordReference
+        .doc(_auth.currentUser!.uid)
+        .collection('Houses')
+        .doc(name)
+        .get();
+    if (houseSnapshot.exists) {
+      setIsAdding(false);
+      return 'exists';
     } else {
-      await houseReference
+      await landlordReference
           .doc(_auth.currentUser!.uid)
-          .collection('House Details')
-          .doc(id)
-          .update({
+          .collection('Houses')
+          .doc(name)
+          .set({
         'House Name': name,
+        'Location': location,
+        'Live Longitude': liveLongitude,
+        'Live Latitude': liveLatitude,
         'House Price': price,
         'House Size': size,
         'Images': images,
         'Description': description,
-        'Available Amenities': amenities
+        'Available Amenities': amenities,
+        'isBooked': isBooked,
       });
+      setIsAdding(false);
+      return 'added';
+    }
+  }
+
+  bool isUpdating = false;
+  void setIsUpdating(bool value) {
+    isUpdating = value;
+    notifyListeners();
+  }
+
+
+  //update house details
+  Future<String?> updateListings(
+    String name,
+    String location,
+    int price,
+    String size,
+    List? images,
+    String description,
+    List? amenities,
+  ) async {
+    setIsUpdating(true);
+    Map<String, dynamic> previousDetails =
+        await getIndividualListing(name) as Map<String, dynamic>;
+    if (previousDetails['House Name'] == name &&
+            previousDetails['Location'] == location &&
+            previousDetails['House Price'] == price &&
+            previousDetails['House Size'] == size &&
+            previousDetails['Images'] == images &&
+            previousDetails['Description'] == description &&
+            previousDetails['Available Amenities'] == amenities
+        //previousDetails['isBooked'] == isBooked
+        ) {
+      setIsUpdating(false);
+      return 'No Change';
+    } else {
+      await landlordReference
+          .doc(_auth.currentUser!.uid)
+          .collection('Houses')
+          .doc(name)
+          .update({
+        'House Name': name,
+        'Location': location,
+        'House Price': price,
+        'House Size': size,
+        'Images': images,
+        'Description': description,
+        'Available Amenities': amenities,
+        'isBooked': false,
+      });
+      notifyListeners();
+      setIsUpdating(false);
       return null;
     }
   }
 
-  Future<Object?> getIndividualListing(String id) async {
-    DocumentSnapshot snapshot = await houseReference
+
+  //fetch details of a house using its house name from Houses sub collection in landlord collection
+  Future<Object?> getIndividualListing(String name) async {
+    DocumentSnapshot snapshot = await landlordReference
         .doc(_auth.currentUser!.uid)
-        .collection('House Details')
-        .doc(id)
+        .collection('Houses')
+        .doc(name)
         .get();
     if (snapshot.exists) {
       return snapshot.data();
@@ -235,26 +317,158 @@ class FirebaseServices extends ChangeNotifier {
     return null;
   }
 
-  Future<List<Map<String, dynamic>>> getHouseListing() async {
-    QuerySnapshot housesSnapshot = await houseReference
+  //fetch details of a booked house from booked_students collection searching using house name
+  Future<Map<String, dynamic>?> getSearchedHouse(String name) async {
+    QuerySnapshot snapshot = await firestore
+        .collection('booked_students')
+        //.where('landlordID', isEqualTo: _auth.currentUser!.uid)
+        .where('houseName', isEqualTo: name)
+        .get();
+    if (snapshot.docs.isNotEmpty) {
+      return snapshot.docs.first.data() as Map<String, dynamic>;
+    }
+    return null;
+  }
+
+  //fetch houses for a single landlord
+  Future<List<Map<String, dynamic>>> getLandlordHouseListings() async {
+    QuerySnapshot housesSnapshot = await landlordReference
         .doc(_auth.currentUser!.uid)
-        .collection('House Details')
+        .collection('Houses')
         .get();
     List<Map<String, dynamic>> houses = [];
     for (var snapshot in housesSnapshot.docs) {
       if (snapshot.exists) {
-        houses.add(
-            {'Id': snapshot.id, ...snapshot.data() as Map<String, dynamic>});
+        houses.add({...snapshot.data() as Map<String, dynamic>});
       }
     }
     return houses;
   }
 
-  Future<void> deleteDocById(String id) async {
-    await houseReference
+
+  //fetch details for a single booked houses. Use the houseId from firebase
+  Future<Map<String,dynamic>?> getBookedHouseDetails(String houseId) async{
+    DocumentSnapshot snapshot = await firestore.collection('booked_students').doc(houseId).get();
+    if(snapshot.exists){
+      return snapshot.data() as Map<String,dynamic>;
+    }
+    return null;
+
+  }
+
+  //fetch details of all booked houses
+  Future<List<Map<String, dynamic>>> getHouseListingStatus() async {
+    QuerySnapshot housesSnapshot = await landlordReference
         .doc(_auth.currentUser!.uid)
-        .collection('House Details')
-        .doc(id)
+        .collection('Houses')
+        .where('isBooked', isEqualTo: true)
+        .get();
+    List<Map<String, dynamic>> houses = [];
+    for (var snapshot in housesSnapshot.docs) {
+      if (snapshot.exists) {
+        bool isBooked = snapshot.get('isBooked') as bool;
+        String tenantName = 'Pending';
+        if (isBooked) {
+          String houseName = snapshot.get('House Name') ?? '';
+          QuerySnapshot booked = await firestore
+              .collection('booked_students')
+              .where('houseName', isEqualTo: houseName)
+              .get();
+          if (booked.docs.isNotEmpty) {
+            tenantName = booked.docs.first.get('name').toString();
+          }
+          houses.add({
+            'tenant': tenantName,
+            ...snapshot.data() as Map<String, dynamic>
+          });
+        }
+      }
+    }
+    return houses;
+  }
+
+  //getting the number of all houses for a landlord
+  Future<int> getNoOfAllHouses() async {
+    QuerySnapshot houses = await landlordReference
+        .doc(_auth.currentUser!.uid)
+        .collection('Houses')
+        .get();
+    return houses.docs.length;
+  }
+
+
+  //getting the number of all booked houses for a landlord
+  Future<int> getNoOfAllBookedHouses() async {
+    QuerySnapshot houses = await landlordReference
+        .doc(_auth.currentUser!.uid)
+        .collection('Houses')
+        .where('isBooked', isEqualTo: true)
+        .get();
+    return houses.docs.length;
+  }
+
+  bool isDeleting = false;
+  void setIsDeleting(bool value) {
+    isDeleting = value;
+    notifyListeners();
+  }
+
+
+  //deleting a document from the Houses sub collection using the house name, since its the document id
+  Future<void> deleteDocById(String name) async {
+    setIsDeleting(true);
+    await landlordReference
+        .doc(_auth.currentUser!.uid)
+        .collection('Houses')
+        .doc(name)
         .delete();
+    setIsDeleting(false);
+    notifyListeners();
+  }
+
+
+
+  Future<List<Map<String, dynamic>>> fetchResidences() async {
+    try {
+      QuerySnapshot snapshot =
+          await firestore.collection('booked_students').get();
+      return snapshot.docs
+          .map((doc) => doc.data() as Map<String, dynamic>)
+          .toList();
+    } catch (e) {
+      logger.e('Error fetching residences: $e');
+      return [];
+    }
+  }
+
+  bool isMarkingAvailable = false;
+
+  void setIsMarkingAvailable(bool value) {
+    isMarkingAvailable = value;
+    notifyListeners();
+  }
+
+  //updating a booked house from booked to available
+  Future<void> markRoomAsAvailable(String houseName) async {
+    setIsMarkingAvailable(true);
+
+    //delete the record from collection booked_students
+    QuerySnapshot bookedHouse = await firestore
+        .collection('booked_students')
+        .where('houseName', isEqualTo: houseName)
+        .get();
+    for (var bookedDoc in bookedHouse.docs) {
+      await bookedDoc.reference.delete();
+      notifyListeners();
+    }
+
+    //update the value of isBooked to false
+    await landlordReference
+        .doc(_auth.currentUser!.uid)
+        .collection('Houses')
+        .doc(houseName)
+        .update({'isBooked': false});
+    notifyListeners();
+    setIsMarkingAvailable(false);
   }
 }

@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_frontend/View/Components/google_fonts.dart';
 
@@ -7,6 +6,7 @@ class HouseCard extends StatelessWidget {
   final String price;
   final String houseSize;
   final String? imageUrl;
+  final bool? isNotMoney;
   final Future Function()? onDeletePressed;
   const HouseCard(
       {super.key,
@@ -14,7 +14,8 @@ class HouseCard extends StatelessWidget {
       required this.price,
       required this.houseSize,
       this.imageUrl,
-      this.onDeletePressed});
+      this.onDeletePressed,
+      this.isNotMoney});
 
   @override
   Widget build(BuildContext context) {
@@ -26,18 +27,18 @@ class HouseCard extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       child: Column(
         children: [
-          imageUrl == null
+          imageUrl == null || imageUrl!.isEmpty
               ? Image.asset(
                   'assets/launch.png',
                   height: 198.0,
-                  fit: BoxFit.fill,
+                  fit: BoxFit.cover,
                   filterQuality: FilterQuality.high,
                 )
-              : CachedNetworkImage(
-                  imageUrl: imageUrl!,
+              : Image.network(
+                  imageUrl!,
                   height: 198.0,
                   filterQuality: FilterQuality.high,
-                  fit: BoxFit.fill,
+                  fit: BoxFit.cover,
                 ),
           Padding(
             padding: const EdgeInsets.only(left: 10.0),
@@ -56,7 +57,7 @@ class HouseCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     UseFont(
-                      text: 'Ksh.$price',
+                      text: isNotMoney != null ? price :'Ksh.$price' ,
                       myFont: 'Roboto',
                       size: 16.0,
                       weight: FontWeight.bold,

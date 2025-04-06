@@ -1,0 +1,43 @@
+{
+  "regions": [
+    {
+      "id": "kakamega",
+      "name": "Kakamega Region",
+      "coords": { "lat": 0.2827, "lng": 34.7519 },
+      "zoom": 12
+    }
+  ],
+  "offices": [
+    {
+      "id": "mmust",
+      "name": "Masinde Muliro University",
+      "address": "Kakamega, Kenya",
+      "lat": 0.29273937362296254,
+      "lng": 34.762268010099426,
+
+      "phone": "+254-000-000-000",
+      "image": "https://example.com/mmust.jpg",
+      "region": "kakamega"
+    },
+    {
+      "id": "lurambi",
+      "name": "Lurambi",
+      "address": "Lurambi, Kakamega",
+      "lat": 0.2835,
+      "lng": 34.7445,
+      "phone": "",
+      "image": "",
+      "region": "kakamega"
+    },
+    {
+      "id": "shinyalu",
+      "name": "Shinyalu",
+      "address": "Shinyalu, Kakamega",
+      "lat": 0.2333,
+      "lng": 34.8500,
+      "phone": "",
+      "image": "",
+      "region": "kakamega"
+    }
+  ]
+}

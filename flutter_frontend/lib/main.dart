@@ -1,10 +1,19 @@
 import 'dart:ui';
 
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_frontend/View-Model/navigation/routes.dart';
+import 'package:flutter_frontend/View/Screens/Admin/add_individuals_page.dart';
+import 'package:flutter_frontend/View/Screens/Admin/view_landlords_page.dart';
+import 'package:flutter_frontend/View/Screens/Admin/view_students_page.dart';
+import 'package:flutter_frontend/View/Screens/Landlord/landlord_profile.dart';
+import 'package:flutter_frontend/View/Screens/Landlord/reviews_and_feedback.dart';
+import 'package:flutter_frontend/View/Screens/Landlord/students_bookings.dart';
+import 'package:flutter_frontend/View/Screens/Landlord/update_house_status.dart';
 import 'package:flutter_frontend/View/Screens/Landlord/view_and_update_listings.dart';
+import 'package:flutter_frontend/View/Screens/Student/mapit.dart';
 import 'package:flutter_frontend/constants.dart';
 import 'package:flutter_frontend/services/firebase_services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -21,9 +30,10 @@ import 'View/Screens/Common/registration_page.dart';
 import 'View/Screens/Landlord/add_house.dart';
 import 'View/Screens/Landlord/landloard_dash.dart';
 import 'View/Screens/Landlord/manage_house_listings.dart';
-import 'View/Screens/Student/student_dash.dart';
+import 'View/Screens/Student/chart_screen.dart';
+import 'data/payment.dart';
+import 'data/providers.dart';
 import 'firebase_options.dart';
-import 'View/Screens/Admin/admin_settings.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -37,9 +47,23 @@ Future<void> main() async {
   } catch (e) {
     print('Firebase initialisation error: $e');
   }
-  String initialRoute = await getLastVisitedPage();
-  runApp(ProviderScope(
-      child: ResidentialTrackerAndBooking(initialRoute: initialRoute)));
+  // String initialRoute = await getLastVisitedPage();
+
+  AwesomeNotifications().initialize(
+    null,
+    [
+      NotificationChannel(
+          channelKey: "app_status",
+          channelName: "booking",
+          channelDescription: "Booking status")
+    ],
+    debug: true,
+  );
+  final sharedPreferences = await SharedPreferences.getInstance();
+
+  runApp(ProviderScope(overrides: [
+    sharedPreferencesProvider.overrideWithValue(sharedPreferences),
+  ], child: ResidentialTrackerAndBooking()));
 }
 
 class CustomScrollBehavior extends MaterialScrollBehavior {
@@ -52,8 +76,8 @@ class CustomScrollBehavior extends MaterialScrollBehavior {
 }
 
 class ResidentialTrackerAndBooking extends ConsumerStatefulWidget {
-  final String initialRoute;
-  const ResidentialTrackerAndBooking({super.key, required this.initialRoute});
+//  final String initialRoute;
+  const ResidentialTrackerAndBooking({super.key});
 
   @override
   ConsumerState<ResidentialTrackerAndBooking> createState() =>
@@ -63,118 +87,180 @@ class ResidentialTrackerAndBooking extends ConsumerStatefulWidget {
 class _StateResidentialTrackerAndBooking
     extends ConsumerState<ResidentialTrackerAndBooking> {
   ThemeMode themeMode = ThemeMode.light;
+
   ColorSelection colorSelected = ColorSelection.blue;
 
-//call this to change the theme of the app (dark or light)
   void changeThemeMode(bool useLightMode) {
     setState(() {
       themeMode = useLightMode ? ThemeMode.light : ThemeMode.dark;
     });
   }
 
-  //use it to change the color of the page /you can add any color in the constants.dart
   void changeColor(int value) {
     setState(() {
       colorSelected = ColorSelection.values[value];
     });
   }
 
-  GoRouter routeMaker(BuildContext context) {
-    double deviceWidth = MediaQuery.of(context).size.width;
-    return GoRouter(
-      initialLocation: widget.initialRoute,
-      routerNeglect: false,
-      redirect: _appRedirect,
-      routes: [
-        GoRoute(builder: (context, state) => LoginPage(), path: '/login'),
-        GoRoute(
-            builder: (context, state) => RegistrationPage(),
-            path: '/registration'),
-        GoRoute(
-            builder: (context, state) {
-              return LayoutBuilder(builder: (context, constraints) {
-                if (constraints.maxWidth > 800) {
-                  return ForgotPassword(
-                    width: deviceWidth / 2,
-                  );
-                } else {
-                  return ForgotPassword(
-                    width: deviceWidth / 1.1,
-                  );
-                }
-              });
-            },
-            path: '/forgot-password'),
-        GoRoute(
-            builder: (context, state) {
-              return LayoutBuilder(builder: (context, constraints) {
-                if (constraints.maxWidth > 800) {
-                  return EmailVerificationPage(
-                    width: deviceWidth / 2,
-                  );
-                } else {
-                  return EmailVerificationPage(
-                    width: deviceWidth / 1.1,
-                  );
-                }
-              });
-            },
-            path: '/verification'),
-        GoRoute(
-            builder: (context, state) {
-              return StudentDashboardScreen();
-            },
-            path: '/student-dashboard'),
-        GoRoute(
-            builder: (context, state) {
-              return LandLoardDashboardScreen();
-            },
-            path: '/landlord-dashboard'),
-        GoRoute(
-            builder: (context, state) {
-              return ManageHouseListings();
-            },
-            path: '/manageListings',
-            routes: [
-              GoRoute(
-                path: 'add-house',
-                builder: (context, state) => LayoutBuilder(
-                  builder: (BuildContext context, BoxConstraints constraints) {
-                    if (constraints.maxWidth > 800) {
-                      return AddHouse(width: deviceWidth / 2);
-                    } else {
-                      return AddHouse(width: deviceWidth / 1.1);
-                    }
-                  },
-                ),
+  late final _router = GoRouter(
+    initialLocation: "/login",
+    redirect: _appRedirect,
+    routes: [
+      //  GoRoute(builder: (context, state) => LoginPage(), path: '/login'),
+
+      GoRoute(builder: (context, state) => LoginPage(), path: '/login'),
+
+      GoRoute(
+          builder: (context, state) => RegistrationPage(),
+          path: '/registration'),
+      GoRoute(
+          builder: (context, state) => ForgotPassword(),
+          path: '/forgot-password'),
+      GoRoute(
+          builder: (context, state) => EmailVerificationPage(),
+          path: '/verification'),
+
+      // GoRoute(
+      //     builder: (context, state) {
+      //       return StudentDashboard();
+      //     },
+      //     path: '/student-dashboard'),
+
+      GoRoute(
+          builder: (context, state) {
+            return LandLordDashboardScreen(
+              changeTheme: changeThemeMode,
+              changeColor: changeColor,
+              colorSelected: colorSelected,
+            );
+          },
+          path: '/landlord-dashboard'),
+
+      GoRoute(
+          builder: (context, state) {
+            return ManageHouseListings(
+              changeTheme: changeThemeMode,
+              changeColor: changeColor,
+              colorSelected: colorSelected,
+            );
+          },
+          path: '/manageListings',
+          routes: [
+            GoRoute(
+              path: 'add-house',
+              builder: (context, state) => AddHouse(
+                changeTheme: changeThemeMode,
+                changeColor: changeColor,
+                colorSelected: colorSelected,
               ),
-              GoRoute(
-                  path: 'view-and-update-listings',
-                  builder: (context, state) => ViewAndUpdateListings())
-            ]),
-        GoRoute(
-            builder: (context, state) {
-              return AdminDashboardScreen();
-            },
-            path: '/admin-dashboard'),
-        GoRoute(
-          path: '/admin-settings',
-          builder: (context, state) => AdminSettingsPage(),
-          
-        ),
-      ],
-      errorPageBuilder: (context, state) {
-        return MaterialPage(
-          key: state.pageKey,
-          child: Scaffold(
-            body: Center(
-              child: Text("404 error:${state.error}"),
             ),
+            GoRoute(
+              path: 'view-and-update-listings',
+              builder: (context, state) => ViewAndUpdateListings(
+                changeTheme: changeThemeMode,
+                changeColor: changeColor,
+                colorSelected: colorSelected,
+              ),
+            ),
+            GoRoute(
+              path: 'update-house-status',
+              builder: (context, state) => UpdateHouseStatus(
+                changeTheme: changeThemeMode,
+                changeColor: changeColor,
+                colorSelected: colorSelected,
+              ),
+            ),
+          ]),
+      GoRoute(
+        path: '/student-bookings',
+        builder: (context, state) => StudentsBookings(
+          changeTheme: changeThemeMode,
+          changeColor: changeColor,
+          colorSelected: colorSelected,
+        ),
+      ),
+      GoRoute(
+          builder: (context, state) => ReviewsAndFeedback(
+            changeTheme: changeThemeMode,
+            changeColor: changeColor,
+            colorSelected: colorSelected,
           ),
-        );
-      },
-    );
-  }
+          path: '/tenant-feedback'),
+      GoRoute(
+          builder: (context, state) => LandlordProfile(
+                changeTheme: changeThemeMode,
+                changeColor: changeColor,
+                colorSelected: colorSelected,
+              ),
+          path: '/landlord-profile'),
+
+
+      GoRoute(
+          builder: (context, state) {
+            return AdminDashboardScreen(
+              changeTheme: changeThemeMode,
+              changeColor: changeColor,
+              colorSelected: colorSelected,
+            );
+          },
+          path: '/admin-dashboard'),
+      GoRoute(
+        path: '/view-students',
+        builder: (context,state){
+          return ViewStudentsPage(
+            changeTheme: changeThemeMode,
+            changeColor: changeColor,
+            colorSelected: colorSelected,
+          );
+        }
+      ),
+      GoRoute(
+          path: '/view-landlords',
+          builder: (context,state){
+            return ViewLandlordsPage(
+              changeTheme: changeThemeMode,
+              changeColor: changeColor,
+              colorSelected: colorSelected,
+            );
+          }
+      ),
+      GoRoute(
+          path: '/add-individuals',
+          builder: (context,state){
+            return AddIndividualsPage(
+              changeTheme: changeThemeMode,
+              changeColor: changeColor,
+              colorSelected: colorSelected,
+            );
+          }
+      ),
+
+      GoRoute(
+          builder: (context, state) {
+            return ChatScreen(
+              changeTheme: changeThemeMode,
+              changeColor: changeColor,
+              colorSelected: colorSelected,
+            );
+          },
+          path: '/student-dashboard'),
+      // GoRoute(
+      //     builder: (context, state) {
+      //       return  MapScreen();
+      //     },
+      //     path: '/mapit'),
+    ],
+    errorPageBuilder: (context, state) {
+      return MaterialPage(
+        key: state.pageKey,
+        child: Scaffold(
+          body: Center(
+            child: Text("404 error:${state.error}"),
+          ),
+        ),
+      );
+    },
+  );
 
   Future<String?> _appRedirect(
       BuildContext context, GoRouterState state) async {
@@ -186,7 +272,7 @@ class _StateResidentialTrackerAndBooking
     if (!loggedIn &&
         !['/login', '/registration', '/forgot-password']
             .contains(state.matchedLocation)) {
-      return null;
+      return '/login';
     }
 
     // If the user is logged in but is on the login page, send them to their dashboard
@@ -215,13 +301,14 @@ class _StateResidentialTrackerAndBooking
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       scrollBehavior: CustomScrollBehavior(),
+      themeMode: themeMode,
       theme:
           ThemeData(colorSchemeSeed: colorSelected.color, useMaterial3: true),
       darkTheme: ThemeData(
           colorSchemeSeed: colorSelected.color,
           useMaterial3: true,
           brightness: Brightness.dark),
-      routerConfig: routeMaker(context),
+      routerConfig: _router,
       title: "Residential Tracker and Booking",
     );
   }
