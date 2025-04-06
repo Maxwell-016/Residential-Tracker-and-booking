@@ -1,8 +1,21 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_frontend/View/Components/admin_side_nav.dart';
+
+import '../../../constants.dart';
+import '../../Components/SimpleAppBar.dart';
+
+
+
+//TODO: Is this page really needed???????????
+
 
 class AddIndividualsPage extends StatefulWidget {
-  const AddIndividualsPage({super.key});
+  final ColorSelection colorSelected;
+  final void Function(bool useLightMode) changeTheme;
+  final void Function(int value) changeColor;
+
+  const AddIndividualsPage({super.key, required this.colorSelected, required this.changeTheme, required this.changeColor});
 
   @override
   State<AddIndividualsPage> createState() => _AddIndividualsPageState();
@@ -64,9 +77,18 @@ class _AddIndividualsPageState extends State<AddIndividualsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Add Individuals'),
-      ),
+    appBar: PreferredSize(
+    preferredSize: const Size.fromHeight(60),
+    child: App_Bar(
+    changeTheme: widget.changeTheme,
+    changeColor: widget.changeColor,
+    colorSelected: widget.colorSelected,
+    title: 'Add Individuals',
+    ),
+    ),
+      drawer: AdminSideNav(),
+
+
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
