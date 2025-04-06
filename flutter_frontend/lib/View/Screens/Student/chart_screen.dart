@@ -53,6 +53,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   String onTapedScreen='ai';
 
   bool showMap=false;
+  bool showAllHouse=false;
   String pkey="pageKey";
 
 
@@ -65,6 +66,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   bool awaitingPhoneNumberInput=false;
   var showHouses=false;
 
+
   String conversationStep="select_option";
 
   List<Map<String, dynamic>> messages = [];
@@ -72,6 +74,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   String? awaitingLocationInput;
   Map<String, dynamic> house={};
+
 
 
 
@@ -104,6 +107,31 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     String userMessage = _controller.text.trim();
     if (userMessage.isEmpty) return;
 
+
+    if (chatService.userWantsToGoBack(userMessage)) {
+      setState(() {
+        conversationStep = "select_option";
+        showHouses = false;
+        awaitingPhoneNumberInput = false;
+        showMap = false;
+
+        messages.add({
+          "role": "ai",
+          "text": "You're back at the main service list. Here are the services we offer:\n\n"
+              " 1 List all available houses in a specific location\n"
+              " 2 See all locations with available houses\n"
+              " 3 Report for an emergency\n"
+              " 4 Ask for help and related questions\n"
+              " 5 See all vacant houses\n\n"
+              "Which option would you like me to assist you with?"
+        });
+        isTyping = false;
+      });
+      return;
+    }
+
+
+
     setState(() {
       messages.add({"role": "user", "text": userMessage});
       isTyping = true;
@@ -112,7 +140,12 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     _controller.clear();
 
 
+
+
+
     if ( conversationStep == "enter_number") {
+
+
       if (await validatePhoneNumber(userMessage)) {
         await chatService.savePhoneNumber(userMessage);
         setState(() {
@@ -253,7 +286,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         if(conversationStep == "view_locations") {
           aiResponse = await chatService.handleOption2();
           //  Future.delayed(Duration(seconds: 1), () async {
-
           setState(() {
 
             messages.add({
@@ -277,9 +309,38 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         aiResponse="Ask any question that you want me to help you with ?";
 
 
-      }else if(aiResponse.contains( "Send feedback to the landlord")) {
+      }else if(aiResponse.contains( "See all vacant houses")) {
 
-        aiResponse= "Send feedback to the landlord";
+        List<Map<String, dynamic>> houses = await chatService.getHouses();
+
+        if (houses.isNotEmpty) {
+          aiResponse = "Click on a house or reply with the house name to proceed with booking.";
+
+          for (var house in houses) {
+            messages.add({
+              "role": "ai",
+              "text": "🏠 ${house["House Name"]} -> Booking",
+              "house": house,
+            });
+          }
+
+          setState(() {
+            showHouses=true;
+         //   showAllHouse = true;
+          });
+
+
+
+        } else {
+          aiResponse = "Thousand apologies, currently there is no available house,I will notify you when they are available.";
+          setState(() {
+           userMessage='go back';
+          });
+
+
+
+
+        }
 
       }
 
@@ -292,10 +353,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       setState(() {
         showMap=false;
       });
-      bool isValid = await validateLocation(userMessage);
+     // bool isValid = await validateLocation(userMessage);
 
-      if (true) {
-        onSearch(userMessage,  ref) ;
+      if (chatService.isLegitPlace(userMessage.trim())) {
+        onSearch(userMessage.trim(),  ref) ;
 
 
         List<Map<String, dynamic>> houses = await chatService.getHousesByLocation(userMessage);
@@ -317,7 +378,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
 
 
-        } else {
+        }else {
           setState(() {
             conversationStep = "enter_location";
           });
@@ -325,7 +386,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
         }
 
-        //  conversationStep = "select_option";
+
+
+
       } else {
         aiResponse = "I couldn't find that location. Please enter a valid location.";
       }
@@ -435,7 +498,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         awaitingPhoneNumberInput = true;
       });
       return;
-    }
+     }
 
 
 
@@ -524,7 +587,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   ),
                   width:180 ,
                   // height: double.infinity,
-
                   child: Column(
                       spacing: 5,
                       children: [
@@ -626,6 +688,15 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     bool isDark = Theme.of(context).brightness == Brightness.dark;
     var screenWidth=MediaQuery.of(context).size.width;
     var screenHeight=MediaQuery.of(context).size.width;
+    int crossAxisCount;
+    if (screenWidth < 300) {
+      crossAxisCount = 1;
+    } else if (screenWidth < 700) {
+      crossAxisCount = 2;
+    } else {
+      crossAxisCount = 4;
+    }
+
     return Column(
       children: [
         Expanded(
@@ -634,7 +705,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               ListView.builder(
                 controller: _scrollController,
                 itemCount: messages.length + (isTyping ? 1 : 0),
-                itemBuilder: (context, index)  {
+                itemBuilder: (context, index) {
                   if (isTyping && index == messages.length) {
                     return Padding(
                       padding: const EdgeInsets.all(8.0),
@@ -648,11 +719,12 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   final message = messages[index];
 
 
-                  if (showMap && index == messages.length - 1 ) {
+                  if (showMap && index == messages.length - 1) {
                     return Align(
                       alignment: Alignment.centerLeft,
                       child: Container(
-                        margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                        margin: EdgeInsets.symmetric(
+                            vertical: 5, horizontal: 10),
                         padding: EdgeInsets.all(8),
                         decoration: BoxDecoration(
                           color: isDark ? Colors.grey[900] : Colors.grey[300],
@@ -663,13 +735,15 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                           children: [
                             Text(
                               "Here are all available locations:",
-                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold),
                             ),
                             SizedBox(height: 10),
                             SizedBox(
-                              width: screenWidth*0.7,
-                              height: screenHeight*0.5,
-                              child: MapScreen(locations:  chatService.getAllLocations()),
+                              width: screenWidth * 0.7,
+                              height: screenHeight * 0.5,
+                              child: MapScreen(
+                                  locations: chatService.getAllLocations()),
                             ),
                           ],
                         ),
@@ -678,8 +752,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   }
 
 
+
                   if (message.containsKey("house") && message["house"] != null && showHouses) {
                     final house = message["house"];
+
                     if (house is Map<String, dynamic>) {
                       return HouseCard(house: house);
                     }
@@ -741,4 +817,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
 
 }
+
+
 

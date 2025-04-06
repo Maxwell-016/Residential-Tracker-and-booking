@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_frontend/data/payment.dart';
@@ -54,14 +55,14 @@ class _StateHouseCard extends ConsumerState<HouseCard> {
       return;
     }
 
-    if (studentPhone == null || studentPhone!.isEmpty) {
+  //  if (studentPhone == null || studentPhone!.isEmpty) {
       await _promptForPhoneNumber();
       // if (studentPhone == null || studentPhone!.isEmpty) {
       //   print("Phone number not provided.");
       //   setState(() => isBooking = false);
       //   return;
       // }
-    }
+   // }
 
     _showPaymentOptions();
     setState(() => isBooking = false);
@@ -271,60 +272,7 @@ class _StateHouseCard extends ConsumerState<HouseCard> {
         houseImage,
         paymentOption,lat,long);
 
-    // var response = await http.post(
-    //   Uri.parse("https://mpesaapi.onrender.com/stkpush"),
-    //   headers: {"Content-Type": "application/json"},
-    //   body: jsonEncode({"phone": studentPhone, "amount": amountToPay}),
-    // );
-    //
-    // if (response.statusCode != null) {
-    //
-    //   var callbackResponse = await http.get(Uri.parse("https://mpesaapi.onrender.com/callback"));
-    //
-    //   if (callbackResponse.statusCode !=null) {
-    //     print("Payment successful, proceeding with booking...");
-    //
-    //     await fs.collection("booked_students").doc().set({
-    //       "email": studentEmail,
-    //       "name": studentName ?? "Unknown",
-    //       "stdContact": studentPhone,
-    //       "houseName": houseName,
-    //       "houseLocation": location,
-    //       "payment_status": "Paid",
-    //       "paymentOption":paymentOption,
-    //       'timestamp': FieldValue.serverTimestamp(),
-    //       "amount_paid": amountToPay,
-    //       "landlordContact": landlordPhone,
-    //       "landlordId":landlordId,
-    //       "landlord": landlordName,
-    //       "images":houseImage
-    //     });
-    //
-    //     await fs
-    //         .collection("Landlords")
-    //         .doc(landlordId)
-    //         .collection("Houses")
-    //         .doc(houseId)
-    //         .update({"isBooked": true});
-    //
-    //
-    //     String msg="$houseName has been booked successfully with the '$paymentOption' option!";
-    //     print(msg  );
-    //     trigernotification(null, msg, "House Booked Successfully");
-    //
-    //   } else {
-    //     String msg="Booking not completed.";
-    //     print(msg);
-    //     trigernotification(null, msg, "Payment failed!!");
-    //
-    //   }
-    // } else {
-    //
-    //   String msg="Error: M-Pesa request failed.";
-    //   print(msg);
-    //   trigernotification(null, msg, "Payment failed!!");
-    //
-    // }
+//
 
     setState(() => isBooking = false);
 
@@ -333,79 +281,87 @@ class _StateHouseCard extends ConsumerState<HouseCard> {
 
 
 
-
-
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => startBookHouse(),
-      child: Center(
-        child: Container(
-          constraints: BoxConstraints(
-            maxWidth: MediaQuery.of(context).size.width > 600
-                ? 600
-                : MediaQuery.of(context).size.width * 0.9,
-          ),
-          child: Card(
-            elevation: 4,
-            margin: EdgeInsets.all(8),
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10)),
-            child: Padding(
-              padding: EdgeInsets.all(8),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (widget.house.containsKey("Images") && widget.house["Images"] is List)
-                    SizedBox(
-                      height: 200,
-                      child: PageView.builder(
-                        itemCount: widget.house["Images"].length,
-                        itemBuilder: (context, index) {
-                          return ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: Image.network(
-                              widget.house["Images"][index],
-                              width: double.infinity,
-                              height: 200,
-                              fit: BoxFit.cover,
-                            ),
-                          );
-                        },
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          double width = constraints.maxWidth;
+
+          return Center(
+            child: Container(
+              constraints: BoxConstraints(
+                maxWidth: width > 600 ? 600 : width * 0.95,
+              ),
+              child: Card(
+                elevation: 4,
+                margin: EdgeInsets.all(8),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+                child: Padding(
+                  padding: EdgeInsets.all(8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (widget.house.containsKey("Images") &&
+                          widget.house["Images"] is List)
+                        CarouselSlider(
+                          options: CarouselOptions(
+                            height: 200,
+                            enlargeCenterPage: true,
+                            enableInfiniteScroll: false,
+                            autoPlay: true,
+                          ),
+                          items: widget.house["Images"].map<Widget>((imgUrl) {
+                            return ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: Image.network(
+                                imgUrl,
+                                width: double.infinity,
+                                height: 200,
+                                fit: BoxFit.cover,
+                              ),
+                            );
+                          }).toList(),
+                        ),
+
+                      const SizedBox(height: 8),
+                      ListTile(
+                        leading: Text(
+                          "🏠 House Name -> ${widget.house["House Name"]}",
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                        ),
+                        trailing: Text(
+                          "Price Ksh ${widget.house["House Price"]} per month",
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                        ),
                       ),
-                    ),
-
-                  SizedBox(height: 8),
-                  ListTile(
-                    leading: Text(
-                      "🏠 ${"House Name -> "+widget.house["House Name"]} ",
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                    ),
-                    trailing: Text(
-                      "Price Ksh ${widget.house["House Price"]} per month",
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                    ),
+                      Text("📍 ${widget.house["Location"] ?? ""}"),
+                      Text("📏 ${widget.house["House Size"]}"),
+                      Text("📝 ${widget.house["Description"]}"),
+                      if (widget.house.containsKey("Available Amenities"))
+                        Text(
+                          "🔹 Amenities: ${widget.house["Available Amenities"]?.join(", ") ?? "N/A"}",
+                        ),
+                      const SizedBox(height: 10),
+                      if (widget.house["isBooked"] == true)
+                        ElevatedButton(
+                          onPressed: () => cancelBooking(),
+                          style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                          child: Text("Cancel Booking"),
+                        ),
+                    ],
                   ),
-                  Text("📍 ${widget.house["Location"]}" ?? ""),
-                  Text("📏 ${widget.house["House Size"]}"),
-                  Text("📝 ${widget.house["Description"]}"),
-                  if (widget.house.containsKey("Available Amenities"))
-                    Text("🔹 Amenities: ${widget.house["Available Amenities"]?.join(", ") ?? "N/A"}"),
-                  SizedBox(height: 10),
-                  if (widget.house["isBooked"] == true)
-                    ElevatedButton(
-                      onPressed: () => cancelBooking(),
-                      style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                      child: Text("Cancel Booking"),
-                    ),
-
-                ],
+                ),
               ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }
+
+
+
 }
