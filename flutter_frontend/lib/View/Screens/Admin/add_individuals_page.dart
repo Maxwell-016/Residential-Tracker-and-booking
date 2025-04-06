@@ -114,7 +114,7 @@ class _AddIndividualsPageState extends State<AddIndividualsPage> {
                   if (value == null || value.isEmpty) {
                     return 'Please enter an email';
                   }
-                  if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                  if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) { // used some automata theory of regular expressions
                     return 'Please enter a valid email';
                   }
                   return null;
