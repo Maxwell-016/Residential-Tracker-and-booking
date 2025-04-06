@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_frontend/View/Components/house_card.dart';
+import 'package:flutter_frontend/View/Screens/Landlord/update_house_status.dart';
 import 'package:flutter_frontend/services/firebase_services.dart';
 import 'package:logger/logger.dart';
 
@@ -42,6 +43,7 @@ class _SearchPageState extends State<SearchPage> {
       setState(() {
         if (searchResults != null) {
           results = searchResults;
+          logger.i(results);
         } else {
           errorMessage = 'No house found with name $name';
         }
@@ -78,20 +80,20 @@ class _SearchPageState extends State<SearchPage> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-
-          //TODO: try to use both uppercase and lowercase to fetch
           title: TextField(
             controller: searchController,
             focusNode: searchFocus,
             enabled: true,
             textInputAction: TextInputAction.search,
-            onSubmitted: (value) async => await searchHouse(value.trim()),
+            onSubmitted: (value) async =>
+                await searchHouse(value.trim().toUpperCase()),
             decoration: InputDecoration(
               hintText: 'Search house by house name',
               hintStyle: TextStyle(color: Colors.grey, fontSize: 14.0),
               suffixIcon: IconButton(
                   onPressed: () async {
-                    await searchHouse(searchController.text.trim());
+                    await searchHouse(
+                        searchController.text.trim().toUpperCase());
                   },
                   icon: Icon(Icons.search)),
               enabledBorder: OutlineInputBorder(
@@ -111,21 +113,39 @@ class _SearchPageState extends State<SearchPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              SizedBox(height: deviceHeight / 4,),
+              SizedBox(
+                height: deviceHeight / 4,
+              ),
               if (isLoading) Center(child: CircularProgressIndicator()),
               if (errorMessage != null) Center(child: Text(errorMessage!)),
               if (results!.isNotEmpty)
                 Center(
                   child: SizedBox(
                     width: deviceWidth / 2,
-
-                    //TODO: add an onTap function that takes you to the description page to mark it as available
-                    child: HouseCard(
-                        isNotMoney: true,
-                        imageUrl: results!['images'][0],
-                        houseName: 'House Name: ${results!['houseName']}',
-                        price: 'Tenant: ${results!['name']}',
-                        houseSize: 'Status: Booked'),
+                    child: GestureDetector(
+                      onTap: () async {
+                        Map<String, dynamic> houseDetails =
+                        {'tenant': results!['name'],
+                          ...await firebaseServices.getIndividualListing(
+                              results!['houseName']) as Map<String, dynamic>
+                        };
+                        logger.i(houseDetails);
+                        if (!context.mounted) return;
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                ChangeHouseStatus(houseDetails: houseDetails),
+                          ),
+                        );
+                      },
+                      child: HouseCard(
+                          isNotMoney: true,
+                          imageUrl: results!['images'][0],
+                          houseName: 'House Name: ${results!['houseName']}',
+                          price: 'Tenant: ${results!['name']}',
+                          houseSize: 'Status: Booked'),
+                    ),
                   ),
                 )
             ],

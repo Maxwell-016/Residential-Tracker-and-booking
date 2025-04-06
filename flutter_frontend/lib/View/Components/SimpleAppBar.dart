@@ -54,10 +54,10 @@ class _StateAppBar extends ConsumerState<App_Bar> {
           ColorButton(changeColor: widget.changeColor, colorSelected: widget.colorSelected),
           IconButton(
             onPressed: () async {
-              fb.signOut(context);
-              await Future.delayed(Duration(milliseconds: 1));
-              if(!context.mounted)return;
-              context.go('/login');
+              await fb.signOut(context);
+             // await Future.delayed(Duration(milliseconds: 1));
+             //  if(!context.mounted)return;
+             //  context.go('/login');
             },
             icon: Icon(Icons.logout_sharp),
           ),

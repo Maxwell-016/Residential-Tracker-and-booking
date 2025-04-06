@@ -126,11 +126,8 @@ class FirebaseServices extends ChangeNotifier {
   //sign out of the app
   Future<void> signOut(BuildContext context) async {
     await _auth.signOut();
-    // await GoogleSignIn().signOut();
-    // Future.microtask(() {
-    //   if (!context.mounted) return;
-    //   Navigator.of(context).pushReplacementNamed('/login');
-    // });
+    if(!context.mounted) return;
+    context.go('/login');
   }
 
   //email verification
@@ -315,6 +312,7 @@ class FirebaseServices extends ChangeNotifier {
   Future<Map<String, dynamic>?> getSearchedHouse(String name) async {
     QuerySnapshot snapshot = await firestore
         .collection('booked_students')
+        //.where('landlordID', isEqualTo: _auth.currentUser!.uid)
         .where('houseName', isEqualTo: name)
         .get();
     if (snapshot.docs.isNotEmpty) {
@@ -323,7 +321,7 @@ class FirebaseServices extends ChangeNotifier {
     return null;
   }
 
-  Future<List<Map<String, dynamic>>> getHouseListing() async {
+  Future<List<Map<String, dynamic>>> getLandlordHouseListings() async {
     QuerySnapshot housesSnapshot = await landlordReference
         .doc(_auth.currentUser!.uid)
         .collection('Houses')
@@ -336,6 +334,17 @@ class FirebaseServices extends ChangeNotifier {
     }
     return houses;
   }
+
+  Future<Map<String,dynamic>?> getBookedHouseDetails(String houseId) async{
+    DocumentSnapshot snapshot = await firestore.collection('booked_students').doc(houseId).get();
+    if(snapshot.exists){
+      return snapshot.data() as Map<String,dynamic>;
+    }
+    return null;
+
+  }
+
+
 
   Future<List<Map<String, dynamic>>> getHouseListingStatus() async {
     QuerySnapshot housesSnapshot = await landlordReference

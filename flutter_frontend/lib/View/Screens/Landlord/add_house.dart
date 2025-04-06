@@ -368,7 +368,7 @@ class AddHouse extends HookConsumerWidget {
                                     try {
                                       String message = await firebaseServicesProvider
                                           .addHouseListing(
-                                            houseNameController.text,
+                                            houseNameController.text.toUpperCase(),
                                             selectedLocation,
                                             ref
                                                 .watch(locationProvider)

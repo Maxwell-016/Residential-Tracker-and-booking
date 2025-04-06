@@ -25,7 +25,11 @@ class LandlordSideNav extends StatelessWidget {
                 context.go('/student-bookings');
               },
               child: SideNavItem(text: 'Students Bookings')),
-          SideNavItem(text: 'Reviews and Feedback'),
+          GestureDetector(
+            onTap: (){
+              context.go('/tenant-feedback');
+            },
+              child: SideNavItem(text: 'Reviews and Feedback')),
           GestureDetector(
             onTap: () {
               context.go('/landlord-profile');
