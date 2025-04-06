@@ -6,6 +6,14 @@ class ChatService {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
   final FirebaseAuth auth = FirebaseAuth.instance;
 
+
+
+  bool isLegitPlace(String name) {
+    final regex = RegExp(r'^[A-Za-z][A-Za-z\s]*$');
+    return regex.hasMatch(name);
+  }
+
+
   Future<String> welcome() async {
     String? email = auth.currentUser?.email;
     if (email == null) return "Welcome! How can I help you today?";
@@ -18,6 +26,8 @@ class ChatService {
 
     if (snapshot.docs.isNotEmpty) {
       String? name = snapshot.docs.first.get("name");
+
+
 
       return name != null && name.isNotEmpty
           ? "Welcome ${name.trim().split(" ").first}, I am your assistant to help you find the house of your choice.\n\n"
@@ -68,6 +78,39 @@ class ChatService {
     return "user";
   }
 
+  bool userWantsToGoBack(String message) {
+    final lowerMsg = message.toLowerCase();
+    return [
+      "go back",
+      "back to menu",
+      "back to options",
+      "return to services",
+      "show services",
+      "main menu",
+      "back",
+    ].any((phrase) => lowerMsg.contains(phrase));
+  }
+
+
+
+  Future<List<Map<String, dynamic>>> getHouses() async {
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collectionGroup('Houses')
+        .where("isBooked", isEqualTo: false)
+        .get();
+
+    return querySnapshot.docs.map((doc) {
+      return {
+        "id": doc.id,
+        "landlordId": doc.reference.parent.parent?.id,
+        ...doc.data() as Map<String, dynamic>
+      };
+    }).toList();
+  }
+
+
+
+
   Future<List<Map<String, dynamic>>> getHousesByLocation(
       String location) async {
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
@@ -87,7 +130,6 @@ class ChatService {
 
   Future<List<Map<String, dynamic>>> getAllHouses() async {
     List<Map<String, dynamic>> houses = [];
-
     try {
       QuerySnapshot landlords = await firestore.collection("Landlords").get();
 
@@ -106,12 +148,10 @@ class ChatService {
           houses.add(houseData);
         }
       }
-
       print("Retrieved ${houses.length} houses.");
     } catch (e) {
       print("Error fetching houses: $e");
     }
-
     return houses;
   }
 
@@ -121,7 +161,6 @@ class ChatService {
       DocumentReference docRef = FirebaseFirestore.instance
           .collection("applicants_details")
           .doc(email);
-
       await docRef.set({
         "phone": phoneNumber,
       }, SetOptions(merge: true)); // Ensures existing data is not lost
@@ -138,6 +177,9 @@ class ChatService {
         .get();
     return doc.exists ? doc["phone"] : null;
   }
+
+
+
 
   Future<List<String>> getAllLocations() async {
     Set<String> uniqueLocations = {};
@@ -163,9 +205,11 @@ class ChatService {
     } catch (e) {
       print("Error fetching locations: $e");
     }
-
     return uniqueLocations.toList();
   }
+
+
+
 
   Future<String> handleOption2() async {
     List<String> locations = await getAllLocations();
@@ -173,7 +217,6 @@ class ChatService {
     if (locations.isEmpty) {
       return "Currently, there are no available houses in any location.";
     }
-
     String locationList = locations
         .asMap()
         .entries

@@ -45,7 +45,7 @@ Future<String> validateOption(String userMessage) async {
   }else if (response.trim() == "option_4") {
     return "Ask for help and related questions.";
   }else if (response.trim() == "option_5") {
-    return "Send feedback to the landlord";
+    return "See all vacant houses";
   }
   else {
     return "I didn't understand your choice. Please reply with a value 1 to 5 or correct option";
@@ -53,6 +53,19 @@ Future<String> validateOption(String userMessage) async {
 }
 
 
+Future<bool> detectGoBackToServiceList(String userMessage) async {
+  final prompt = '''
+check for me if this  $userMessage has any meaning of going back or relates to going back to something ,returning ,choose another option
+,redo ,reset ,start again or any things that relates to returning if it does relate then 
+return true if not return false ,
+only return true or false 
+''';
+
+  final response = await aiService.getAIResponse(prompt);
+  print("Go Back Detection: $response");
+
+  return response.trim().toLowerCase() == 'true';
+}
 
 
 Future<bool> validateLocation(String location) async {
