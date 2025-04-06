@@ -1,8 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_frontend/View/Components/admin_side_nav.dart';
+
+import '../../../constants.dart';
+import '../../Components/SimpleAppBar.dart';
 
 class ViewLandlordsPage extends StatefulWidget {
-  const ViewLandlordsPage({super.key});
+  final ColorSelection colorSelected;
+  final void Function(bool useLightMode) changeTheme;
+  final void Function(int value) changeColor;
+
+  const ViewLandlordsPage({super.key, required this.colorSelected, required this.changeTheme, required this.changeColor});
 
   @override
   State<ViewLandlordsPage> createState() => _ViewLandlordsPageState();
@@ -39,9 +47,16 @@ class _ViewLandlordsPageState extends State<ViewLandlordsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('View Landlords'),
-      ),
+      appBar: PreferredSize(
+    preferredSize: const Size.fromHeight(60),
+    child: App_Bar(
+    changeTheme: widget.changeTheme,
+    changeColor: widget.changeColor,
+    colorSelected: widget.colorSelected,
+    title: 'View Landlords',
+    ),
+    ),
+      drawer: AdminSideNav(),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : landlords.isEmpty

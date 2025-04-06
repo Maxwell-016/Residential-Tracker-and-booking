@@ -1,8 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_frontend/View/Components/admin_side_nav.dart';
 import 'package:flutter_frontend/services/firebase_services.dart';
 
+import '../../../constants.dart';
+import '../../Components/SimpleAppBar.dart';
+
 class ViewStudentsPage extends StatefulWidget {
-  const ViewStudentsPage({super.key});
+  final ColorSelection colorSelected;
+  final void Function(bool useLightMode) changeTheme;
+  final void Function(int value) changeColor;
+
+  const ViewStudentsPage(
+      {super.key,
+      required this.colorSelected,
+      required this.changeTheme,
+      required this.changeColor});
 
   @override
   State<ViewStudentsPage> createState() => _ViewStudentsPageState();
@@ -39,10 +51,16 @@ class _ViewStudentsPageState extends State<ViewStudentsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('View Students'),
-        centerTitle: true,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(60),
+        child: App_Bar(
+          changeTheme: widget.changeTheme,
+          changeColor: widget.changeColor,
+          colorSelected: widget.colorSelected,
+          title: 'View Students',
+        ),
       ),
+      drawer: AdminSideNav(),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(

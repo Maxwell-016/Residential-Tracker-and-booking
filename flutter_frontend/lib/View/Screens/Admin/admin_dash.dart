@@ -1,12 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_frontend/View/Screens/Admin/admin_search_page.dart';
-import 'package:flutter_frontend/View/Screens/Admin/search_individuals_page.dart';
-import 'package:flutter_frontend/View/Screens/Admin/view_students_page.dart';
-import 'package:flutter_frontend/View/Screens/Admin/view_studn.dart';
+import 'package:flutter_frontend/View/Components/admin_side_nav.dart';
 import 'package:flutter_frontend/services/firebase_services.dart';
-import 'package:flutter_frontend/View/Screens/Admin/admin_settings.dart';
-import 'package:flutter_frontend/View/Screens/Admin/view_landlords_page.dart';
-import 'package:flutter_frontend/View/Screens/Admin/add_individuals_page.dart';
 
 import '../../../constants.dart';
 import '../../Components/SimpleAppBar.dart';
@@ -67,97 +61,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           title: "Admin Dashboard",
         ),
       ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            DrawerHeader(
-              decoration: const BoxDecoration(
-                color: Colors.blue,
-              ),
-              child: const Text(
-                'Admin Menu',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                ),
-              ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.settings),
-              title: const Text('Admin Settings'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => AdminSettingsPage(
-                      changeTheme: widget.changeTheme,
-                      changeColor: widget.changeColor,
-                      colorSelected: widget.colorSelected,
-                    ),
-                  ),
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.person),
-              title: const Text('View Students'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ViewStudentdt(
-                      changeTheme: widget.changeTheme,
-                      changeColor: widget.changeColor,
-                      colorSelected: widget.colorSelected,
-                    ),
-                  ),
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.people),
-              title: const Text('View Landlords'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ViewLandlordsPage(),
-                  ),
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.add),
-              title: const Text('Add Individuals'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const AddIndividualsPage(),
-                  ),
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.search),
-              title: const Text('Search Individuals'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => AdminSearchPg(
-                      changeTheme: widget.changeTheme,
-                      changeColor: widget.changeColor,
-                      colorSelected: widget.colorSelected,
-                    ),
-                  ),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
+      drawer: AdminSideNav(),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : const Center(

@@ -5,6 +5,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_frontend/View-Model/navigation/routes.dart';
+import 'package:flutter_frontend/View/Screens/Admin/add_individuals_page.dart';
+import 'package:flutter_frontend/View/Screens/Admin/view_landlords_page.dart';
+import 'package:flutter_frontend/View/Screens/Admin/view_students_page.dart';
 import 'package:flutter_frontend/View/Screens/Landlord/landlord_profile.dart';
 import 'package:flutter_frontend/View/Screens/Landlord/reviews_and_feedback.dart';
 import 'package:flutter_frontend/View/Screens/Landlord/students_bookings.dart';
@@ -31,7 +34,6 @@ import 'View/Screens/Student/chart_screen.dart';
 import 'data/payment.dart';
 import 'data/providers.dart';
 import 'firebase_options.dart';
-import 'View/Screens/Admin/admin_settings.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -203,12 +205,34 @@ class _StateResidentialTrackerAndBooking
           },
           path: '/admin-dashboard'),
       GoRoute(
-        path: '/admin-settings',
-        builder: (context, state) => AdminSettingsPage(
-          changeTheme: changeThemeMode,
-          changeColor: changeColor,
-          colorSelected: colorSelected,
-        ),
+        path: '/view-students',
+        builder: (context,state){
+          return ViewStudentsPage(
+            changeTheme: changeThemeMode,
+            changeColor: changeColor,
+            colorSelected: colorSelected,
+          );
+        }
+      ),
+      GoRoute(
+          path: '/view-landlords',
+          builder: (context,state){
+            return ViewLandlordsPage(
+              changeTheme: changeThemeMode,
+              changeColor: changeColor,
+              colorSelected: colorSelected,
+            );
+          }
+      ),
+      GoRoute(
+          path: '/add-individuals',
+          builder: (context,state){
+            return AddIndividualsPage(
+              changeTheme: changeThemeMode,
+              changeColor: changeColor,
+              colorSelected: colorSelected,
+            );
+          }
       ),
 
       GoRoute(

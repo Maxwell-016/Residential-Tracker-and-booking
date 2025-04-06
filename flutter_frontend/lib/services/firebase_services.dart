@@ -106,6 +106,8 @@ class FirebaseServices extends ChangeNotifier {
     }
   }
 
+
+  //fetching the authenticated user role
   Future<String?> getUserRole() async {
     if (_auth.currentUser == null) return null;
 
@@ -166,8 +168,8 @@ class FirebaseServices extends ChangeNotifier {
     return message;
   }
 
-  //landlords Profile
 
+  //landlords Profile
   Future<void> createLandlordProfile(
     WidgetRef ref,
     String name,
@@ -187,6 +189,7 @@ class FirebaseServices extends ChangeNotifier {
     }, SetOptions(merge: true));
   }
 
+
   //fetching the landlords details
   Future<Map<String, dynamic>?> getLandlordProfile() async {
     DocumentSnapshot profile =
@@ -202,6 +205,7 @@ class FirebaseServices extends ChangeNotifier {
     isAdding = value;
     notifyListeners();
   }
+
 
   //Adding house to the database
   Future<String> addHouseListing(
@@ -253,6 +257,8 @@ class FirebaseServices extends ChangeNotifier {
     notifyListeners();
   }
 
+
+  //update house details
   Future<String?> updateListings(
     String name,
     String location,
@@ -297,6 +303,8 @@ class FirebaseServices extends ChangeNotifier {
     }
   }
 
+
+  //fetch details of a house using its house name from Houses sub collection in landlord collection
   Future<Object?> getIndividualListing(String name) async {
     DocumentSnapshot snapshot = await landlordReference
         .doc(_auth.currentUser!.uid)
@@ -309,6 +317,7 @@ class FirebaseServices extends ChangeNotifier {
     return null;
   }
 
+  //fetch details of a booked house from booked_students collection searching using house name
   Future<Map<String, dynamic>?> getSearchedHouse(String name) async {
     QuerySnapshot snapshot = await firestore
         .collection('booked_students')
@@ -321,6 +330,7 @@ class FirebaseServices extends ChangeNotifier {
     return null;
   }
 
+  //fetch houses for a single landlord
   Future<List<Map<String, dynamic>>> getLandlordHouseListings() async {
     QuerySnapshot housesSnapshot = await landlordReference
         .doc(_auth.currentUser!.uid)
@@ -335,6 +345,8 @@ class FirebaseServices extends ChangeNotifier {
     return houses;
   }
 
+
+  //fetch details for a single booked houses. Use the houseId from firebase
   Future<Map<String,dynamic>?> getBookedHouseDetails(String houseId) async{
     DocumentSnapshot snapshot = await firestore.collection('booked_students').doc(houseId).get();
     if(snapshot.exists){
@@ -344,8 +356,7 @@ class FirebaseServices extends ChangeNotifier {
 
   }
 
-
-
+  //fetch details of all booked houses
   Future<List<Map<String, dynamic>>> getHouseListingStatus() async {
     QuerySnapshot housesSnapshot = await landlordReference
         .doc(_auth.currentUser!.uid)
@@ -376,6 +387,7 @@ class FirebaseServices extends ChangeNotifier {
     return houses;
   }
 
+  //getting the number of all houses for a landlord
   Future<int> getNoOfAllHouses() async {
     QuerySnapshot houses = await landlordReference
         .doc(_auth.currentUser!.uid)
@@ -384,6 +396,8 @@ class FirebaseServices extends ChangeNotifier {
     return houses.docs.length;
   }
 
+
+  //getting the number of all booked houses for a landlord
   Future<int> getNoOfAllBookedHouses() async {
     QuerySnapshot houses = await landlordReference
         .doc(_auth.currentUser!.uid)
@@ -399,6 +413,8 @@ class FirebaseServices extends ChangeNotifier {
     notifyListeners();
   }
 
+
+  //deleting a document from the Houses sub collection using the house name, since its the document id
   Future<void> deleteDocById(String name) async {
     setIsDeleting(true);
     await landlordReference
@@ -409,6 +425,8 @@ class FirebaseServices extends ChangeNotifier {
     setIsDeleting(false);
     notifyListeners();
   }
+
+
 
   Future<List<Map<String, dynamic>>> fetchResidences() async {
     try {
@@ -430,6 +448,7 @@ class FirebaseServices extends ChangeNotifier {
     notifyListeners();
   }
 
+  //updating a booked house from booked to available
   Future<void> markRoomAsAvailable(String houseName) async {
     setIsMarkingAvailable(true);
 
