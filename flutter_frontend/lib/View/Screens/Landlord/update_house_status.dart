@@ -143,82 +143,84 @@ class ChangeHouseStatus extends HookConsumerWidget {
       child: Scaffold(
         appBar: AppBar(),
         body: SingleChildScrollView(
-          child: Wrap(
-            spacing: 60.0,
-            runSpacing: 60.0,
-            children: [
-              ImageBuilder(
-                imageUrls: houseDetails['Images'],
-                width: width,
-                placeholderAsset: 'assets/launch.png',
-              ),
-              Padding(
-                padding: deviceWidth < 800
-                    ? const EdgeInsets.only(left: 50.0)
-                    : const EdgeInsets.all(10.0),
-                child: SizedBox(
+          child: Center(
+            child: Wrap(
+              spacing: 60.0,
+              runSpacing: 60.0,
+              children: [
+                ImageBuilder(
+                  imageUrls: houseDetails['Images'],
                   width: width,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    spacing: 30.0,
-                    children: [
-                      UseFont(
-                          text: 'House Name: ${houseDetails['House Name']}',
-                          myFont: 'Open Sans',
-                          size: 20.0),
-                      UseFont(
-                          text: 'Tenant : ${houseDetails['tenant']}',
-                          myFont: 'Open Sans',
-                          size: 20.0),
-                      UseFont(
-                          text: 'Location: ${houseDetails['Location']}',
-                          myFont: 'Open Sans',
-                          size: 20.0),
-                      UseFont(
-                          text: 'House Price: ${houseDetails['House Price']}',
-                          myFont: 'Open Sans',
-                          size: 20.0),
-                      UseFont(
-                          text: 'House Size: ${houseDetails['House Size']}',
-                          myFont: 'Open Sans',
-                          size: 20.0),
-                      UseFont(
-                          text: houseDetails['Description'].toString(),
-                          myFont: 'Open Sans',
-                          size: 20.0),
-                       FunctionButton(
-                                      width: width,
-                                      text: 'Mark as Available',
-                                      onPressed: () async{
-                                        await dialogBox(
-                                            context,
-                                            'Update House',
-                                            'Are you sure you want to mark this house as Available? ',
-                                            () async{
-                                              try {
-                                                firebaseServicesProvider
-                                                    .markRoomAsAvailable(
-                                                    houseDetails['House Name']);
-                                                SnackBars.showSuccessSnackBar(context,
-                                                    'House Status updates Successfully');
-                                                Navigator.pop(context);
-                                              } catch (e) {
-                                                logger.e(e);
-                                                SnackBars.showErrorSnackBar(context,
-                                                    'An error occurred trying to update the house status');
-                                                Navigator.pop(context);
-                                              }
-                                            },
-                                            firebaseServicesProvider.isMarkingAvailable
-                                        );
-                                      },
-                                      textColor: Colors.white,
-                                      btnColor: AppColors.booked),
-                    ],
-                  ),
+                  placeholderAsset: 'assets/launch.png',
                 ),
-              )
-            ],
+                Padding(
+                  padding: deviceWidth < 800
+                      ? const EdgeInsets.only(left: 50.0)
+                      : const EdgeInsets.all(10.0),
+                  child: SizedBox(
+                    width: width,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      spacing: 30.0,
+                      children: [
+                        UseFont(
+                            text: 'House Name: ${houseDetails['House Name']}',
+                            myFont: 'Open Sans',
+                            size: 20.0),
+                        UseFont(
+                            text: 'Tenant : ${houseDetails['tenant']}',
+                            myFont: 'Open Sans',
+                            size: 20.0),
+                        UseFont(
+                            text: 'Location: ${houseDetails['Location']}',
+                            myFont: 'Open Sans',
+                            size: 20.0),
+                        UseFont(
+                            text: 'House Price: ${houseDetails['House Price']}',
+                            myFont: 'Open Sans',
+                            size: 20.0),
+                        UseFont(
+                            text: 'House Size: ${houseDetails['House Size']}',
+                            myFont: 'Open Sans',
+                            size: 20.0),
+                        UseFont(
+                            text: houseDetails['Description'].toString(),
+                            myFont: 'Open Sans',
+                            size: 20.0),
+                         FunctionButton(
+                                        width: width,
+                                        text: 'Mark as Available',
+                                        onPressed: () async{
+                                          await dialogBox(
+                                              context,
+                                              'Update House',
+                                              'Are you sure you want to mark this house as Available? ',
+                                              () async{
+                                                try {
+                                                  firebaseServicesProvider
+                                                      .markRoomAsAvailable(
+                                                      houseDetails['House Name']);
+                                                  SnackBars.showSuccessSnackBar(context,
+                                                      'House Status updates Successfully');
+                                                  Navigator.pop(context);
+                                                } catch (e) {
+                                                  logger.e(e);
+                                                  SnackBars.showErrorSnackBar(context,
+                                                      'An error occurred trying to update the house status');
+                                                  Navigator.pop(context);
+                                                }
+                                              },
+                                              firebaseServicesProvider.isMarkingAvailable
+                                          );
+                                        },
+                                        textColor: Colors.white,
+                                        btnColor: AppColors.booked),
+                      ],
+                    ),
+                  ),
+                )
+              ],
+            ),
           ),
         ),
       ),

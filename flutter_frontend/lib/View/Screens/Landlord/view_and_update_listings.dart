@@ -49,7 +49,7 @@ class _ViewAndUpdateListingsState extends State<ViewAndUpdateListings> {
               title: "View Listings"),
         ),
         body: FutureBuilder(
-            future: firebaseServicesProvider.getHouseListing(),
+            future: firebaseServicesProvider.getLandlordHouseListings(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return Center(child: CircularProgressIndicator());
@@ -469,7 +469,7 @@ class HouseDetails extends HookConsumerWidget {
                                       String? message =
                                           await firebaseServicesProvider
                                               .updateListings(
-                                        houseNameController.text,
+                                        houseNameController.text.toUpperCase(),
                                         selectedLocation,
                                         int.parse(priceController.text),
                                         selectedSize,
@@ -523,7 +523,7 @@ class HouseDetails extends HookConsumerWidget {
                 delegate: SliverChildBuilderDelegate(childCount: othersLength,
                     (context, index) {
                   return FutureBuilder(
-                      future: firebaseServicesProvider.getHouseListing(),
+                      future: firebaseServicesProvider.getLandlordHouseListings(),
                       builder: (context, snapshot) {
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {

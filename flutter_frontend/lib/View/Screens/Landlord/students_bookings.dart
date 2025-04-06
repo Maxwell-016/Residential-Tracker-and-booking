@@ -100,47 +100,49 @@ class BookingDetails extends StatelessWidget {
     return SafeArea(child: Scaffold(
       appBar: AppBar(),
       body: SingleChildScrollView(
-        child: Wrap(
-          spacing: 60.0,
-          runSpacing: 60.0,
-          children: [
-            ImageBuilder(
-              imageUrls: houseDetails['images'],
-              width: width,
-              placeholderAsset: 'assets/launch.png',
-            ),
-            Padding(
-              padding: deviceWidth < 800
-                  ? const EdgeInsets.only(left: 50.0)
-                  : const EdgeInsets.all(10.0),
-              child: SizedBox(
+        child: Center(
+          child: Wrap(
+            spacing: 60.0,
+            runSpacing: 60.0,
+            children: [
+              ImageBuilder(
+                imageUrls: houseDetails['images'],
                 width: width,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  spacing: 30.0,
-                  children: [
-                    UseFont(
-                        text: 'House Name: ${houseDetails['houseName']}',
-                        myFont: 'Open Sans',
-                        size: 20.0,
-                    ),
-                    UseFont(
-                        text: 'Tenant : ${houseDetails['name']}',
-                        myFont: 'Open Sans',
-                        size: 20.0),
-                    UseFont(
-                        text: 'Location: ${houseDetails['houseLocation']}',
-                        myFont: 'Open Sans',
-                        size: 20.0),
-                    UseFont(
-                        text: 'House Price: ${houseDetails['amount_paid']}',
-                        myFont: 'Open Sans',
-                        size: 20.0),
-                  ],
-                ),
+                placeholderAsset: 'assets/launch.png',
               ),
-            )
-          ],
+              Padding(
+                padding: deviceWidth < 800
+                    ? const EdgeInsets.only(left: 50.0)
+                    : const EdgeInsets.all(10.0),
+                child: SizedBox(
+                  width: width,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    spacing: 30.0,
+                    children: [
+                      UseFont(
+                          text: 'House Name: ${houseDetails['houseName']}',
+                          myFont: 'Open Sans',
+                          size: 20.0,
+                      ),
+                      UseFont(
+                          text: 'Tenant : ${houseDetails['name']}',
+                          myFont: 'Open Sans',
+                          size: 20.0),
+                      UseFont(
+                          text: 'Location: ${houseDetails['houseLocation']}',
+                          myFont: 'Open Sans',
+                          size: 20.0),
+                      UseFont(
+                          text: 'House Price: ${houseDetails['amount_paid']}',
+                          myFont: 'Open Sans',
+                          size: 20.0),
+                    ],
+                  ),
+                ),
+              )
+            ],
+          ),
         ),
       ),
     ),

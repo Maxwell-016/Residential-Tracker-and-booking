@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_frontend/View-Model/navigation/routes.dart';
 import 'package:flutter_frontend/View/Screens/Landlord/landlord_profile.dart';
+import 'package:flutter_frontend/View/Screens/Landlord/reviews_and_feedback.dart';
 import 'package:flutter_frontend/View/Screens/Landlord/students_bookings.dart';
 import 'package:flutter_frontend/View/Screens/Landlord/update_house_status.dart';
 import 'package:flutter_frontend/View/Screens/Landlord/view_and_update_listings.dart';
@@ -177,12 +178,21 @@ class _StateResidentialTrackerAndBooking
         ),
       ),
       GoRoute(
+          builder: (context, state) => ReviewsAndFeedback(
+            changeTheme: changeThemeMode,
+            changeColor: changeColor,
+            colorSelected: colorSelected,
+          ),
+          path: '/tenant-feedback'),
+      GoRoute(
           builder: (context, state) => LandlordProfile(
                 changeTheme: changeThemeMode,
                 changeColor: changeColor,
                 colorSelected: colorSelected,
               ),
           path: '/landlord-profile'),
+
+
       GoRoute(
           builder: (context, state) {
             return AdminDashboardScreen(
@@ -238,7 +248,7 @@ class _StateResidentialTrackerAndBooking
     if (!loggedIn &&
         !['/login', '/registration', '/forgot-password']
             .contains(state.matchedLocation)) {
-      return null;
+      return '/login';
     }
 
     // If the user is logged in but is on the login page, send them to their dashboard
