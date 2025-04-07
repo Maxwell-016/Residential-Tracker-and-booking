@@ -235,6 +235,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
 
     if (showHouses) {
+
       List<Map<String, dynamic>> houses = await chatService.getAllHouses();
       var selectedHouse = houses.firstWhere(
             (house) => house["House Name"].toLowerCase() == userMessage.toLowerCase(),
@@ -346,6 +347,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           setState(() {
             showHouses=true;
 
+
           });
 
 
@@ -372,19 +374,25 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           messages.add({"role": "ai", "text": "Please enter the price range or max price. (e.g., 3000-6000 or just 5000)"});
         });
       } else if (userMessage == "2") {
+        setState(() {
         selectedSpecType = "amenities";
         awaitingSpecSelection = false;
         awaitingSpecValue = true;
         conversationStep = "enter_spec_value";
         messages.add({"role": "ai", "text": "Please enter the amenity you're looking for (e.g., WiFi, hot shower, parking):"});
+      });
       } else if (userMessage == "3") {
+        setState(() {
         selectedSpecType = "description";
         awaitingSpecSelection = false;
         awaitingSpecValue = true;
         conversationStep = "enter_spec_value";
         messages.add({"role": "ai", "text": "Please enter a keyword related to the house description (e.g., quiet, spacious, furnished):"});
+        });
       } else {
+        setState(() {
         messages.add({"role": "ai", "text": "Invalid choice. Please reply with 1, 2, or 3."});
+      });
       }
       Future.delayed(Duration(milliseconds: 300), _scrollToBottom);
       isTyping=false;
@@ -408,11 +416,14 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           results = await chatService.getHousesByPriceRange(minPrice!, maxPrice);
         }
       } else if (selectedSpecType == "amenities") {
-        print("user =$userMessage");
+
         results = await chatService.getHousesByAmenity(userMessage.trim());
+        print("user =$results");
       } else if (selectedSpecType == "description") {
 
         results = await chatService.getHousesByDescription(userMessage.trim());
+
+
       }
 
       if (results.isEmpty) {
@@ -661,6 +672,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
 
         body:ref.watch(toggleMenu)?
+        Column(
+          children: [
         Expanded(
             child:
             Row(
@@ -759,7 +772,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
               ],
             )
-        ):
+        )])
+
+        :
         prefs.getString(pkey)=="ai"?AiPage():
         prefs.getString(pkey)=="booked"?BookedHousesScreen():
         prefs.getString(pkey)=="places"?SearchedPlacesScreen():

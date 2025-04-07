@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 
+import '../chartbot_fun/ai_funs.dart';
+
 class ChatService {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
   final FirebaseAuth auth = FirebaseAuth.instance;
@@ -166,46 +168,80 @@ class ChatService {
         .where("isBooked", isEqualTo: false)
         .get();
 
-    print(snapshot);
     return snapshot.docs
-        .map((e) => e.data() as Map<String, dynamic>)
-        .where((house) =>
-        house["House Price"] != null &&
-       // house["House Price"] is double &&
-        house["House Price"] >= min &&
-        house["House Price"] <= max)
+        .where((e) {
+      final data = e.data() as Map<String, dynamic>;
+      return data["House Price"] != null &&
+          data["House Price"] >= min &&
+          data["House Price"] <= max;
+    })
+        .map((e) => {
+      "id": e.id,
+      "landlordId": e.reference.parent.parent?.id,
+      ...e.data() as Map<String, dynamic>,
+    })
         .toList();
   }
 
 
-  Future<List<Map<String, dynamic>>> getHousesByAmenity(String keyword) async {
+
+  Future<List<Map<String, dynamic>>> getHousesByAmenity(String userText) async {
+    List<String> matchedAmenities = await extractAmenitiesFromText(userText);
+
+    if (matchedAmenities.isEmpty) {
+      return [];
+    }
+
     final snapshot = await firestore
         .collectionGroup('Houses')
         .where("isBooked", isEqualTo: false)
         .get();
 
     return snapshot.docs
-        .map((e) => e.data())
-        .where((house) =>
-    house["Amenities"] != null &&
-        house["Amenities"].toString().toLowerCase().contains(keyword.toLowerCase()))
+        .where((e) {
+      final data = e.data();
+      final amenities = data["Available Amenities"];
+      if (amenities == null) return false;
+
+      return (amenities as List<dynamic>).any((amenity) =>
+          matchedAmenities.any((keyword) =>
+              amenity.toString().toLowerCase().contains(keyword.toLowerCase()))
+      );
+    })
+        .map((e) => {
+      "id": e.id,
+      "landlordId": e.reference.parent.parent?.id,
+      ...e.data() as Map<String, dynamic>,
+    })
         .toList();
   }
 
-  Future<List<Map<String, dynamic>>> getHousesByDescription(String keyword) async {
+  Future<List<Map<String, dynamic>>> getHousesByDescription(String userText) async {
+    List<String> keywords = await extractDescriptionKeywords(userText);
+
+    if (keywords.isEmpty) return [];
+
     final snapshot = await firestore
         .collectionGroup('Houses')
         .where("isBooked", isEqualTo: false)
         .get();
 
     return snapshot.docs
-        .map((e) => e.data())
-        .where((house) =>
-    house["Description"] != null &&
-        house["Description"].toLowerCase().contains(keyword.toLowerCase()))
+        .where((e) {
+      final data = e.data();
+      final description = data["Description"];
+      if (description == null) return false;
+
+      String lowerDesc = description.toLowerCase();
+      return keywords.any((kw) => lowerDesc.contains(kw));
+    })
+        .map((e) => {
+      "id": e.id,
+      "landlordId": e.reference.parent.parent?.id,
+      ...e.data() as Map<String, dynamic>,
+    })
         .toList();
   }
-
 
 
 
