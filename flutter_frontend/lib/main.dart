@@ -292,7 +292,6 @@ class _StateResidentialTrackerAndBooking
       }
     }
 
-    // Stay on the current page
     return null;
   }
 
