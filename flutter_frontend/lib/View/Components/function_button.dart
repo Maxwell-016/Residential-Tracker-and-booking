@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 class FunctionButton extends StatelessWidget {
   final String text;
+  final bool? isLoading;
   final Color? textColor;
   final VoidCallback onPressed;
   final Color btnColor;
@@ -12,7 +13,8 @@ class FunctionButton extends StatelessWidget {
       required this.onPressed,
       required this.btnColor,
       this.textColor,
-      this.width});
+      this.width,
+        this.isLoading});
 
   @override
   Widget build(BuildContext context) {

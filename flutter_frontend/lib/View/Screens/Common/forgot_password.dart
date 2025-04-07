@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_frontend/View-Model/utils/app_colors.dart';
 import 'package:flutter_frontend/services/firebase_services.dart';
 import 'package:flutter_frontend/View-Model/utils/validator.dart';
-import 'package:flutter_frontend/View-Model/view_model.dart';
 import 'package:flutter_frontend/View/Components/function_button.dart';
 import 'package:flutter_frontend/View/Components/google_fonts.dart';
 import 'package:flutter_frontend/View/Components/snackbars.dart';
@@ -11,15 +10,24 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../../../View-Model/utils/savecurrentpage.dart';
+
 class ForgotPassword extends HookConsumerWidget {
-  final double width;
   const ForgotPassword({
     super.key,
-    required this.width,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    var screenWidth = MediaQuery.of(context).size.width;
+    var width = 0.0;
+    if (screenWidth > 800) {
+      width = screenWidth / 2;
+    } else {
+      width = screenWidth / 1.1;
+    }
+
+    saveCurrentPage('/forgot-password');
     final formKey = GlobalKey<FormState>();
     TextEditingController emailController = useTextEditingController();
     final firebaseServicesProvider = ref.watch(firebaseServices);
