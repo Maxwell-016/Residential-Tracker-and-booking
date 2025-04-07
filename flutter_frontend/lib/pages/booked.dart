@@ -302,14 +302,13 @@ class _BookedHousesScreenState extends State<BookedHousesScreen> {
   }
 
 
-  /// Send Feedback to Firebase
   Future<void> sendFeedback(String houseId,String land) async {
     String? email = _auth.currentUser?.email;
     if (email == null) return;
 
     await FirebaseFirestore.instance.collection("house_feedback").add({
       "houseId": houseId,
-      "userEmail": email,
+      "email": email,
       "landlordId":land,
       "feedback": feedbackController.text,
       "timestamp": FieldValue.serverTimestamp(),

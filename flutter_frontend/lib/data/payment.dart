@@ -21,7 +21,7 @@ final FirebaseFirestore fs = FirebaseFirestore.instance;
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
           "phone": studentPhone,
-          "amount": amountToPay,
+          "amount": amountToPay/1000,
         }),
       );
 
@@ -36,7 +36,7 @@ final FirebaseFirestore fs = FirebaseFirestore.instance;
         bool paymentSuccess = await checkPaymentStatus();
 
         if (paymentSuccess) {
-          await fs.collection("booked_students").doc().set({
+          await fs.collection("booked_students").doc(houseId).set({
             "email": studentEmail,
             "name": studentName ?? "Unknown",
             "stdContact": studentPhone,

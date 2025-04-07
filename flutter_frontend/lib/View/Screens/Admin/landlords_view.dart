@@ -1,3 +1,9 @@
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+
+
 class Landlord {
   final String id;
   final String name;
@@ -36,9 +42,6 @@ Future<List<Landlord>> fetchLandlords() async {
 
 
 
-import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 // Assume Landlord model and fetchLandlords function are here
 

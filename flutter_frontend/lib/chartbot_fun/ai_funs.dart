@@ -27,7 +27,7 @@ Future<String> validateOption(String userMessage) async {
           " 1 List all available houses in a specific location\n"
           " 2 See all locations with available houses\n"
           " 3 Report for an emergency\n"
-          " 4 Ask for help and related questions\n"
+          " 4 Search for available  houses by specifications\n"
           " 5 See all vacant houses\n\n"
           "Which option would you like me to assist you with? "
           "  also return the correct option "
@@ -43,7 +43,7 @@ Future<String> validateOption(String userMessage) async {
   }else if (response.trim() == "option_3") {
     return "Report for an emergency.";
   }else if (response.trim() == "option_4") {
-    return "Ask for help and related questions.";
+    return "houses by specifications";
   }else if (response.trim() == "option_5") {
     return "See all vacant houses";
   }

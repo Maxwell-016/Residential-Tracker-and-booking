@@ -35,7 +35,7 @@ class ChatService {
               " 1 List all available houses in a specific location\n"
               " 2 See all locations with available houses\n"
               " 3 Report for an emergency\n"
-              " 4 Ask for help and related questions\n"
+              " 4 Search for available  houses by specifications\n"
               " 5 See all vacant houses\n\n"
               "Which option would you like me to assist you with? (Reply with one of the above options eg 1 or option 1)"
           : "I see you haven't provided a name. Please enter your full name:";
@@ -85,6 +85,7 @@ class ChatService {
       "back to menu",
       "back to options",
       "return to services",
+      "i want another option",
       "show services",
       "main menu",
       "back",
@@ -154,6 +155,62 @@ class ChatService {
     }
     return houses;
   }
+
+
+
+
+
+  Future<List<Map<String, dynamic>>> getHousesByPriceRange(int min, int max) async {
+    final snapshot = await firestore
+        .collectionGroup('Houses')
+        .where("isBooked", isEqualTo: false)
+        .get();
+
+    print(snapshot);
+    return snapshot.docs
+        .map((e) => e.data() as Map<String, dynamic>)
+        .where((house) =>
+        house["House Price"] != null &&
+       // house["House Price"] is double &&
+        house["House Price"] >= min &&
+        house["House Price"] <= max)
+        .toList();
+  }
+
+
+  Future<List<Map<String, dynamic>>> getHousesByAmenity(String keyword) async {
+    final snapshot = await firestore
+        .collectionGroup('Houses')
+        .where("isBooked", isEqualTo: false)
+        .get();
+
+    return snapshot.docs
+        .map((e) => e.data())
+        .where((house) =>
+    house["Amenities"] != null &&
+        house["Amenities"].toString().toLowerCase().contains(keyword.toLowerCase()))
+        .toList();
+  }
+
+  Future<List<Map<String, dynamic>>> getHousesByDescription(String keyword) async {
+    final snapshot = await firestore
+        .collectionGroup('Houses')
+        .where("isBooked", isEqualTo: false)
+        .get();
+
+    return snapshot.docs
+        .map((e) => e.data())
+        .where((house) =>
+    house["Description"] != null &&
+        house["Description"].toLowerCase().contains(keyword.toLowerCase()))
+        .toList();
+  }
+
+
+
+
+
+
 
   Future<void> savePhoneNumber(String phoneNumber) async {
     String? email = FirebaseAuth.instance.currentUser?.email;
