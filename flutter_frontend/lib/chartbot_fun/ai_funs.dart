@@ -183,6 +183,36 @@ Future<List<Map<String,dynamic>>> getLocationsToBeMarked(Future<List<String>> ma
 }
 
 
+Future<List<String>> extractAmenitiesFromText(String userText) async {
+  String prompt = """
+The following are valid housing amenities: Wi-Fi, Water, Security, Electricity.
+From this user's request: "$userText", extract all amenities mentioned. Reply with a comma-separated list of only the amenities that match those in the list above. If none match, return an empty list.
+""";
+
+  String response = await aiService.getAIResponse(prompt);
 
 
+  return response
+      .split(',')
+      .map((e) => e.trim())
+      .where((e) => e.isNotEmpty)
+      .toList();
+}
+
+
+Future<List<String>> extractDescriptionKeywords(String userText) async {
+  String prompt = """
+Extract important keywords or phrases from this housing-related request: "$userText".
+Return 3 to 5 short keywords or phrases that can help match housing descriptions, such as "spacious", "single room", "near town", etc.
+Respond with a comma-separated list only.
+""";
+
+  String response = await aiService.getAIResponse(prompt);
+
+  return response
+      .split(',')
+      .map((e) => e.trim().toLowerCase())
+      .where((e) => e.isNotEmpty)
+      .toList();
+}
 
