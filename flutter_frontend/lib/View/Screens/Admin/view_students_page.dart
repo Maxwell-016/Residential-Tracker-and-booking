@@ -51,7 +51,7 @@ class _ViewStudentsPageState extends State<ViewStudentsPage> {
   }
 
   void _viewLocationOnMap(Map<String, dynamic> student) {
-    if (student['latitude'] != null && student['longitude'] != null) {
+    if (student['lat'] != null && student['long'] != null) {
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -61,8 +61,8 @@ class _ViewStudentsPageState extends State<ViewStudentsPage> {
               {
                 "houseName": student['houseName'] ?? 'N/A',
                 "location": student['houseLocation'] ?? 'N/A',
-                "lat": student['latitude'],
-                "long": student['longitude'],
+                "lat": student['lat'],
+                "long": student['long'],
                 "image": student['houseImage'] ?? '', // Optional image field
               }
             ],
@@ -78,6 +78,8 @@ class _ViewStudentsPageState extends State<ViewStudentsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(60),
@@ -88,38 +90,83 @@ class _ViewStudentsPageState extends State<ViewStudentsPage> {
           title: 'View Students',
         ),
       ),
-      drawer: const AdminSideNav(), // Reverted to use AdminSideNav as a drawer
+      drawer: const AdminSideNav(),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: DataTable(
-                columns: const [
-                  DataColumn(label: Text('Name')),
-                  DataColumn(label: Text('Email')),
-                  DataColumn(label: Text('House Name')),
-                  DataColumn(label: Text('House Location')),
-                  DataColumn(label: Text('Landlord Name')),
-                  DataColumn(label: Text('Student Contact')),
-                  DataColumn(label: Text('Actions')), // New column for the button
-                ],
-                rows: students.map((student) {
-                  return DataRow(cells: [
-                    DataCell(Text(student['name'] ?? 'N/A')),
-                    DataCell(Text(student['email'] ?? 'N/A')),
-                    DataCell(Text(student['houseName'] ?? 'N/A')),
-                    DataCell(Text(student['houseLocation'] ?? 'N/A')),
-                    DataCell(Text(student['landlordName'] ?? 'N/A')),
-                    DataCell(Text(student['stdContact'] ?? 'N/A')),
-                    DataCell(
-                      ElevatedButton(
-                        onPressed: () => _viewLocationOnMap(student),
-                        child: const Text('View Location'),
-                      ),
+          : LayoutBuilder(
+              builder: (context, constraints) {
+                if (constraints.maxWidth < 600) {
+                  // Small screen layout (e.g., mobile)
+                  return ListView.builder(
+                    itemCount: students.length,
+                    itemBuilder: (context, index) {
+                      final student = students[index];
+                      return Card(
+                        margin: const EdgeInsets.all(8.0),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                student['name'] ?? 'N/A',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text('Email: ${student['email'] ?? 'N/A'}'),
+                              Text('House Name: ${student['houseName'] ?? 'N/A'}'),
+                              Text('House Location: ${student['houseLocation'] ?? 'N/A'}'),
+                              Text('Landlord: ${student['landlord'] ?? 'N/A'}'),
+                              Text('Landlord Contact: ${student['landlordContact'] ?? 'N/A'}'),
+                              const SizedBox(height: 8),
+                              ElevatedButton(
+                                onPressed: () => _viewLocationOnMap(student),
+                                child: const Text('View Location'),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                } else {
+                  // Large screen layout (e.g., tablet, desktop)
+                  return SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: DataTable(
+                      columnSpacing: screenWidth * 0.05,
+                      columns: const [
+                        DataColumn(label: Text('Name')),
+                        DataColumn(label: Text('Email')),
+                        DataColumn(label: Text('House Name')),
+                        DataColumn(label: Text('House Location')),
+                        DataColumn(label: Text('Landlord')),
+                        DataColumn(label: Text('Landlord Contact')),
+                        DataColumn(label: Text('Actions')),
+                      ],
+                      rows: students.map((student) {
+                        return DataRow(cells: [
+                          DataCell(Text(student['name'] ?? 'N/A')),
+                          DataCell(Text(student['email'] ?? 'N/A')),
+                          DataCell(Text(student['houseName'] ?? 'N/A')),
+                          DataCell(Text(student['houseLocation'] ?? 'N/A')),
+                          DataCell(Text(student['landlord'] ?? 'N/A')),
+                          DataCell(Text(student['landlordContact'] ?? 'N/A')),
+                          DataCell(
+                            ElevatedButton(
+                              onPressed: () => _viewLocationOnMap(student),
+                              child: const Text('View Location'),
+                            ),
+                          ),
+                        ]);
+                      }).toList(),
                     ),
-                  ]);
-                }).toList(),
-              ),
+                  );
+                }
+              },
             ),
     );
   }
