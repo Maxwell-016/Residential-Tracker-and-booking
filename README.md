@@ -46,6 +46,9 @@ We welcome contributions! Please follow these steps:
 
 -- For more details on collaboration, see this repository
 [dataNerd65-github-basics](https://github.com/dataNerd65/github.git)
+ 
+ or visit the official git documentation
+ [https://git-scm.com/docs](https://git-scm.com/docs)
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
