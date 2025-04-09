@@ -27,30 +27,6 @@ class SearchedPlacesScreen extends ConsumerWidget {
         )
 
 
-
-      // ListView.builder(
-      //   itemCount: searchedPlaces.length,
-      //   itemBuilder: (context, index) {
-      //     final place = searchedPlaces[index];
-      //     return ListTile(
-      //       title: Text(place),
-      //       subtitle: Text("Tap to check available houses"),
-      //       onTap: () {
-      //         // Navigate to a screen showing houses in this location
-      //         Navigator.push(
-      //           context,
-      //           MaterialPageRoute(builder: (_) => HousesInLocationScreen(place)),
-      //         );
-      //
-      //
-      //
-      //       },
-      //     );
-      //   },
-      // ),
-
-
-
     );
   }
 }
