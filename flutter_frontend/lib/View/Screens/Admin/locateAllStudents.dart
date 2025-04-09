@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+import '../../Components/admin_side_nav.dart';
 
 
-class MapScreenHouses extends StatefulWidget {
+
+class AllBookedHouses extends StatefulWidget {
   final List<Map<String, dynamic>> houses;
   final String title;
 
-  const MapScreenHouses({super.key, required this.title, required this.houses});
+  const AllBookedHouses({super.key, required this.title, required this.houses});
 
   @override
-  State<MapScreenHouses> createState() => _MapScreenState();
+  State<AllBookedHouses> createState() => _MapScreenState();
 }
 
-class _MapScreenState extends State<MapScreenHouses> {
+class _MapScreenState extends State<AllBookedHouses> {
   final Map<String, Marker> _markers = {};
 
   @override
@@ -30,10 +32,13 @@ class _MapScreenState extends State<MapScreenHouses> {
           markerId: MarkerId(house["houseName"]),
           position: LatLng(house["lat"], house["long"]),
           infoWindow: InfoWindow(
-            snippet:house["houseName"] ,
-            title: house["location"],
+            snippet:house["location"] ,
+            title: house["name"],
             onTap: () {
-              _showHouseDetails(house);
+                // _showHouseDetails(house);
+
+              _showHouseDetails({"houseName": house["houseName"], "name": house['name'], "email": house['email'], "image":  house["image"], "location":house["location"]});
+
             },
           ),
         );
@@ -41,13 +46,13 @@ class _MapScreenState extends State<MapScreenHouses> {
       }
     });
   }
-
+//[{"houseName": houseName, "lat": data['lat'], "long": data['long'], "image":  images[0], "location": location}]
   void _showHouseDetails(Map<String, dynamic> house) {
     showModalBottomSheet(
       context: context,
       builder: (context) {
         return SizedBox(
-          height: 300,
+          height: 450,
           child: Column(
             children: [
               Image.network(
@@ -58,19 +63,22 @@ class _MapScreenState extends State<MapScreenHouses> {
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Column(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.vertical,
+                  child:
+                Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Text("Name : $house['name']", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                    // Text("Email : $house['email']", style: TextStyle(fontSize: 18, fontWeight: FontWeight.normal)),
-                    // Text("Email : $house['email']", style: TextStyle(fontSize: 14, fontWeight: FontWeight.normal)),
-                    // Text("Student Phone Number : $house['sphn']", style: TextStyle(fontSize: 16, fontWeight: FontWeight.normal)),
-                    // Text("Landlord Name : $house['landlord']", style: TextStyle(fontSize: 14, fontWeight: FontWeight.normal)),
-                    // Text("LandLord Phone Number : $house['lphn']", style: TextStyle(fontSize: 14, fontWeight: FontWeight.normal)),
-                    // Text("Location : $house['location']",style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    Text("Name : $house['name']", ),
+                    Text("Email : $house['email']", ),
+                    // Text("Student Phone Number : $house['sphn']", ),
+                    // Text("Landlord Name : $house['landlordName']", ),
+                    // Text("LandLord Phone Number : $house['lphn']", ),
+                    // Text("Location : $house['houseName']",),
                     Text("Location: ${house["location"]}"),
-                    Text("Latitude:  ${house["lat"]},Longitude:${house["long"]}"),
+                    // _showHouseDetails({"houseName": houseName, "name": house['name'], "email": house['email'], "image":  images[0], "location":house["location"]});
                   ],
+                ),
                 ),
               ),
             ],
@@ -83,6 +91,7 @@ class _MapScreenState extends State<MapScreenHouses> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: const AdminSideNav(),
       appBar: AppBar(title: Text(widget.title)),
       body: GoogleMap(
         mapType: MapType.hybrid,

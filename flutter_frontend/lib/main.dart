@@ -13,6 +13,7 @@ import 'package:flutter_frontend/View/Screens/Landlord/reviews_and_feedback.dart
 import 'package:flutter_frontend/View/Screens/Landlord/students_bookings.dart';
 import 'package:flutter_frontend/View/Screens/Landlord/update_house_status.dart';
 import 'package:flutter_frontend/View/Screens/Landlord/view_and_update_listings.dart';
+import 'package:flutter_frontend/View/Screens/Student/allstudent.dart';
 import 'package:flutter_frontend/View/Screens/Student/mapit.dart';
 import 'package:flutter_frontend/View/Screens/Student/testemail.dart';
 import 'package:flutter_frontend/constants.dart';
@@ -111,6 +112,9 @@ class _StateResidentialTrackerAndBooking
 
       GoRoute(builder: (context, state) =>  LoginPage(),
           path: '/login'),
+      GoRoute(
+          builder: (context, state) => AllBookedHousesMap(),
+          path: '/students-location'),
 
       GoRoute(
           builder: (context, state) => RegistrationPage(),
