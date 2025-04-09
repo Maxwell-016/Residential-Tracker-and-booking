@@ -2,6 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../View/Screens/Student/haoperlocation.dart';
+
 final hasNameProvider = StateProvider<bool>((ref) => false);
 
 final toggleMenu = StateProvider<bool>((ref) => true);
@@ -51,7 +53,11 @@ class SearchedPlacesNotifier extends StateNotifier<List<String>> {
   }
 
   void _notifyUser(String location) {
-    print("House added in $location! Check it out.");
+    trigernotification(null,  "House added in $location! Check it out.", "New House Added");
+   // print("House added in $location! Check it out.");
+
+
+
   }
 }
 

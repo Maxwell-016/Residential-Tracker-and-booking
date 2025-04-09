@@ -10,7 +10,9 @@ import 'package:intl/intl.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 
+import '../View/Screens/Student/haoperlocation.dart';
 import '../View/Screens/Student/mapscreen.dart';
+import '../View/Screens/Student/sendEmail.dart';
 
 class BookedHousesScreen extends StatefulWidget {
   const BookedHousesScreen({super.key});
@@ -20,8 +22,7 @@ class BookedHousesScreen extends StatefulWidget {
 }
 
 class _BookedHousesScreenState extends State<BookedHousesScreen> {
-  final FlutterLocalNotificationsPlugin _notifications =
-  FlutterLocalNotificationsPlugin();
+
   final TextEditingController feedbackController = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
@@ -31,40 +32,19 @@ class _BookedHousesScreenState extends State<BookedHousesScreen> {
   @override
   void initState() {
     super.initState();
-    _initializeNotifications();
+
   }
 
-  void _initializeNotifications() {
-    const AndroidInitializationSettings androidInitSettings =
-    AndroidInitializationSettings('@mipmap/ic_launcher');
-    final InitializationSettings initSettings =
-    InitializationSettings(android: androidInitSettings);
-    _notifications.initialize(initSettings);
-  }
+
+
 
   Future<void> _sendNotification(String title, String body) async {
-    const AndroidNotificationDetails androidDetails =
-    AndroidNotificationDetails('reminder_channel', 'Reminders',
-        importance: Importance.high, priority: Priority.high);
-    const NotificationDetails details =
-    NotificationDetails(android: androidDetails);
-    await _notifications.show(0, title, body, details);
+     trigernotification(null, body, title);
+
+
+
   }
 
-  Future<void> _sendEmailReminder(String recipientEmail) async {
-    final Email email = Email(
-      body: "Your house booking is about to expire! Please make a payment to continue staying.",
-      subject: "Urgent: House Booking Expiry",
-      recipients: [recipientEmail],
-      isHTML: false,
-    );
-
-    try {
-      await FlutterEmailSender.send(email);
-    } catch (error) {
-      print("Error sending email: $error");
-    }
-  }
 
   Future<void> _makePayment(String phoneNumber, String docId, int amount) async {
     final Uri url = Uri.parse("https://mpesaapi.onrender.com/stkpush");
@@ -131,9 +111,11 @@ class _BookedHousesScreenState extends State<BookedHousesScreen> {
               DateTime expiryDate = paymentDate.add(Duration(days: paidMonths * 30));
               int daysRemaining = expiryDate.difference(DateTime.now()).inDays;
 
-              if (daysRemaining == 29) {
+              if (daysRemaining == 0) {
+                trigernotification(null,"Your house $houseName booking expires today!" , "Payment Reminder");
                 _sendNotification("Payment Reminder", "Your house booking expires today!");
-                _sendEmailReminder(email);
+
+                  sendEmailViaApi(to:  email,hsName:houseName);
               }
 
               return Card(
@@ -217,7 +199,8 @@ class _BookedHousesScreenState extends State<BookedHousesScreen> {
                               padding: EdgeInsets.symmetric(vertical: 5),
                               child: Text(
                                 "⚠️ Your house will be unbooked after 5 days without payment!",
-                                style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                                style: TextStyle(color: Colors.red,
+                                    fontWeight: FontWeight.bold),
                               ),
                             ),
 
@@ -358,16 +341,14 @@ class _BookedHousesScreenState extends State<BookedHousesScreen> {
 
 void showHouseOnMap(List<Map<String,dynamic>> houses ,String title,BuildContext context) {
 
-// void showHouseOnMap(double lat, double long, String houseName, String imageUrl, String location,title,context) {
+
   Navigator.push(
     context,
     MaterialPageRoute(
       builder: (context) => MapScreenHouses(
         title: title,
         houses: houses
-        // [
-        //   {"houseName": houseName, "lat": lat, "long": long, "image": imageUrl, "location": location}
-        // ],
+
       ),
     ),
   );
