@@ -1,4 +1,4 @@
-import 'dart:io';
+
 import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -154,8 +154,8 @@ class AddHouse extends HookConsumerWidget {
                               menuWidth: width,
                               items: areas.map((entry) {
                                 return DropdownMenuItem(
-                                  value: entry,
-                                  child: Text(entry),
+                                  value: entry.toLowerCase(),
+                                  child: Text(entry.toLowerCase()),
                                 );
                               }).toList(),
                               value: selectedLocation,
@@ -350,7 +350,7 @@ class AddHouse extends HookConsumerWidget {
                         ],
                       ),
                       firebaseServicesProvider.isAdding
-                          ? CircularProgressIndicator()
+                          ? Center(child: CircularProgressIndicator())
                           : FunctionButton(
                               text: 'Add House',
                               onPressed: () async {
