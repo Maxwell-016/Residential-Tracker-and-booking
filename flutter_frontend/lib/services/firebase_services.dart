@@ -106,7 +106,6 @@ class FirebaseServices extends ChangeNotifier {
     }
   }
 
-
   //fetching the authenticated user role
   Future<String?> getUserRole() async {
     if (_auth.currentUser == null) return null;
@@ -128,7 +127,7 @@ class FirebaseServices extends ChangeNotifier {
   //sign out of the app
   Future<void> signOut(BuildContext context) async {
     await _auth.signOut();
-    if(!context.mounted) return;
+    if (!context.mounted) return;
     context.go('/login');
   }
 
@@ -168,9 +167,13 @@ class FirebaseServices extends ChangeNotifier {
     return message;
   }
 
-
+  bool isUpdatingLandlordProfile = false;
+  void setIsUpdatingLandlordProfile(bool value){
+    isUpdatingLandlordProfile = value;
+    notifyListeners();
+  }
   //landlords Profile
-  Future<void> createLandlordProfile(
+  Future<String?> createLandlordProfile(
     WidgetRef ref,
     String name,
     String email,
@@ -178,17 +181,29 @@ class FirebaseServices extends ChangeNotifier {
     String location,
     String? profilePhoto,
   ) async {
-    await landlordReference.doc(_auth.currentUser!.uid).set({
-      'Name': name,
-      'Email': email,
-      'Phone Number': phoneNo,
-      'Created at': FieldValue.serverTimestamp(),
-      'isVerified': _auth.currentUser!.emailVerified,
-      'Location': location,
-      'Profile Photo': profilePhoto,
-    }, SetOptions(merge: true));
+    setIsUpdatingLandlordProfile(true);
+    Map<String, dynamic>? landlordDetails = await getLandlordProfile();
+    if (landlordDetails!['Name'] == name &&
+        landlordDetails['Email'] == email &&
+        landlordDetails['Phone Number'] == phoneNo &&
+        landlordDetails['Location'] == location &&
+        landlordDetails['Profile Photo'] == profilePhoto) {
+      setIsUpdatingLandlordProfile(false);
+      return 'No Change';
+    } else {
+      await landlordReference.doc(_auth.currentUser!.uid).set({
+        'Name': name,
+        'Email': email,
+        'Phone Number': phoneNo,
+        'Created at': FieldValue.serverTimestamp(),
+        'isVerified': _auth.currentUser!.emailVerified,
+        'Location': location,
+        'Profile Photo': profilePhoto,
+      }, SetOptions(merge: true));
+      setIsUpdatingLandlordProfile(true);
+      return null;
+    }
   }
-
 
   //fetching the landlords details
   Future<Map<String, dynamic>?> getLandlordProfile() async {
@@ -205,7 +220,6 @@ class FirebaseServices extends ChangeNotifier {
     isAdding = value;
     notifyListeners();
   }
-
 
   //Adding house to the database
   Future<String> addHouseListing(
@@ -257,7 +271,6 @@ class FirebaseServices extends ChangeNotifier {
     notifyListeners();
   }
 
-
   //update house details
   Future<String?> updateListings(
     String name,
@@ -303,7 +316,6 @@ class FirebaseServices extends ChangeNotifier {
     }
   }
 
-
   //fetch details of a house using its house name from Houses sub collection in landlord collection
   Future<Object?> getIndividualListing(String name) async {
     DocumentSnapshot snapshot = await landlordReference
@@ -345,15 +357,14 @@ class FirebaseServices extends ChangeNotifier {
     return houses;
   }
 
-
   //fetch details for a single booked houses. Use the houseId from firebase
-  Future<Map<String,dynamic>?> getBookedHouseDetails(String houseId) async{
-    DocumentSnapshot snapshot = await firestore.collection('booked_students').doc(houseId).get();
-    if(snapshot.exists){
-      return snapshot.data() as Map<String,dynamic>;
+  Future<Map<String, dynamic>?> getBookedHouseDetails(String houseId) async {
+    DocumentSnapshot snapshot =
+        await firestore.collection('booked_students').doc(houseId).get();
+    if (snapshot.exists) {
+      return snapshot.data() as Map<String, dynamic>;
     }
     return null;
-
   }
 
   //fetch details of all booked houses
@@ -396,7 +407,6 @@ class FirebaseServices extends ChangeNotifier {
     return houses.docs.length;
   }
 
-
   //getting the number of all booked houses for a landlord
   Future<int> getNoOfAllBookedHouses() async {
     QuerySnapshot houses = await landlordReference
@@ -413,7 +423,6 @@ class FirebaseServices extends ChangeNotifier {
     notifyListeners();
   }
 
-
   //deleting a document from the Houses sub collection using the house name, since its the document id
   Future<void> deleteDocById(String name) async {
     setIsDeleting(true);
@@ -425,8 +434,6 @@ class FirebaseServices extends ChangeNotifier {
     setIsDeleting(false);
     notifyListeners();
   }
-
-
 
   Future<List<Map<String, dynamic>>> fetchResidences() async {
     try {
