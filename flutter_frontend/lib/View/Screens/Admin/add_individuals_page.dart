@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_frontend/View/Components/admin_side_nav.dart';
+import 'package:flutter_frontend/security/hashPassword.dart'; // Import the hashPassword function
 
 import '../../../constants.dart';
 import '../../Components/SimpleAppBar.dart';
@@ -25,57 +26,63 @@ class _AddIndividualsPageState extends State<AddIndividualsPage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
-  final TextEditingController _locationController = TextEditingController();
-  final TextEditingController _profilePhotoController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController(); // Password controller
   String _selectedRole = 'Student'; // Default role
   bool _isLoading = false;
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Future<void> _addIndividual() async {
+  Future<void> _addUser() async {
     if (_formKey.currentState!.validate()) {
       setState(() {
         _isLoading = true;
       });
 
       try {
-        // Prepare user data
-        final userData = {
-          'Name': _nameController.text.trim(),
-          'Email': _emailController.text.trim(),
-          'Location': _locationController.text.trim(),
-          'Phone Number': _phoneController.text.trim(),
-          'Profile Photo': _profilePhotoController.text.trim(),
-          'isVerified': false, // Default to false for new entries
-          'Created At': FieldValue.serverTimestamp(),
-        };
+        // Check if the user already exists
+        final querySnapshot = await _firestore
+            .collection('Users')
+            .where('email', isEqualTo: _emailController.text.trim())
+            .get();
 
-        // Save to Firestore
-        if (_selectedRole == 'Landlord') {
-          await _firestore.collection('Landlords').add(userData);
+        if (querySnapshot.docs.isNotEmpty) {
+          // User already exists
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('User already exists')),
+          );
         } else {
+          // Hash the password using the imported function
+          final hashedPassword = hashPassword(_passwordController.text.trim());
+
+          // Prepare user data
+          final userData = {
+            'name': _nameController.text.trim(),
+            'email': _emailController.text.trim(),
+            'role': _selectedRole,
+            'password': hashedPassword, // Save the hashed password
+            'createdAt': FieldValue.serverTimestamp(),
+          };
+
+          // Save to Firestore
           await _firestore.collection('Users').add(userData);
+
+          // Show success message
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('User added successfully!')),
+          );
+
+          // Clear the form
+          _nameController.clear();
+          _emailController.clear();
+          _passwordController.clear();
+          setState(() {
+            _selectedRole = 'Student';
+          });
         }
-
-        // Show success message
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Individual added successfully!')),
-        );
-
-        // Clear the form
-        _nameController.clear();
-        _emailController.clear();
-        _phoneController.clear();
-        _locationController.clear();
-        _profilePhotoController.clear();
-        setState(() {
-          _selectedRole = 'Student';
-        });
       } catch (e) {
         // Handle errors
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to add individual: $e')),
+          SnackBar(content: Text('Failed to add user: $e')),
         );
       } finally {
         setState(() {
@@ -94,7 +101,7 @@ class _AddIndividualsPageState extends State<AddIndividualsPage> {
           changeTheme: widget.changeTheme,
           changeColor: widget.changeColor,
           colorSelected: widget.colorSelected,
-          title: 'Add Individuals',
+          title: 'Add Users',
         ),
       ),
       drawer: const AdminSideNav(),
@@ -131,6 +138,21 @@ class _AddIndividualsPageState extends State<AddIndividualsPage> {
                   },
                 ),
                 const SizedBox(height: 16),
+                TextFormField(
+                  controller: _passwordController,
+                  decoration: const InputDecoration(labelText: 'Password'),
+                  obscureText: true, // Hide the password input
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a password';
+                    }
+                    if (value.length < 6) {
+                      return 'Password must be at least 6 characters';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
                 DropdownButtonFormField<String>(
                   value: _selectedRole,
                   decoration: const InputDecoration(labelText: 'Role'),
@@ -145,40 +167,11 @@ class _AddIndividualsPageState extends State<AddIndividualsPage> {
                   },
                 ),
                 const SizedBox(height: 16),
-                if (_selectedRole == 'Landlord') ...[
-                  TextFormField(
-                    controller: _phoneController,
-                    decoration: const InputDecoration(labelText: 'Phone Number'),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter a phone number';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    controller: _locationController,
-                    decoration: const InputDecoration(labelText: 'Location'),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter a location';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    controller: _profilePhotoController,
-                    decoration: const InputDecoration(labelText: 'Profile Photo URL (Optional)'),
-                  ),
-                  const SizedBox(height: 16),
-                ],
                 _isLoading
                     ? const Center(child: CircularProgressIndicator())
                     : ElevatedButton(
-                        onPressed: _addIndividual,
-                        child: const Text('Add Individual'),
+                        onPressed: _addUser,
+                        child: const Text('Add User'),
                       ),
               ],
             ),
