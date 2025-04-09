@@ -74,7 +74,7 @@ class _StateHouseCard extends ConsumerState<HouseCard> {
       builder: (context) {
         TextEditingController controller = TextEditingController();
         return AlertDialog(
-          title: Text("Enter Your Phone Number"),
+          title: Text("Enter Phone Number For Payment"),
           content: TextField(
             controller: controller,
             keyboardType: TextInputType.phone,
@@ -89,7 +89,7 @@ class _StateHouseCard extends ConsumerState<HouseCard> {
             ),
             TextButton(
               onPressed: () => Navigator.pop(context, controller.text),
-              child: Text("Save"),
+              child: Text("Send"),
             ),
           ],
         );
@@ -186,6 +186,24 @@ class _StateHouseCard extends ConsumerState<HouseCard> {
       ),
     );
   }
+  Future<void> markHouseAsBooked(String landlordId, String houseId) async {
+    final houseRef = FirebaseFirestore.instance
+        .collection("Landlords")
+        .doc(landlordId)
+        .collection("Houses")
+        .doc(houseId);
+
+    await houseRef.update({"isBooked": true});
+  }
+  Future<void> markHouseAsUnbooked(String landlordId, String houseId) async {
+    final houseRef = FirebaseFirestore.instance
+        .collection("Landlords")
+        .doc(landlordId)
+        .collection("Houses")
+        .doc(houseId);
+
+    await houseRef.update({"isBooked": false});
+  }
 
 
   Future<void> bookHouse(String paymentOption) async {
@@ -201,12 +219,14 @@ class _StateHouseCard extends ConsumerState<HouseCard> {
     }
 
     try {
-      await FirebaseFirestore.instance
-          .collection("Landlords")
-          .doc(landlordId)
-          .collection("Houses")
-          .doc(houseId)
-          .update({"isBooked": true});
+      // await FirebaseFirestore.instance
+      //     .collection("Landlords")
+      //     .doc(landlordId)
+      //     .collection("Houses")
+      //     .doc(houseId)
+      //     .update({"isBooked": true});
+
+      markHouseAsBooked(landlordId, houseId);
 
       setState(() {
         widget.house["isBooked"] = true;
@@ -226,18 +246,11 @@ class _StateHouseCard extends ConsumerState<HouseCard> {
     String? landlordId = widget.house["landlordId"] as String?;
     String? houseId = widget.house["id"] as String?;
     String houseName = widget.house["House Name"] ?? "Unknown House";
-    double lat =  widget.house["Live Latitude"]?? 0.0;
-    double long =  widget.house["Live Longitude"]?? 0.0;
+    double lat = widget.house["Live Latitude"] ?? 0.0;
+    double long = widget.house["Live Longitude"] ?? 0.0;
     String location = widget.house["Location"] ?? "Unknown Location";
     double price = widget.house["House Price"] ?? 0.0;
-    // var houseImage = widget.house["Images"].toString() ?? [];
-    // List<String> houseImage = widget.house["Images"].map((item) => item.toString()).toList();
-    List<String> houseImage = widget.house["Images"].cast<String>()??[];
-    if (landlordId == null || houseId == null) {
-      print("Error: LandlordId or HouseId is null");
-      setState(() => isBooking = false);
-      return;
-    }
+    List<String> houseImage = widget.house["Images"].cast<String>() ?? [];
 
     String? studentEmail = auth.currentUser?.email;
     String? studentName = await chatService.getUserName();
@@ -252,30 +265,50 @@ class _StateHouseCard extends ConsumerState<HouseCard> {
       }
     }
 
-    // Fetch landlord details
+
     DocumentSnapshot landlordDoc = await fs.collection("Landlords").doc(landlordId).get();
     String landlordPhone = landlordDoc.exists ? landlordDoc.get("Phone Number") : "Unknown";
     String landlordName = landlordDoc.exists ? landlordDoc.get("Name") : "Unknown";
-
     double amountToPay = paymentOption == "semester" ? price * 4 : price;
 
-    initiatePayment(studentPhone,
-        amountToPay,
-        studentEmail!,
-        studentName,
-        houseName,
-        location,
-        landlordPhone,
-        landlordId,
-        landlordName,
-        houseId,
-        houseImage,
-        paymentOption,lat,long);
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        initiatePayment(
+          studentPhone,
+          amountToPay,
+          studentEmail!,
+          studentName,
+          houseName,
+          location,
+          landlordPhone,
+          landlordId!,
+          landlordName,
+          houseId!,
+          houseImage,
+          paymentOption,
+          lat,
+          long,
+        ).then((_) {
+          Navigator.of(context).pop();
 
-//
+          setState(() => isBooking = false);
+        });
 
-    setState(() => isBooking = false);
-
+        return AlertDialog(
+          title: Text("Processing Payment"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircularProgressIndicator(),
+              const SizedBox(height: 16),
+              Text("Waiting for payment confirmation..."),
+            ],
+          ),
+        );
+      },
+    );
   }
 
 

@@ -68,45 +68,7 @@ class _MapScreenState extends State<MapScreen> {
   }
 
 
-  // Future<void> _onMapCreated(GoogleMapController controller) async {
-  //
-  //
-  //   final List<Map<String, dynamic>> toBeMarked = await getLocationsToBeMarked(widget.locations);
-  //
-  //
-  //   setState(()  async {
-  //     _markers.clear();
-  //     for (final place in toBeMarked) {
-  //   int  availableHouses =  await AvailableHousesPerArea(place["name"]);
-  //   print("available houses $availableHouses");
-  //       final marker = Marker(
-  //         markerId: MarkerId(place["id"].toString()),
-  //         position: LatLng(place["lat"], place["lng"]),
-  //         infoWindow: InfoWindow(
-  //           title: place["name"],
-  //           snippet: "${place["address"]}\nRegion: ${place["region"]}\n Vacant Houses : $availableHouses",
-  //           onTap: ()  {
-  //             availableHouses>0?
-  //             Navigator.push(
-  //               context,
-  //               MaterialPageRoute(
-  //                 builder: (context) =>  AvailableHousesScreen(location: place["name"].toLowerCase())
-  //               ),
-  //             ):null;
-  //           },
-  //         ),
-  //       );
-  //
-  //
-  //
-  //
-  //       _markers[place["name"]] = marker;
-  //     }
-  //   });
-  //
-  //   print("Markers added: ${_markers.length}");
-  // }
-  //
+
 
 
 

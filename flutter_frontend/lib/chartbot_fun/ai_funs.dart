@@ -27,7 +27,7 @@ Future<String> validateOption(String userMessage) async {
           " 1 List all available houses in a specific location\n"
           " 2 See all locations with available houses\n"
           " 3 Report for an emergency\n"
-          " 4 Ask for help and related questions\n"
+          " 4 Search for available  houses by specifications\n"
           " 5 See all vacant houses\n\n"
           "Which option would you like me to assist you with? "
           "  also return the correct option "
@@ -43,7 +43,7 @@ Future<String> validateOption(String userMessage) async {
   }else if (response.trim() == "option_3") {
     return "Report for an emergency.";
   }else if (response.trim() == "option_4") {
-    return "Ask for help and related questions.";
+    return "houses by specifications";
   }else if (response.trim() == "option_5") {
     return "See all vacant houses";
   }
@@ -183,6 +183,36 @@ Future<List<Map<String,dynamic>>> getLocationsToBeMarked(Future<List<String>> ma
 }
 
 
+Future<List<String>> extractAmenitiesFromText(String userText) async {
+  String prompt = """
+The following are valid housing amenities: Wi-Fi, Water, Security, Electricity.
+From this user's request: "$userText", extract all amenities mentioned. Reply with a comma-separated list of only the amenities that match those in the list above. If none match, return an empty list.
+""";
+
+  String response = await aiService.getAIResponse(prompt);
 
 
+  return response
+      .split(',')
+      .map((e) => e.trim())
+      .where((e) => e.isNotEmpty)
+      .toList();
+}
+
+
+Future<List<String>> extractDescriptionKeywords(String userText) async {
+  String prompt = """
+Extract important keywords or phrases from this housing-related request: "$userText".
+Return 3 to 5 short keywords or phrases that can help match housing descriptions, such as "spacious", "single room", "near town", etc.
+Respond with a comma-separated list only.
+""";
+
+  String response = await aiService.getAIResponse(prompt);
+
+  return response
+      .split(',')
+      .map((e) => e.trim().toLowerCase())
+      .where((e) => e.isNotEmpty)
+      .toList();
+}
 

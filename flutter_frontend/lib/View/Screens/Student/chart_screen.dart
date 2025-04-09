@@ -22,6 +22,7 @@ import '../../../pages/booked.dart';
 import '../../../pages/help.dart';
 import '../../../pages/searched_places.dart';
 import '../../Components/SimpleAppBar.dart';
+import 'animateTyping.dart';
 import 'chart_app_bar.dart';
 import 'mapit.dart';
 
@@ -56,6 +57,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   bool showAllHouse=false;
   String pkey="pageKey";
 
+  String selectedSpecType = "";
+  bool awaitingSpecSelection = false;
+  bool awaitingSpecValue = false;
 
 
   String paymentOP="";
@@ -114,6 +118,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         showHouses = false;
         awaitingPhoneNumberInput = false;
         showMap = false;
+        _controller.clear();
 
         messages.add({
           "role": "ai",
@@ -121,12 +126,14 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               " 1 List all available houses in a specific location\n"
               " 2 See all locations with available houses\n"
               " 3 Report for an emergency\n"
-              " 4 Ask for help and related questions\n"
+              " 4 Search for available  houses by specifications\n"
               " 5 See all vacant houses\n\n"
               "Which option would you like me to assist you with?"
         });
         isTyping = false;
       });
+      Future.delayed(Duration(milliseconds: 300), _scrollToBottom);
+
       return;
     }
 
@@ -184,7 +191,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   " 1 List all available houses in a specific location\n"
                   " 2 See all locations with available houses\n"
                   " 3 Report for an emergency\n"
-                  " 4 Ask for help and related questions\n"
+                  " 4 Search for available  houses by specifications\n"
                   " 5 See all vacant houses\n\n"
                   "Which option would you like me to assist you with? (Reply with one of the above options eg 1 or option 1)"
             });
@@ -228,6 +235,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
 
     if (showHouses) {
+
       List<Map<String, dynamic>> houses = await chatService.getAllHouses();
       var selectedHouse = houses.firstWhere(
             (house) => house["House Name"].toLowerCase() == userMessage.toLowerCase(),
@@ -304,9 +312,21 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
 
 
-      }else if(aiResponse.contains("Ask for help and related questions.")) {
+      }else if(aiResponse.contains("houses by specifications")) {
 
-        aiResponse="Ask any question that you want me to help you with ?";
+        setState(() {
+          conversationStep = "specification_selection";
+          awaitingSpecSelection = true;
+          messages.add({
+            "role": "ai",
+            "text": "Please choose how you'd like to search:\n1. By Price\n2. By Amenities\n3. By Description\n(Type 1, 2, or 3)",
+          });
+          isTyping=false;
+        });
+        Future.delayed(Duration(milliseconds: 300), _scrollToBottom);
+
+        return;
+
 
 
       }else if(aiResponse.contains( "See all vacant houses")) {
@@ -323,10 +343,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               "house": house,
             });
           }
-
+          isTyping=false;
           setState(() {
             showHouses=true;
-         //   showAllHouse = true;
+
+
           });
 
 
@@ -338,17 +359,96 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           });
 
 
-
-
         }
 
       }
 
 
+    }else if (conversationStep == "specification_selection" && awaitingSpecSelection) {
+      if (userMessage == "1") {
+        setState(() {
+          selectedSpecType = "price";
+          awaitingSpecSelection = false;
+          awaitingSpecValue = true;
+          conversationStep = "enter_spec_value";
+          messages.add({"role": "ai", "text": "Please enter the price range or max price. (e.g., 3000-6000 or just 5000)"});
+        });
+      } else if (userMessage == "2") {
+        setState(() {
+        selectedSpecType = "amenities";
+        awaitingSpecSelection = false;
+        awaitingSpecValue = true;
+        conversationStep = "enter_spec_value";
+        messages.add({"role": "ai", "text": "Please enter the amenity you're looking for (e.g., WiFi, hot shower, parking):"});
+      });
+      } else if (userMessage == "3") {
+        setState(() {
+        selectedSpecType = "description";
+        awaitingSpecSelection = false;
+        awaitingSpecValue = true;
+        conversationStep = "enter_spec_value";
+        messages.add({"role": "ai", "text": "Please enter a keyword related to the house description (e.g., quiet, spacious, furnished):"});
+        });
+      } else {
+        setState(() {
+        messages.add({"role": "ai", "text": "Invalid choice. Please reply with 1, 2, or 3."});
+      });
+      }
+      Future.delayed(Duration(milliseconds: 300), _scrollToBottom);
+      isTyping=false;
+
+      return;
+    }else if (conversationStep == "enter_spec_value" && awaitingSpecValue) {
+      List<Map<String, dynamic>> results = [];
+
+      if (selectedSpecType == "price") {
+        int? minPrice, maxPrice;
+        if (userMessage.contains("-")) {
+          var parts = userMessage.split("-");
+          minPrice = int.tryParse(parts[0].trim());
+          maxPrice = int.tryParse(parts[1].trim());
+        } else {
+          maxPrice = int.tryParse(userMessage.trim());
+          minPrice = 0;
+        }
+
+        if (maxPrice != null) {
+          results = await chatService.getHousesByPriceRange(minPrice!, maxPrice);
+        }
+      } else if (selectedSpecType == "amenities") {
+
+        results = await chatService.getHousesByAmenity(userMessage.trim());
+        print("user =$results");
+      } else if (selectedSpecType == "description") {
+
+        results = await chatService.getHousesByDescription(userMessage.trim());
 
 
+      }
 
+      if (results.isEmpty) {
+        print("i am result $results");
+        messages.add({"role": "ai", "text": "No houses found matching your criteria. Would you like to try again? Type 'go back' to return."});
+
+      } else {
+        messages.add({"role": "ai", "text": "Here are some houses matching your criteria:\n\nClick on a house or reply with its name to book."});
+        for (var house in results) {
+          messages.add({
+            "role": "ai",
+            "text": "🏠 ${house["House Name"]} -> Booking",
+            "house": house,
+          });
+        }
+        setState(() {
+          showHouses = true;
+          awaitingSpecValue = false;
+          conversationStep = "select_house_from_spec";
+        });
+      }
+      return;
     }
+
+
     else if (conversationStep == "enter_location") {
       setState(() {
         showMap=false;
@@ -572,6 +672,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
 
         body:ref.watch(toggleMenu)?
+        Column(
+          children: [
         Expanded(
             child:
             Row(
@@ -670,7 +772,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
               ],
             )
-        ):
+        )])
+
+        :
         prefs.getString(pkey)=="ai"?AiPage():
         prefs.getString(pkey)=="booked"?BookedHousesScreen():
         prefs.getString(pkey)=="places"?SearchedPlacesScreen():
@@ -708,12 +812,17 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 itemBuilder: (context, index) {
                   if (isTyping && index == messages.length) {
                     return Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        "Typing...",
-                        style: TextStyle(fontStyle: FontStyle.italic),
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          TypingIndicator(),
+                        ],
                       ),
+
                     );
+
+
                   }
 
                   final message = messages[index];
@@ -798,11 +907,15 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     hintText: awaitingPhoneNumberInput ? "e.g. 254712845678" : "Type a message...",
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                   ),
+                  onSubmitted: (value) {
+                    sendMessage();
+                  },
                 ),
               ),
+
               SizedBox(width: 10),
               IconButton(
-                icon: Icon(Icons.send, color: Colors.blue),
+                icon: Icon(Icons.send, color: Colors.blue,size: 24,),
                 onPressed: sendMessage,
               )
             ],
