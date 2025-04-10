@@ -176,7 +176,7 @@ class _StateHouseCard extends ConsumerState<HouseCard> {
                   if (value != null) {
                     setState(() => selectedPayment = value);
                     Navigator.pop(context);
-                    _processBooking(value);  // Run after closing dialog
+                    _processBooking(value);
                   }
                 },
               ),
@@ -316,6 +316,7 @@ class _StateHouseCard extends ConsumerState<HouseCard> {
 
   @override
   Widget build(BuildContext context) {
+    var screenWidth=MediaQuery.of(context).size.width;
     return GestureDetector(
       onTap: () => startBookHouse(),
       child: LayoutBuilder(
@@ -360,6 +361,7 @@ class _StateHouseCard extends ConsumerState<HouseCard> {
                         ),
 
                       const SizedBox(height: 8),
+                    screenWidth>700?
                       ListTile(
                         leading: Text(
                           "🏠 House Name -> ${widget.house["House Name"]}",
@@ -369,7 +371,11 @@ class _StateHouseCard extends ConsumerState<HouseCard> {
                           "Price Ksh ${widget.house["House Price"]} per month",
                           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                         ),
-                      ),
+                      ):
+                    Text(
+                      "🏠 House Name -> ${widget.house["House Name"]} \nPrice Ksh ${widget.house["House Price"]} per month",
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                    ),
                       Text("📍 ${widget.house["Location"] ?? ""}"),
                       Text("📏 ${widget.house["House Size"]}"),
                       Text("📝 ${widget.house["Description"]}"),
