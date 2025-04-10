@@ -111,8 +111,7 @@ class _StateResidentialTrackerAndBooking
     routes: [
       //  GoRoute(builder: (context, state) => LoginPage(), path: '/login'),
 
-      GoRoute(builder: (context, state) =>  LoginPage(),
-          path: '/login'),
+      GoRoute(builder: (context, state) => LoginPage(), path: '/login'),
       GoRoute(
           builder: (context, state) => AllBookedHousesMap(),
           path: '/students-location'),
@@ -126,12 +125,6 @@ class _StateResidentialTrackerAndBooking
       GoRoute(
           builder: (context, state) => EmailVerificationPage(),
           path: '/verification'),
-
-      // GoRoute(
-      //     builder: (context, state) {
-      //       return StudentDashboard();
-      //     },
-      //     path: '/student-dashboard'),
 
       GoRoute(
           builder: (context, state) {
@@ -188,10 +181,10 @@ class _StateResidentialTrackerAndBooking
       ),
       GoRoute(
           builder: (context, state) => ReviewsAndFeedback(
-            changeTheme: changeThemeMode,
-            changeColor: changeColor,
-            colorSelected: colorSelected,
-          ),
+                changeTheme: changeThemeMode,
+                changeColor: changeColor,
+                colorSelected: colorSelected,
+              ),
           path: '/tenant-feedback'),
       GoRoute(
           builder: (context, state) => LandlordProfile(
@@ -200,7 +193,6 @@ class _StateResidentialTrackerAndBooking
                 colorSelected: colorSelected,
               ),
           path: '/landlord-profile'),
-
 
       GoRoute(
           builder: (context, state) {
@@ -212,35 +204,32 @@ class _StateResidentialTrackerAndBooking
           },
           path: '/admin-dashboard'),
       GoRoute(
-        path: '/view-students',
-        builder: (context,state){
-          return ViewStudentsPage(
-            changeTheme: changeThemeMode,
-            changeColor: changeColor,
-            colorSelected: colorSelected,
-          );
-        }
-      ),
+          path: '/view-students',
+          builder: (context, state) {
+            return ViewStudentsPage(
+              changeTheme: changeThemeMode,
+              changeColor: changeColor,
+              colorSelected: colorSelected,
+            );
+          }),
       GoRoute(
           path: '/view-landlords',
-          builder: (context,state){
+          builder: (context, state) {
             return ViewLandlordsPage(
               changeTheme: changeThemeMode,
               changeColor: changeColor,
               colorSelected: colorSelected,
             );
-          }
-      ),
+          }),
       GoRoute(
           path: '/add-individuals',
-          builder: (context,state){
+          builder: (context, state) {
             return AddIndividualsPage(
               changeTheme: changeThemeMode,
               changeColor: changeColor,
               colorSelected: colorSelected,
             );
-          }
-      ),
+          }),
 
       GoRoute(
           builder: (context, state) {
@@ -283,23 +272,68 @@ class _StateResidentialTrackerAndBooking
     }
 
     // If the user is logged in but is on the login page, send them to their dashboard
-    if (loggedIn && isOnLoginPage) {
+    if (loggedIn) {
       String? role = await fb.getUserRole();
-      if (role != null) {
-        switch (role) {
-          case 'Student':
-            return '/student-dashboard';
-          case 'Landlord':
-            return '/landlord-dashboard';
-          case 'Admin':
-            return '/admin-dashboard';
-        }
-      } else {
-        return '/login';
+
+      if (isOnLoginPage) {
+        return getDashboardForRole(role);
       }
+
+      if(!hasPermissionForRoute(role, state.matchedLocation)){
+        return getDashboardForRole(role);
+      }
+
     }
 
     return null;
+  }
+
+  String? getDashboardForRole(String? role) {
+    switch (role) {
+      case 'Student':
+        return '/student-dashboard';
+      case 'Landlord':
+        return '/landlord-dashboard';
+      case 'Admin':
+        return '/admin-dashboard';
+      default:
+        return '/login';
+    }
+
+  }
+
+  bool hasPermissionForRoute(String? role, String route) {
+    const roleRoutes = {
+      'Student': [
+        '/student-dashboard',
+        '/students-location',
+      ],
+      'Landlord': [
+        '/landlord-dashboard',
+        '/manageListings',
+        '/manageListings/add-house',
+        '/manageListings/view-and-update-listings',
+        '/manageListings/update-house-status',
+        '/landlord-profile',
+        '/student-bookings',
+        '/tenant-feedback',
+      ],
+      'Admin': [
+        '/admin-dashboard',
+        '/view-students',
+        '/view-landlords',
+        '/add-individuals',
+      ]
+    };
+    const commonRoutes = [
+      '/login',
+      '/registration',
+      '/forgot-password',
+      '/verification'
+    ];
+
+    return commonRoutes.contains(route) ||
+        (role != null && roleRoutes[role]!.contains(route));
   }
 
   @override

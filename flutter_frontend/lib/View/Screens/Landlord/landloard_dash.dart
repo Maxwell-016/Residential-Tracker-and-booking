@@ -52,14 +52,6 @@ class _LandLordDashboardScreenState extends ConsumerState<LandLordDashboardScree
 
   @override
   Widget build(BuildContext context) {
-    final fb= ref.watch(firebaseServices);
-
-
-
-    Logger logger = Logger();
-    logger.i('Rebuilding admin dash');
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return SafeArea(
       child: Scaffold(
 
