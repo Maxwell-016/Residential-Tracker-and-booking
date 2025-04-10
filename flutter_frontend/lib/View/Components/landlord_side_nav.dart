@@ -14,27 +14,27 @@ class LandlordSideNav extends StatelessWidget {
               onTap: () {
                 context.go('/landlord-dashboard');
               },
-              child: SideNavItem(text: 'Dashboard')),
+              child: SideNavItem(icon:Icon(Icons.dashboard,color: Colors.blue,) ,text: 'Dashboard')),
           GestureDetector(
               onTap: () {
                 context.go('/manageListings');
               },
-              child: SideNavItem(text: 'Manage House Listings')),
+              child: SideNavItem(icon: Icon(Icons.apartment,color: Colors.blue,), text: 'Manage House Listings')),
           GestureDetector(
               onTap: () {
                 context.go('/student-bookings');
               },
-              child: SideNavItem(text: 'Students Bookings')),
+              child: SideNavItem(icon: Icon(Icons.calendar_month,color: Colors.blue,),text: 'Students Bookings')),
           GestureDetector(
             onTap: (){
               context.go('/tenant-feedback');
             },
-              child: SideNavItem(text: 'Reviews and Feedback')),
+              child: SideNavItem(icon: Icon(Icons.feedback,color: Colors.blue,), text: 'Reviews and Feedback')),
           GestureDetector(
             onTap: () {
               context.go('/landlord-profile');
             },
-            child: SideNavItem(text: 'Profile'),
+            child: SideNavItem(icon: Icon(Icons.person,color: Colors.blue,), text: 'Profile'),
           ),
         ],
       ),
