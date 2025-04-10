@@ -147,7 +147,8 @@ class RegForm extends HookConsumerWidget {
                                       context,
                                       ref,
                                       emailController.text,
-                                      hashPassword(passController.text),
+                                      passController.text,
+                                      //hashPassword(passController.text),
                                       ref.watch(selectedNameProvider),
                                     );
                                   } catch (e) {

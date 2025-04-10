@@ -52,7 +52,8 @@ class _AddIndividualsPageState extends State<AddIndividualsPage> {
           );
         } else {
           // Hash the password using the imported function
-          final hashedPassword = hashPassword(_passwordController.text.trim());
+          //final hashedPassword = hashPassword(_passwordController.text.trim());
+          final hashedPassword = _passwordController.text.trim();
 
           // Prepare user data
           final userData = {
