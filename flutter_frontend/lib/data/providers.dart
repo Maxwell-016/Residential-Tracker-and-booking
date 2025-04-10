@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../View/Screens/Student/haoperlocation.dart';
 
 final hasNameProvider = StateProvider<bool>((ref) => false);
+final isBooked = StateProvider<bool>((ref) => false);
 
 final toggleMenu = StateProvider<bool>((ref) => true);
 

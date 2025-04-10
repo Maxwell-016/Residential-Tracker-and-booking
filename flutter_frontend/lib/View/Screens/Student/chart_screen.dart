@@ -236,6 +236,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
     if (showHouses) {
 
+      ref.watch(isBooked)?
+          setState(() {
+
+          }):null;
+
       List<Map<String, dynamic>> houses = await chatService.getAllHouses();
       var selectedHouse = houses.firstWhere(
             (house) => house["House Name"].toLowerCase() == userMessage.toLowerCase(),
@@ -308,7 +313,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
       }else if(aiResponse.contains("Report for an emergency.")) {
 
-        aiResponse="Which kind of emergency do you wish to report.";
+        aiResponse="Sorry Please, The service will be implemented soon, Kindly type go back to go to the main menu.";
 
 
 
