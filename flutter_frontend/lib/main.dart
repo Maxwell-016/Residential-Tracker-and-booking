@@ -306,7 +306,6 @@ class _StateResidentialTrackerAndBooking
     const roleRoutes = {
       'Student': [
         '/student-dashboard',
-        '/students-location',
       ],
       'Landlord': [
         '/landlord-dashboard',
@@ -323,6 +322,7 @@ class _StateResidentialTrackerAndBooking
         '/view-students',
         '/view-landlords',
         '/add-individuals',
+        '/students-location',
       ]
     };
     const commonRoutes = [
