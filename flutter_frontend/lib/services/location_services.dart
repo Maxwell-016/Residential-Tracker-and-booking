@@ -23,6 +23,7 @@ class _LandlordLocationSelectionState extends ConsumerState<LandlordLocationSele
     return Stack(
       children: [
         GoogleMap(
+          mapType: MapType.hybrid,
             initialCameraPosition: CameraPosition(
                 target: _initialPosition,
               zoom: 15,
@@ -46,7 +47,7 @@ class _LandlordLocationSelectionState extends ConsumerState<LandlordLocationSele
         Align(
           alignment: Alignment.bottomRight,
           child: Padding(
-            padding: const EdgeInsets.only(right: 10.0,bottom: 10.0),
+            padding: const EdgeInsets.only(right: 60.0,bottom: 20.0),
             child: FloatingActionButton.extended(
               onPressed: () {
                 if (_selectedLocation != null) {

@@ -12,6 +12,8 @@ class MyTextField extends StatefulWidget {
   final FocusNode focusNode;
   final double width;
   final int? maxLines;
+  final VoidCallback? onSubmit;
+  final TextInputAction? inputAction;
   const MyTextField(
       {super.key,
       required this.label,
@@ -21,8 +23,10 @@ class MyTextField extends StatefulWidget {
       required this.fieldValidator,
       required this.focusNode,
       required this.width,
-      this.maxLines,
+      this.maxLines = 1,
       this.isEnabled,
+      this.onSubmit,
+      this.inputAction,
       });
 
   @override
@@ -48,6 +52,8 @@ class _MyTextFieldState extends State<MyTextField> {
               validator: widget.fieldValidator,
               controller: widget.controller,
               maxLines: widget.maxLines,
+              textInputAction: widget.inputAction,
+              onFieldSubmitted: (value) => widget.onSubmit!,
               decoration: InputDecoration(
                 hintText: widget.placeHolder,
                 hintStyle: TextStyle(color: Colors.grey, fontSize: 14.0),

@@ -14,6 +14,8 @@ class PasswordField extends HookConsumerWidget {
   final FormFieldValidator<String?> fieldValidator;
   final FocusNode focusNode;
   final double width;
+  final VoidCallback? onSubmit;
+  final TextInputAction? inputAction;
   const PasswordField(
       {super.key,
       required this.label,
@@ -24,6 +26,8 @@ class PasswordField extends HookConsumerWidget {
       required this.fieldValidator,
       required this.focusNode,
       required this.width,
+      this.onSubmit,
+      this.inputAction,
       });
 
   @override
