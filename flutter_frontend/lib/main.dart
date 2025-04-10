@@ -5,15 +5,22 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_frontend/View-Model/navigation/routes.dart';
+import 'package:flutter_frontend/View/Screens/Admin/add_individuals_page.dart';
+import 'package:flutter_frontend/View/Screens/Admin/view_landlords_page.dart';
+import 'package:flutter_frontend/View/Screens/Admin/view_students_page.dart';
 import 'package:flutter_frontend/View/Screens/Landlord/landlord_profile.dart';
+import 'package:flutter_frontend/View/Screens/Landlord/reviews_and_feedback.dart';
 import 'package:flutter_frontend/View/Screens/Landlord/students_bookings.dart';
+import 'package:flutter_frontend/View/Screens/Landlord/update_house_status.dart';
 import 'package:flutter_frontend/View/Screens/Landlord/view_and_update_listings.dart';
+import 'package:flutter_frontend/View/Screens/Student/allstudent.dart';
 import 'package:flutter_frontend/View/Screens/Student/mapit.dart';
+import 'package:flutter_frontend/View/Screens/Student/testemail.dart';
 import 'package:flutter_frontend/constants.dart';
 import 'package:flutter_frontend/services/firebase_services.dart';
+import 'package:flutter_frontend/components/wallit.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'View-Model/utils/savecurrentpage.dart';
@@ -27,10 +34,9 @@ import 'View/Screens/Landlord/add_house.dart';
 import 'View/Screens/Landlord/landloard_dash.dart';
 import 'View/Screens/Landlord/manage_house_listings.dart';
 import 'View/Screens/Student/chart_screen.dart';
-import 'View/Screens/Student/student_dash.dart';
+import 'data/payment.dart';
 import 'data/providers.dart';
 import 'firebase_options.dart';
-import 'View/Screens/Admin/admin_settings.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -44,14 +50,9 @@ Future<void> main() async {
   } catch (e) {
     print('Firebase initialisation error: $e');
   }
+  // String initialRoute = await getLastVisitedPage();
 
-  String initialRoute = await getLastVisitedPage();
-
-  //Request permission for notifications
-
-
-  await AwesomeNotifications
-  ().initialize(
+  AwesomeNotifications().initialize(
     null,
     [
       NotificationChannel(
@@ -61,14 +62,11 @@ Future<void> main() async {
     ],
     debug: true,
   );
-
   final sharedPreferences = await SharedPreferences.getInstance();
 
-  runApp(ProviderScope(
-      overrides: [
-        sharedPreferencesProvider.overrideWithValue(sharedPreferences),
-      ],
-      child: ResidentialTrackerAndBooking()));
+  runApp(ProviderScope(overrides: [
+    sharedPreferencesProvider.overrideWithValue(sharedPreferences),
+  ], child: ResidentialTrackerAndBooking()));
 }
 
 class CustomScrollBehavior extends MaterialScrollBehavior {
@@ -111,7 +109,13 @@ class _StateResidentialTrackerAndBooking
     initialLocation: "/login",
     redirect: _appRedirect,
     routes: [
+      //  GoRoute(builder: (context, state) => LoginPage(), path: '/login'),
+
       GoRoute(builder: (context, state) => LoginPage(), path: '/login'),
+      GoRoute(
+          builder: (context, state) => AllBookedHousesMap(),
+          path: '/students-location'),
+
       GoRoute(
           builder: (context, state) => RegistrationPage(),
           path: '/registration'),
@@ -121,12 +125,6 @@ class _StateResidentialTrackerAndBooking
       GoRoute(
           builder: (context, state) => EmailVerificationPage(),
           path: '/verification'),
-
-      // GoRoute(
-      //     builder: (context, state) {
-      //       return StudentDashboard();
-      //     },
-      //     path: '/student-dashboard'),
 
       GoRoute(
           builder: (context, state) {
@@ -157,20 +155,37 @@ class _StateResidentialTrackerAndBooking
               ),
             ),
             GoRoute(
-                path: 'view-and-update-listings',
-                builder: (context, state) => ViewAndUpdateListings(
-                      changeTheme: changeThemeMode,
-                      changeColor: changeColor,
-                      colorSelected: colorSelected,
-                    ))
-          ]),
-      GoRoute(
-          path: '/student-bookings',
-          builder: (context, state) => StudentsBookings(
+              path: 'view-and-update-listings',
+              builder: (context, state) => ViewAndUpdateListings(
                 changeTheme: changeThemeMode,
                 changeColor: changeColor,
                 colorSelected: colorSelected,
-              )),
+              ),
+            ),
+            GoRoute(
+              path: 'update-house-status',
+              builder: (context, state) => UpdateHouseStatus(
+                changeTheme: changeThemeMode,
+                changeColor: changeColor,
+                colorSelected: colorSelected,
+              ),
+            ),
+          ]),
+      GoRoute(
+        path: '/student-bookings',
+        builder: (context, state) => StudentsBookings(
+          changeTheme: changeThemeMode,
+          changeColor: changeColor,
+          colorSelected: colorSelected,
+        ),
+      ),
+      GoRoute(
+          builder: (context, state) => ReviewsAndFeedback(
+                changeTheme: changeThemeMode,
+                changeColor: changeColor,
+                colorSelected: colorSelected,
+              ),
+          path: '/tenant-feedback'),
       GoRoute(
           builder: (context, state) => LandlordProfile(
                 changeTheme: changeThemeMode,
@@ -178,6 +193,7 @@ class _StateResidentialTrackerAndBooking
                 colorSelected: colorSelected,
               ),
           path: '/landlord-profile'),
+
       GoRoute(
           builder: (context, state) {
             return AdminDashboardScreen(
@@ -188,13 +204,32 @@ class _StateResidentialTrackerAndBooking
           },
           path: '/admin-dashboard'),
       GoRoute(
-        path: '/admin-settings',
-        builder: (context, state) => AdminSettingsPage(
-          changeTheme: changeThemeMode,
-          changeColor: changeColor,
-          colorSelected: colorSelected,
-        ),
-      ),
+          path: '/view-students',
+          builder: (context, state) {
+            return ViewStudentsPage(
+              changeTheme: changeThemeMode,
+              changeColor: changeColor,
+              colorSelected: colorSelected,
+            );
+          }),
+      GoRoute(
+          path: '/view-landlords',
+          builder: (context, state) {
+            return ViewLandlordsPage(
+              changeTheme: changeThemeMode,
+              changeColor: changeColor,
+              colorSelected: colorSelected,
+            );
+          }),
+      GoRoute(
+          path: '/add-individuals',
+          builder: (context, state) {
+            return AddIndividualsPage(
+              changeTheme: changeThemeMode,
+              changeColor: changeColor,
+              colorSelected: colorSelected,
+            );
+          }),
 
       GoRoute(
           builder: (context, state) {
@@ -205,11 +240,11 @@ class _StateResidentialTrackerAndBooking
             );
           },
           path: '/student-dashboard'),
-      GoRoute(
-          builder: (context, state) {
-            return MapScreen();
-          },
-          path: '/mapit'),
+      // GoRoute(
+      //     builder: (context, state) {
+      //       return  MapScreen();
+      //     },
+      //     path: '/mapit'),
     ],
     errorPageBuilder: (context, state) {
       return MaterialPage(
@@ -233,28 +268,72 @@ class _StateResidentialTrackerAndBooking
     if (!loggedIn &&
         !['/login', '/registration', '/forgot-password']
             .contains(state.matchedLocation)) {
-      return null;
+      return '/login';
     }
 
     // If the user is logged in but is on the login page, send them to their dashboard
-    if (loggedIn && isOnLoginPage) {
+    if (loggedIn) {
       String? role = await fb.getUserRole();
-      if (role != null) {
-        switch (role) {
-          case 'Student':
-            return '/student-dashboard';
-          case 'Landlord':
-            return '/landlord-dashboard';
-          case 'Admin':
-            return '/admin-dashboard';
-        }
-      } else {
-        return '/login';
+
+      if (isOnLoginPage) {
+        return getDashboardForRole(role);
       }
+
+      if(!hasPermissionForRoute(role, state.matchedLocation)){
+        return getDashboardForRole(role);
+      }
+
     }
 
-    // Stay on the current page
     return null;
+  }
+
+  String? getDashboardForRole(String? role) {
+    switch (role) {
+      case 'Student':
+        return '/student-dashboard';
+      case 'Landlord':
+        return '/landlord-dashboard';
+      case 'Admin':
+        return '/admin-dashboard';
+      default:
+        return '/login';
+    }
+
+  }
+
+  bool hasPermissionForRoute(String? role, String route) {
+    const roleRoutes = {
+      'Student': [
+        '/student-dashboard',
+        '/students-location',
+      ],
+      'Landlord': [
+        '/landlord-dashboard',
+        '/manageListings',
+        '/manageListings/add-house',
+        '/manageListings/view-and-update-listings',
+        '/manageListings/update-house-status',
+        '/landlord-profile',
+        '/student-bookings',
+        '/tenant-feedback',
+      ],
+      'Admin': [
+        '/admin-dashboard',
+        '/view-students',
+        '/view-landlords',
+        '/add-individuals',
+      ]
+    };
+    const commonRoutes = [
+      '/login',
+      '/registration',
+      '/forgot-password',
+      '/verification'
+    ];
+
+    return commonRoutes.contains(route) ||
+        (role != null && roleRoutes[role]!.contains(route));
   }
 
   @override

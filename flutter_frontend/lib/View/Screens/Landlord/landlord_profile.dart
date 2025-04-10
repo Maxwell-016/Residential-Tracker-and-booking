@@ -40,6 +40,7 @@ class LandlordProfile extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final formKey = GlobalKey<FormState>();
     Logger logger = Logger();
+    final firebaseServicesProvider = ref.watch(firebaseServices);
     ImagePickerService imagePickerService = ImagePickerService();
 
     final landlordDetails = useState<Map<String, dynamic>>({});
@@ -56,12 +57,12 @@ class LandlordProfile extends HookConsumerWidget {
 
     useEffect(() {
       Future.microtask(() async {
-        final profile = await ref.watch(firebaseServices).getLandlordProfile();
+        final profile = await firebaseServicesProvider.getLandlordProfile();
         if (profile != null && profile.isNotEmpty) {
           landlordDetails.value = profile;
           isLoading.value = false;
           ref.read(houseLocationProvider.notifier).state =
-              landlordDetails.value['Location'] ?? 'Kakamega Town';
+              landlordDetails.value['Location'] ?? 'kakamega town';
           nameController.text = landlordDetails.value['Name'];
           emailController.text = landlordDetails.value['Email'];
           phoneController.text = landlordDetails.value['Phone Number'];
@@ -81,19 +82,19 @@ class LandlordProfile extends HookConsumerWidget {
     String selectedLocation = ref.watch(houseLocationProvider);
 
     List<String> areas = [
-      'Myala',
-      'Lurambi',
-      'Sichirayi',
-      'Amalemba',
-      'Kefinco',
-      'Milimani',
-      'Shinyalu',
-      'Koromatangi',
-      'Kakamega Town',
-      'Mudiri',
-      'Lubao',
-      'Stage Mandazi',
-      'Khayega'
+      'myala',
+      'lurambi',
+      'sichirayi',
+      'amalemba',
+      'kefinco',
+      'milimani',
+      'shinyalu',
+      'koromatangi',
+      'kakamega town',
+      'mudiri',
+      'lubao',
+      'stage mandazi',
+      'khayega'
     ];
     areas.sort((a, b) => a.compareTo(b));
 
@@ -159,7 +160,7 @@ class LandlordProfile extends HookConsumerWidget {
                               },
                               child: CircleAvatar(
                                 radius: 80.0,
-                                backgroundImage:ref
+                                backgroundImage: ref
                                         .watch(profileUrl)
                                         .isNotEmpty
                                     ? NetworkImage(ref.watch(profileUrl))
@@ -173,13 +174,15 @@ class LandlordProfile extends HookConsumerWidget {
                                                 .value['Profile Photo'])
                                             as ImageProvider
                                         : null,
-                                child:
-                                    (landlordDetails.value['Profile Photo'] ==
+                                child: (ref.watch(profileUrl).isEmpty &&
+                                        (landlordDetails
+                                                    .value['Profile Photo'] ==
                                                 null ||
                                             landlordDetails
-                                                .value['Profile Photo'].isEmpty)
-                                        ? Icon(Icons.person_add_alt, size: 50.0)
-                                        : null,
+                                                .value['Profile Photo']
+                                                .isEmpty))
+                                    ? Icon(Icons.person_add_alt, size: 50.0)
+                                    : null,
                               ),
                             ),
                             MyTextField(
@@ -255,8 +258,7 @@ class LandlordProfile extends HookConsumerWidget {
                                 : GestureDetector(
                                     onTap: () async {
                                       try {
-                                        await ref
-                                            .watch(firebaseServices)
+                                        await firebaseServicesProvider
                                             .sendEmailVerification();
                                         if (!context.mounted) return;
                                         SnackBars.showInfoSnackBar(context,
@@ -280,35 +282,49 @@ class LandlordProfile extends HookConsumerWidget {
                                       ),
                                     ),
                                   ),
-                            FunctionButton(
-                              text: 'Update Profile',
-                              onPressed: () async {
-                                if (formKey.currentState!.validate()) {
-                                  try {
-                                    String profile = ref.watch(profileUrl);
+                            firebaseServicesProvider.isUpdatingLandlordProfile
+                                ? Center(
+                                    child: CircularProgressIndicator(),
+                                  )
+                                : FunctionButton(
+                                    text: 'Update Profile',
+                                    onPressed: () async {
+                                      if (formKey.currentState!.validate()) {
+                                        try {
+                                          String profile =
+                                              ref.watch(profileUrl);
 
-                                    await ref
-                                        .watch(firebaseServices)
-                                        .createLandlordProfile(
-                                            ref,
-                                            nameController.text,
-                                            emailController.text,
-                                            phoneController.text,
-                                            ref.watch(houseLocationProvider),
-                                            profile);
-                                    if (!context.mounted) return;
-                                    SnackBars.showSuccessSnackBar(context,
-                                        'Profile Updated successfully');
-                                  } catch (e) {
-                                    logger.e(e);
-                                    SnackBars.showErrorSnackBar(context,
-                                        'An error occurred trying to update your profile. Please try again');
-                                  }
-                                }
-                              },
-                              btnColor: AppColors.deepBlue,
-                              width: width,
-                            ),
+                                          String? message =
+                                              await firebaseServicesProvider
+                                                  .createLandlordProfile(
+                                                      ref,
+                                                      nameController.text,
+                                                      emailController.text,
+                                                      phoneController.text,
+                                                      ref.watch(
+                                                          houseLocationProvider),
+                                                      profile);
+                                          if (!context.mounted) return;
+                                          if (message == null) {
+                                            SnackBars.showSuccessSnackBar(
+                                                context,
+                                                'Profile Updated successfully');
+                                          }
+                                          if (message == 'No Change') {
+                                            SnackBars.showInfoSnackBar(context,
+                                                'There\'s no change on your profile');
+
+                                          }
+                                        } catch (e) {
+                                          logger.e(e);
+                                          SnackBars.showErrorSnackBar(context,
+                                              'An error occurred trying to update your profile. Please try again');
+                                        }
+                                      }
+                                    },
+                                    btnColor: AppColors.deepBlue,
+                                    width: width,
+                                  ),
                           ],
                         ),
                       ),

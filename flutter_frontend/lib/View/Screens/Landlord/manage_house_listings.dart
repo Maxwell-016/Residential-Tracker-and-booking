@@ -33,9 +33,7 @@ class ManageHouseListings extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    Logger logger = Logger();
-    final firebaseServicesProvider = ref.watch(firebaseServices);
+    double deviceWidth = MediaQuery.of(context).size.width;
     return SafeArea(
       child: Scaffold(
 
@@ -52,49 +50,56 @@ class ManageHouseListings extends ConsumerWidget {
         drawer: LandlordSideNav(),
         body: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.only(left: 100.0),
-            child: Wrap(
-              spacing: 40.0,
-              runSpacing: 40.0,
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    context.go('/manageListings/add-house');
-                  },
-                  child: CardButton(
-                    bgColor: AppColors.manage,
-                    title: 'Add House',
-                    icon: Icon(
-                      color: Colors.black,
-                      Icons.add_circle_outline_outlined,
-                      size: 30.0,
+            padding: deviceWidth > 700 ? const EdgeInsets.only(left: 100.0): const EdgeInsets.only(left: 10.0),
+            child: Center(
+              child: Wrap(
+                spacing: 40.0,
+                runSpacing: 40.0,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      context.go('/manageListings/add-house');
+                    },
+                    child: CardButton(
+                      bgColor: AppColors.manage,
+                      title: 'Add House',
+                      icon: Icon(
+                        color: Colors.black,
+                        Icons.add_circle_outline_outlined,
+                        size: 30.0,
+                      ),
                     ),
                   ),
-                ),
-                GestureDetector(
-                  onTap: () async {
-                    context.go('/manageListings/view-and-update-listings');
-                  },
-                  child: CardButton(
-                    bgColor: AppColors.manage,
-                    title: 'View / Update Listings',
-                    icon: Icon(
-                      color: Colors.black,
-                      Icons.update,
-                      size: 30.0,
+                  GestureDetector(
+                    onTap: ()  {
+                      context.go('/manageListings/view-and-update-listings');
+                    },
+                    child: CardButton(
+                      bgColor: AppColors.manage,
+                      title: 'View / Update Listings',
+                      icon: Icon(
+                        color: Colors.black,
+                        Icons.update,
+                        size: 30.0,
+                      ),
                     ),
                   ),
-                ),
-                CardButton(
-                  bgColor: AppColors.manage,
-                  title: 'Mark House as Booked / Not Booked',
-                  icon: Icon(
-                    color: Colors.black,
-                    Icons.calendar_month_outlined,
-                    size: 30.0,
+                  GestureDetector(
+                    onTap: (){
+                      context.go('/manageListings/update-house-status');
+                    },
+                    child: CardButton(
+                      bgColor: AppColors.manage,
+                      title: 'Mark House as Available',
+                      icon: Icon(
+                        color: Colors.black,
+                        Icons.calendar_month_outlined,
+                        size: 30.0,
+                      ),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

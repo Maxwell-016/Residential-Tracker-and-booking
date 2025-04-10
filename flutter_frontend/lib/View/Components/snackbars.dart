@@ -5,6 +5,7 @@ import 'google_fonts.dart';
 class SnackBars {
   static showSuccessSnackBar(BuildContext context, String text) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      elevation: 0,
       content: ShowMessage(
         text: text,
         color: Colors.green,
@@ -26,6 +27,7 @@ class SnackBars {
 
   static showErrorSnackBar(BuildContext context, String text) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      elevation: 0,
       content: Container(
         decoration: BoxDecoration(
           color: Colors.red,
@@ -67,6 +69,7 @@ class SnackBars {
 
   static showInfoSnackBar(BuildContext context, String text) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      elevation: 0,
       content: ShowMessage(
         text: text,
         color: Colors.blueAccent,

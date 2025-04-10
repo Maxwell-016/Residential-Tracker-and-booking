@@ -77,12 +77,16 @@ class _FAQItemState extends State<FAQItem> {
     return Card(
       elevation: 2,
       child: ExpansionTile(
-        title: Text(widget.question,
+            title: Text(widget.question,
             style: TextStyle(fontWeight: FontWeight.bold)),
+        expandedAlignment: Alignment.centerRight,
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text(widget.answer),
+            child: Text(
+                widget.answer,
+
+            ),
           ),
         ],
       ),
