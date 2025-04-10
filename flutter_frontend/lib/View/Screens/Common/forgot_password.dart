@@ -16,6 +16,7 @@ class ForgotPassword extends HookConsumerWidget {
   const ForgotPassword({
     super.key,
   });
+  static final formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -28,7 +29,6 @@ class ForgotPassword extends HookConsumerWidget {
     }
 
     saveCurrentPage('/forgot-password');
-    final formKey = GlobalKey<FormState>();
     TextEditingController emailController = useTextEditingController();
     final firebaseServicesProvider = ref.watch(firebaseServices);
     FocusNode emailFocus = useFocusNode();

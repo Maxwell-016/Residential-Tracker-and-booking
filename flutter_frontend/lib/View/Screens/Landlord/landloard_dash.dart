@@ -52,6 +52,7 @@ class _LandLordDashboardScreenState extends ConsumerState<LandLordDashboardScree
 
   @override
   Widget build(BuildContext context) {
+    double deviceWidth = MediaQuery.of(context).size.width;
     return SafeArea(
       child: Scaffold(
 
@@ -74,25 +75,27 @@ class _LandLordDashboardScreenState extends ConsumerState<LandLordDashboardScree
             final data = snapshot.data!;
             return SingleChildScrollView(
               child: Padding(
-                padding: const EdgeInsets.only(left: 100.0),
-                child: Wrap(
-                  spacing: 40.0,
-                  runSpacing: 40.0,
-                  children: [
-                    // display
-                    CardButton(
-                        quantity: data['total'],
-                        bgColor: AppColors.totalListings,
-                        title: 'Total Listings'),
-                    CardButton(
-                        quantity: data['booked'],
-                        bgColor: AppColors.booked,
-                        title: 'Booked Houses'),
-                    CardButton(
-                        quantity: data['notBooked'],
-                        bgColor: AppColors.availableListings,
-                        title: 'Available Houses'),
-                  ],
+                padding: deviceWidth > 700 ? const EdgeInsets.only(left: 100.0): const EdgeInsets.only(left: 10.0),
+                child: Center(
+                  child: Wrap(
+                    spacing: 40.0,
+                    runSpacing: 40.0,
+                    children: [
+                      // display
+                      CardButton(
+                          quantity: data['total'],
+                          bgColor: AppColors.totalListings,
+                          title: 'Total Listings'),
+                      CardButton(
+                          quantity: data['booked'],
+                          bgColor: AppColors.booked,
+                          title: 'Booked Houses'),
+                      CardButton(
+                          quantity: data['notBooked'],
+                          bgColor: AppColors.availableListings,
+                          title: 'Available Houses'),
+                    ],
+                  ),
                 ),
               ),
             );
