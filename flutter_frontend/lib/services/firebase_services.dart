@@ -200,7 +200,7 @@ class FirebaseServices extends ChangeNotifier {
         'Location': location,
         'Profile Photo': profilePhoto,
       }, SetOptions(merge: true));
-      setIsUpdatingLandlordProfile(true);
+      setIsUpdatingLandlordProfile(false);
       return null;
     }
   }

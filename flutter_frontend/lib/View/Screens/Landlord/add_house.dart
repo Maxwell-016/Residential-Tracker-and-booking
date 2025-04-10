@@ -363,6 +363,7 @@ class AddHouse extends HookConsumerWidget {
                                       ['Select images'])) {
                                     SnackBars.showErrorSnackBar(context,
                                         'Select at least one image of the house');
+                                    firebaseServicesProvider.setIsAdding(false);
                                   } else {
                                     List<String>? urls =
                                         await imagePickerService.uploadFiles(

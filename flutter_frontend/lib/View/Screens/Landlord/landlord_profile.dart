@@ -313,6 +313,7 @@ class LandlordProfile extends HookConsumerWidget {
                                           if (message == 'No Change') {
                                             SnackBars.showInfoSnackBar(context,
                                                 'There\'s no change on your profile');
+
                                           }
                                         } catch (e) {
                                           logger.e(e);

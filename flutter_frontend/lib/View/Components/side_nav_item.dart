@@ -4,7 +4,8 @@ import 'google_fonts.dart';
 
 class SideNavItem extends StatelessWidget {
   final String text;
-  const SideNavItem({super.key, required this.text});
+  final Icon icon;
+  const SideNavItem({super.key, required this.text, required this.icon});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +18,13 @@ class SideNavItem extends StatelessWidget {
           horizontal: BorderSide(
             color: isDark ? Colors.white : Colors.black54, width: 1.0),),
       ),
-      child: UseFont(text: text, myFont: 'Open Sans', size: 20,color: Colors.blue,),
+      child: Row(
+        spacing: 20.0,
+        children: [
+          icon,
+          UseFont(text: text, myFont: 'Open Sans', size: 20,color: Colors.blue,),
+        ],
+      ),
     );
   }
 }
