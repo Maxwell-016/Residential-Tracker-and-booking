@@ -13,9 +13,12 @@ import 'package:flutter_frontend/View/Screens/Landlord/reviews_and_feedback.dart
 import 'package:flutter_frontend/View/Screens/Landlord/students_bookings.dart';
 import 'package:flutter_frontend/View/Screens/Landlord/update_house_status.dart';
 import 'package:flutter_frontend/View/Screens/Landlord/view_and_update_listings.dart';
+import 'package:flutter_frontend/View/Screens/Student/allstudent.dart';
 import 'package:flutter_frontend/View/Screens/Student/mapit.dart';
+import 'package:flutter_frontend/View/Screens/Student/testemail.dart';
 import 'package:flutter_frontend/constants.dart';
 import 'package:flutter_frontend/services/firebase_services.dart';
+import 'package:flutter_frontend/components/wallit.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -108,7 +111,11 @@ class _StateResidentialTrackerAndBooking
     routes: [
       //  GoRoute(builder: (context, state) => LoginPage(), path: '/login'),
 
-      GoRoute(builder: (context, state) => LoginPage(), path: '/login'),
+      GoRoute(builder: (context, state) =>  LoginPage(),
+          path: '/login'),
+      GoRoute(
+          builder: (context, state) => AllBookedHousesMap(),
+          path: '/students-location'),
 
       GoRoute(
           builder: (context, state) => RegistrationPage(),

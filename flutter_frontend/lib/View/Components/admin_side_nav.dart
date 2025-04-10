@@ -30,6 +30,16 @@ class AdminSideNav extends StatelessWidget {
               );
             },
           ),
+
+
+          ListTile(
+            leading: const Icon(Icons.pin_drop_outlined),
+            title: const Text('See All students\' location'),
+            onTap: () {
+              context.go('/students-location');
+            },
+          ),
+
           ListTile(
             leading: const Icon(Icons.person),
             title: const Text('View Students'),

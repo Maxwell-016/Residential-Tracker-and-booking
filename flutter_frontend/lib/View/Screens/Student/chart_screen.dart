@@ -453,6 +453,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       setState(() {
         showMap=false;
       });
+
      // bool isValid = await validateLocation(userMessage);
 
       if (chatService.isLegitPlace(userMessage.trim())) {
