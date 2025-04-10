@@ -18,6 +18,7 @@ import 'package:flutter_frontend/View/Screens/Student/mapit.dart';
 import 'package:flutter_frontend/View/Screens/Student/testemail.dart';
 import 'package:flutter_frontend/constants.dart';
 import 'package:flutter_frontend/services/firebase_services.dart';
+import 'package:flutter_frontend/components/wallit.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
