@@ -40,7 +40,7 @@ class UpdateHouseStatus extends HookConsumerWidget {
             changeTheme: changeTheme,
             changeColor: changeColor,
             colorSelected: colorSelected,
-            title: "Update House Status",
+            title: "",
             search: GestureDetector(
               onTap: (){
                 Navigator.push(context, MaterialPageRoute(builder: (context) => SearchPage()));

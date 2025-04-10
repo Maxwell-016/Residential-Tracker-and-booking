@@ -18,6 +18,7 @@ import 'link_button.dart';
 
 class LoginForm extends HookConsumerWidget {
   const LoginForm({super.key});
+  static final GlobalKey<FormState> formKeylogin = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -26,7 +27,6 @@ class LoginForm extends HookConsumerWidget {
     FocusNode emailFocus = useFocusNode();
     TextEditingController passController = useTextEditingController();
     FocusNode passFocus = useFocusNode();
-    final GlobalKey<FormState> formKeylogin = GlobalKey<FormState>();
 
     bool isDark = Theme.of(context).brightness == Brightness.dark;
 
@@ -71,6 +71,10 @@ class LoginForm extends HookConsumerWidget {
                             fieldValidator: Validators.emailValidator,
                             focusNode: emailFocus,
                             width: width,
+                            onSubmit: (){
+                              FocusScope.of(context).requestFocus(passFocus);
+                            },
+                            inputAction: TextInputAction.next,
                           ),
                           PasswordField(
                             label: 'Password',
@@ -81,6 +85,7 @@ class LoginForm extends HookConsumerWidget {
                             fieldValidator: Validators.passwordValidator,
                             focusNode: passFocus,
                             width: width,
+                            inputAction: TextInputAction.done,
                           ),
                         ]),
                       ),

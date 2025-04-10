@@ -174,15 +174,15 @@ class LandlordProfile extends HookConsumerWidget {
                                                 .value['Profile Photo'])
                                             as ImageProvider
                                         : null,
-                                child:
-                                    (landlordDetails.value['Profile Photo'] ==
+                                child: (ref.watch(profileUrl).isEmpty &&
+                                        (landlordDetails
+                                                    .value['Profile Photo'] ==
                                                 null ||
                                             landlordDetails
                                                 .value['Profile Photo']
-                                                .isEmpty ||
-                                            ref.watch(profileUrl).isEmpty)
-                                        ? Icon(Icons.person_add_alt, size: 50.0)
-                                        : null,
+                                                .isEmpty))
+                                    ? Icon(Icons.person_add_alt, size: 50.0)
+                                    : null,
                               ),
                             ),
                             MyTextField(

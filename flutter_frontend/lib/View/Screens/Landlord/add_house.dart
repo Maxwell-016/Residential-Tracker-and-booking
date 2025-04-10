@@ -94,10 +94,12 @@ class AddHouse extends HookConsumerWidget {
         isDark ? AppColors.lightThemeBackground : AppColors.darkThemeBackground;
 
     void openLocationPicker() {
-      showModalBottomSheet(
+      showDialog(
         context: context,
-        isScrollControlled: true,
-        builder: (context) => SizedBox(
+        builder: (context) => Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10.0),
+          ),
           height: MediaQuery.of(context).size.height * 0.9,
           width: double.infinity,
           child: LandlordLocationSelection(),

@@ -18,10 +18,10 @@ import 'link_button.dart';
 
 class RegForm extends HookConsumerWidget {
   const RegForm({super.key});
+  static final formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final formKey = GlobalKey<FormState>();
     final firebaseServicesProvider = ref.watch(firebaseServices);
 
     String selectedUser = ref.watch(selectedNameProvider);
@@ -101,6 +101,10 @@ class RegForm extends HookConsumerWidget {
                         fieldValidator: Validators.emailValidator,
                         focusNode: emailFocus,
                         width: width,
+                        onSubmit: (){
+                          FocusScope.of(context).requestFocus(passFocus);
+                        },
+                        inputAction: TextInputAction.next,
                       ),
 
                       PasswordField(
@@ -112,6 +116,10 @@ class RegForm extends HookConsumerWidget {
                         fieldValidator: Validators.passwordValidator,
                         focusNode: passFocus,
                         width: width,
+                        onSubmit: (){
+                          FocusScope.of(context).requestFocus(confirmPassFocus);
+                        },
+                        inputAction: TextInputAction.next,
                       ),
                       PasswordField(
                         label: 'Confirm Password',
@@ -124,6 +132,7 @@ class RegForm extends HookConsumerWidget {
                                 value, passController.text),
                         focusNode: confirmPassFocus,
                         width: width,
+                        inputAction: TextInputAction.done,
                       ),
 
                       Center(
