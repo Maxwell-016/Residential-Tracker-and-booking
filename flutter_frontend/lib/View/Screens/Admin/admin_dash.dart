@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_frontend/View/Components/Graph_home.dart';
+import 'package:flutter_frontend/View/Components/Student_No.dart';
 import 'package:flutter_frontend/View/Components/admin_side_nav.dart';
 import 'package:flutter_frontend/services/firebase_services.dart';
 
@@ -64,12 +66,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       drawer: AdminSideNav(),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
-          : const Center(
-              child: Text(
-                'Welcome to the Admin Dashboard!',
-                style: TextStyle(fontSize: 18),
-              ),
-            ),
+          : GraphHome(),
     );
   }
 }
