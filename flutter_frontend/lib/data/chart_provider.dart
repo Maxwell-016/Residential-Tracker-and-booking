@@ -42,7 +42,7 @@ class ChatService {
               "Which option would you like me to assist you with? (Reply with one of the above options eg 1 or option 1)"
           : "I see you haven't provided a name. Please enter your full name:";
     }
-    return "I couldn't find your details. Please enter your full name:";
+    return "Welcome!. I couldn't find your details. Please enter your full name:";
   }
 
   bool isValidFullName(String name) {

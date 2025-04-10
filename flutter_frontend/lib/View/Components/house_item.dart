@@ -12,6 +12,7 @@ import 'package:http/http.dart' as http;
 
 import '../../data/chart_provider.dart';
 import '../../data/notifications.dart';
+import '../../data/providers.dart';
 
 class HouseCard extends ConsumerStatefulWidget {
   const HouseCard({required this.house, super.key});
@@ -230,7 +231,11 @@ class _StateHouseCard extends ConsumerState<HouseCard> {
 
       setState(() {
         widget.house["isBooked"] = true;
+        ref.read(isBooked.notifier).state=true;
       });
+
+
+
 
       print("House booked successfully.");
     } catch (e) {
@@ -242,6 +247,7 @@ class _StateHouseCard extends ConsumerState<HouseCard> {
 
   Future<void> _processBooking(String paymentOption) async {
     setState(() => isBooking = true);
+
 
     String? landlordId = widget.house["landlordId"] as String?;
     String? houseId = widget.house["id"] as String?;
