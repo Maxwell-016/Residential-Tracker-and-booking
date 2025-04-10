@@ -67,6 +67,7 @@ class LandlordProfile extends HookConsumerWidget {
           emailController.text = landlordDetails.value['Email'];
           phoneController.text = landlordDetails.value['Phone Number'];
         }
+        isLoading.value = false;
       });
       return null;
     }, []);

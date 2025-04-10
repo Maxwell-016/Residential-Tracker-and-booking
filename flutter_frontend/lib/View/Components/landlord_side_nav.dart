@@ -31,6 +31,12 @@ class LandlordSideNav extends StatelessWidget {
             },
               child: SideNavItem(icon: Icon(Icons.feedback,color: Colors.blue,), text: 'Reviews and Feedback')),
           GestureDetector(
+            onTap: (){
+              context.go('/wallet');
+            },
+            child: SideNavItem(text: 'My Wallet', icon: Icon(Icons.wallet,color: Colors.blue,)),
+          ),
+          GestureDetector(
             onTap: () {
               context.go('/landlord-profile');
             },

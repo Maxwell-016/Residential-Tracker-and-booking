@@ -91,26 +91,29 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       ),
       drawer: AdminSideNav(),
       body: Center(
-        child: AspectRatio(
-            aspectRatio: 1.6,
-          child: Card(
-            elevation: 4,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0)),
-            child: Padding(
-                padding: EdgeInsets.all(16.0),
-              child: Column(
-                spacing: 20.0,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text('Distribution of students across different areas'),
-                  Expanded(
-                      child: isLoading? Center(child: CircularProgressIndicator(),):
-                          BarChart(mainBarData()),
-                  ),
-                ],
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: AspectRatio(
+              aspectRatio: 1.3,
+            child: Card(
+              elevation: 4,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0)),
+              child: Padding(
+                  padding: EdgeInsets.all(16.0),
+                child: Column(
+                  spacing: 20.0,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text('Distribution of students across different areas'),
+                    Expanded(
+                        child: isLoading? Center(child: CircularProgressIndicator(),):
+                            BarChart(mainBarData()),
+                    ),
+                  ],
+                ),
               ),
-            ),
 
+            ),
           ),
         ),
       )

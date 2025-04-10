@@ -9,6 +9,7 @@ import 'package:flutter_frontend/View/Screens/Admin/add_individuals_page.dart';
 import 'package:flutter_frontend/View/Screens/Admin/view_landlords_page.dart';
 import 'package:flutter_frontend/View/Screens/Admin/view_students_page.dart';
 import 'package:flutter_frontend/View/Screens/Landlord/landlord_profile.dart';
+import 'package:flutter_frontend/View/Screens/Landlord/my_wallet.dart';
 import 'package:flutter_frontend/View/Screens/Landlord/reviews_and_feedback.dart';
 import 'package:flutter_frontend/View/Screens/Landlord/students_bookings.dart';
 import 'package:flutter_frontend/View/Screens/Landlord/update_house_status.dart';
@@ -193,6 +194,13 @@ class _StateResidentialTrackerAndBooking
                 colorSelected: colorSelected,
               ),
           path: '/landlord-profile'),
+      GoRoute(
+          builder: (context, state) => MyWallet(
+            changeTheme: changeThemeMode,
+            changeColor: changeColor,
+            colorSelected: colorSelected,
+          ),
+          path: '/wallet'),
 
       GoRoute(
           builder: (context, state) {
@@ -316,6 +324,7 @@ class _StateResidentialTrackerAndBooking
         '/landlord-profile',
         '/student-bookings',
         '/tenant-feedback',
+        '/wallet',
       ],
       'Admin': [
         '/admin-dashboard',
