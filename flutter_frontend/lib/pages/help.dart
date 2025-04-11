@@ -110,11 +110,7 @@ class _ContactSupportState extends State<ContactSupport> {
       "phone": "+254700742362",
       "email": "nickeagle888@gmail.com"
     },
-    // {"name": "Kila mtu aweke yake ", "phone": "+254798765432", "email": "support2@houseassistant.com"},
-    // {"name": "Technical Team", "phone": "+254711223344", "email": "tech@houseassistant.com"},
-    // {"name": "Support 2", "phone": "+254798765432", "email": "support2@houseassistant.com"},
-    // {"name": "Technical Team", "phone": "+254711223344", "email": "tech@houseassistant.com"},
-    //
+
   ];
 
   // Function to launch a phone call
@@ -124,7 +120,7 @@ class _ContactSupportState extends State<ContactSupport> {
     await launchUrl(callUri);
   }
 
-  // Function to send an email
+
   void _sendEmail(String email) async {
     final Uri emailUri = Uri(
       scheme: 'mailto',

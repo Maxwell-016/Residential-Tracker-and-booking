@@ -317,6 +317,7 @@ class LandlordProfile extends HookConsumerWidget {
 
                                           }
                                         } catch (e) {
+                                          firebaseServicesProvider.setIsUpdatingLandlordProfile(false);
                                           logger.e(e);
                                           SnackBars.showErrorSnackBar(context,
                                               'An error occurred trying to update your profile. Please try again');
