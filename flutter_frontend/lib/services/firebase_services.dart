@@ -172,25 +172,47 @@ class FirebaseServices extends ChangeNotifier {
     isUpdatingLandlordProfile = value;
     notifyListeners();
   }
-  //landlords Profile
+
   Future<String?> createLandlordProfile(
-    WidgetRef ref,
-    String name,
-    String email,
-    String phoneNo,
-    String location,
-    String? profilePhoto,
-  ) async {
+      WidgetRef ref,
+      String name,
+      String email,
+      String phoneNo,
+      String location,
+      String? profilePhoto,
+      ) async {
     setIsUpdatingLandlordProfile(true);
-    Map<String, dynamic>? landlordDetails = await getLandlordProfile();
-    if (landlordDetails!['Name'] == name &&
-        landlordDetails['Email'] == email &&
-        landlordDetails['Phone Number'] == phoneNo &&
-        landlordDetails['Location'] == location &&
-        landlordDetails['Profile Photo'] == profilePhoto) {
-      setIsUpdatingLandlordProfile(false);
-      return 'No Change';
-    } else {
+
+    try {
+      Map<String, dynamic>? landlordDetails = await getLandlordProfile();
+
+      // If no previous data exists, create new profile
+      if (landlordDetails == null) {
+        await landlordReference.doc(_auth.currentUser!.uid).set({
+          'Name': name,
+          'Email': email,
+          'Phone Number': phoneNo,
+          'Created at': FieldValue.serverTimestamp(),
+          'isVerified': _auth.currentUser!.emailVerified,
+          'Location': location,
+          'Profile Photo': profilePhoto,
+        }, SetOptions(merge: true));
+
+        return null;
+      }
+
+      // Compare existing data safely using null-aware access
+      bool noChanges = (landlordDetails['Name'] ?? '') == name &&
+          (landlordDetails['Email'] ?? '') == email &&
+          (landlordDetails['Phone Number'] ?? '') == phoneNo &&
+          (landlordDetails['Location'] ?? '') == location &&
+          (landlordDetails['Profile Photo'] ?? '') == (profilePhoto ?? '');
+
+      if (noChanges) {
+        return 'No Change';
+      }
+
+      // Update only if there are changes
       await landlordReference.doc(_auth.currentUser!.uid).set({
         'Name': name,
         'Email': email,
@@ -200,12 +222,16 @@ class FirebaseServices extends ChangeNotifier {
         'Location': location,
         'Profile Photo': profilePhoto,
       }, SetOptions(merge: true));
-      setIsUpdatingLandlordProfile(false);
+
       return null;
+    } finally {
+      setIsUpdatingLandlordProfile(false);
     }
   }
 
-  //fetching the landlords details
+
+
+
   Future<Map<String, dynamic>?> getLandlordProfile() async {
     DocumentSnapshot profile =
         await landlordReference.doc(_auth.currentUser!.uid).get();
