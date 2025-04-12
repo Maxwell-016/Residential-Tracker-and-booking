@@ -642,7 +642,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     initiatePayment(studentPhone, amountToPay,
         studentEmail, studentName, houseName, location,
         landlordPhone, landlordId, lname, houseId,
-        houseImages, paymentOption,lat,long);
+        houseImages, paymentOption,lat,long,context);
 
 
   }

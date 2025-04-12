@@ -96,6 +96,24 @@ class ChatService {
 
 
 
+
+  Stream<List<Map<String, dynamic>>> getHousesStream() {
+    return FirebaseFirestore.instance
+        .collectionGroup('Houses')
+        .where("isBooked", isEqualTo: false)
+        .snapshots()
+        .map((querySnapshot) {
+      return querySnapshot.docs.map((doc) {
+        return {
+          "id": doc.id,
+          "landlordId": doc.reference.parent.parent?.id,
+          ...doc.data() as Map<String, dynamic>
+        };
+      }).toList();
+    });
+  }
+
+
   Future<List<Map<String, dynamic>>> getHouses() async {
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
         .collectionGroup('Houses')

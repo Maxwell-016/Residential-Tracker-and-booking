@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_frontend/View/Components/snackbars.dart';
 import 'package:http/http.dart' as http;
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -13,7 +14,7 @@ final FirebaseFirestore fs = FirebaseFirestore.instance;
   Future<void> initiatePayment(String studentPhone, double amountToPay, String studentEmail,
       String studentName, String houseName, String location,
       String landlordPhone, String landlordId, String lname,
-      String houseId, List<String> houseImages, String paymentOption,double lat,double long) async {
+      String houseId, List<String> houseImages, String paymentOption,double lat,double long,BuildContext context) async {
 
     try {
       var response = await http.post(
@@ -62,24 +63,28 @@ final FirebaseFirestore fs = FirebaseFirestore.instance;
 
           String msg="$houseName has been booked successfully with the '$paymentOption' option!";
                print(msg  );
-               trigernotification(null, msg, "House Booked Successfully");
+               trigernotification(context, msg, "House Booked Successfully");
+               SnackBars.showSuccessSnackBar(context, msg);
 
 
         } else {
 
             // return "Payment failed or timed out. Please try again.";
-            trigernotification(null,  "Payment failed or timed out. Please try again.", "Payment failed!!");
+            trigernotification(context,  "Payment failed or timed out. Please try again.", "Payment failed!!");
+            SnackBars.showErrorSnackBar(context,  "Payment failed or timed out. Please try again.");
 
         }
       } else {
 
           // return "STK Push request failed. Try again.";
-          trigernotification(null,  "STK Push request failed. Try again.", "Payment failed!!");
+          trigernotification(context,  "STK Push request failed. Try again.", "Payment failed!!");
+          SnackBars.showErrorSnackBar(context,  "STK Push request failed. Try again.");
 
       }
     } catch (e) {
 
-      trigernotification(null, e.toString(), "Payment failed!!");
+      trigernotification(context, e.toString(), "Payment failed!!");
+      SnackBars.showErrorSnackBar(context,  e.toString());
        // return "Error: ${e.toString()}";
 
     }
