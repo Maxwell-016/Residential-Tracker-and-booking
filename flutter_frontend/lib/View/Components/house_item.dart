@@ -1,17 +1,17 @@
-
-
 import 'dart:convert';
 
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_frontend/data/payment.dart';
+import 'package:flutter_frontend/View/Components/snackbars.dart';
+// import 'package:flutter_frontend/data/payment.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
 
 import '../../data/chart_provider.dart';
 import '../../data/notifications.dart';
+import '../../data/payment.dart';
 import '../../data/providers.dart';
 
 class HouseCard extends ConsumerStatefulWidget {
@@ -56,36 +56,31 @@ class _StateHouseCard extends ConsumerState<HouseCard> {
       return;
     }
 
-  //  if (studentPhone == null || studentPhone!.isEmpty) {
-      await _promptForPhoneNumber();
-      // if (studentPhone == null || studentPhone!.isEmpty) {
-      //   print("Phone number not provided.");
-      //   setState(() => isBooking = false);
-      //   return;
-      // }
-   // }
-
+    await _promptForPhoneNumber();
     _showPaymentOptions();
     setState(() => isBooking = false);
   }
-
+  TextEditingController controller = TextEditingController();
   Future<void> _promptForPhoneNumber() async {
     String? phoneNumber = await showDialog<String>(
       context: context,
       builder: (context) {
-        TextEditingController controller = TextEditingController();
+ //       TextEditingController controller = TextEditingController();
         return AlertDialog(
           title: Text("Enter Phone Number For Payment"),
           content: TextField(
             controller: controller,
             keyboardType: TextInputType.phone,
-            decoration: InputDecoration(
-              hintText: "e.g., 2547XXXXXXXX",
-            ),
+            decoration: InputDecoration(hintText: "e.g., 2547XXXXXXXX"),
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context, null),
+              onPressed: (){
+          Navigator.pop(context, null);
+          return;
+
+
+              },
               child: Text("Cancel"),
             ),
             TextButton(
@@ -97,13 +92,13 @@ class _StateHouseCard extends ConsumerState<HouseCard> {
       },
     );
 
-    if (phoneNumber != null && phoneNumber.isNotEmpty) {
-      setState(() => studentPhone = phoneNumber);
+    // if (phoneNumber != null && phoneNumber.isNotEmpty) {
+    //   setState(() => studentPhone = phoneNumber);
       await fs.collection("applicants_details").doc(auth.currentUser?.email).set(
         {"phone": studentPhone},
         SetOptions(merge: true),
       );
-    }
+    // }
   }
 
   Future<void> cancelBooking() async {
@@ -126,128 +121,98 @@ class _StateHouseCard extends ConsumerState<HouseCard> {
           .doc(houseId)
           .update({"isBooked": false});
 
+
       setState(() {
         widget.house["isBooked"] = false;
+        ref.read(isBooked.notifier).state = false;
       });
-
+trigernotification(context,  "Booking canceled successfully.","Booking");
       print("Booking canceled successfully.");
     } catch (e) {
+      trigernotification(context,  "Error canceling booking: $e","Booking");
       print("Error canceling booking: $e");
+
     }
 
     setState(() => isBooking = false);
+    return;
   }
 
+  Future<void> _showPaymentOptions() async {
+    String? studentPhone = await chatService.getUserPhone();
 
 
 
 
-  void _showPaymentOptions() {
-    double housePrice = widget.house["House Price"]?? 0.0;
+    double housePrice = widget.house["House Price"] ?? 0.0;
     double monthlyPayment = housePrice;
-    double semesterPayment = (housePrice * 4);
+    double semesterPayment = housePrice * 4;
 
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text("Select Payment Option"),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              title: Text("Pay for the first month - Ksh $monthlyPayment"),
-              leading: Radio<String>(
-                value: "first_month",
-                groupValue: selectedPayment,
-                onChanged: (value) {
-                  if (value != null) {
-                    setState(() => selectedPayment = value);
-                    Navigator.pop(context);
-                    _processBooking(value);
-                  }
-                },
+
+    if (controller.text.isEmpty) {
+      SnackBars.showErrorSnackBar(context, "Phone number for payment not provided.Booking cancelled");
+      if (studentPhone == null || studentPhone.isEmpty) {
+        print("Phone number not provided.");
+        setState(() => isBooking = false);
+        return;
+      }
+    }else {
+      showDialog(
+        context: context,
+        builder: (context) =>
+            AlertDialog(
+              title: Text("Select Payment Option"),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ListTile(
+                    title: Text(
+                        "Pay for the first month - Ksh $monthlyPayment"),
+                    leading: Radio<String>(
+                      value: "first_month",
+                      groupValue: selectedPayment,
+                      onChanged: (value) {
+                        if (value != null) {
+                          setState(() => selectedPayment = value);
+                          Navigator.pop(context);
+                          _processBooking(value);
+                        }
+                      },
+
+                    ),
+                  ),
+                  ListTile(
+                    title: Text("Pay per semester - Ksh $semesterPayment"),
+                    leading: Radio<String>(
+                      value: "semester",
+                      groupValue: selectedPayment,
+                      onChanged: (value) {
+                        if (value != null) {
+                          setState(() => selectedPayment = value);
+                          Navigator.pop(context);
+                          _processBooking(value);
+                        }
+                      },
+                    ),
+                  ),
+                ],
               ),
             ),
-            ListTile(
-              title: Text("Pay per semester - Ksh $semesterPayment"),
-              leading: Radio<String>(
-                value: "semester",
-                groupValue: selectedPayment,
-                onChanged: (value) {
-                  if (value != null) {
-                    setState(() => selectedPayment = value);
-                    Navigator.pop(context);
-                    _processBooking(value);
-                  }
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+      );
+    }
   }
+
   Future<void> markHouseAsBooked(String landlordId, String houseId) async {
-    final houseRef = FirebaseFirestore.instance
+    await FirebaseFirestore.instance
         .collection("Landlords")
         .doc(landlordId)
         .collection("Houses")
-        .doc(houseId);
-
-    await houseRef.update({"isBooked": true});
-  }
-  Future<void> markHouseAsUnbooked(String landlordId, String houseId) async {
-    final houseRef = FirebaseFirestore.instance
-        .collection("Landlords")
-        .doc(landlordId)
-        .collection("Houses")
-        .doc(houseId);
-
-    await houseRef.update({"isBooked": false});
-  }
-
-
-  Future<void> bookHouse(String paymentOption) async {
-    setState(() => isBooking = true);
-
-    String? landlordId = widget.house["landlordId"] as String?;
-    String? houseId = widget.house["id"] as String?;
-
-    if (landlordId == null || houseId == null) {
-      print("Error: LandlordId or HouseId is null");
-      setState(() => isBooking = false);
-      return;
-    }
-
-    try {
-      // await FirebaseFirestore.instance
-      //     .collection("Landlords")
-      //     .doc(landlordId)
-      //     .collection("Houses")
-      //     .doc(houseId)
-      //     .update({"isBooked": true});
-
-      markHouseAsBooked(landlordId, houseId);
-
-      setState(() {
-        widget.house["isBooked"] = true;
-        ref.read(isBooked.notifier).state=true;
-      });
-
-
-
-
-      print("House booked successfully.");
-    } catch (e) {
-      print("Error booking house: $e");
-    }
-
-    setState(() => isBooking = false);
+        .doc(houseId)
+        .update({"isBooked": true});
   }
 
   Future<void> _processBooking(String paymentOption) async {
     setState(() => isBooking = true);
-
 
     String? landlordId = widget.house["landlordId"] as String?;
     String? houseId = widget.house["id"] as String?;
@@ -264,13 +229,12 @@ class _StateHouseCard extends ConsumerState<HouseCard> {
 
     if (studentPhone == null || studentPhone.isEmpty) {
       await _promptForPhoneNumber();
-      if (studentPhone == null || studentPhone!.isEmpty) {
+      if (studentPhone == null || studentPhone.isEmpty) {
         print("Phone number not provided.");
         setState(() => isBooking = false);
         return;
       }
     }
-
 
     DocumentSnapshot landlordDoc = await fs.collection("Landlords").doc(landlordId).get();
     String landlordPhone = landlordDoc.exists ? landlordDoc.get("Phone Number") : "Unknown";
@@ -296,9 +260,15 @@ class _StateHouseCard extends ConsumerState<HouseCard> {
           paymentOption,
           lat,
           long,
+          context
         ).then((_) {
-          Navigator.of(context).pop();
 
+          setState(() {
+            widget.house["isBooked"] = true;
+            ref.read(isBooked.notifier).state = true;
+          });
+
+          Navigator.of(context).pop();
           setState(() => isBooking = false);
         });
 
@@ -317,12 +287,10 @@ class _StateHouseCard extends ConsumerState<HouseCard> {
     );
   }
 
-
-
-
   @override
   Widget build(BuildContext context) {
-    var screenWidth=MediaQuery.of(context).size.width;
+    var screenWidth = MediaQuery.of(context).size.width;
+
     return GestureDetector(
       onTap: () => startBookHouse(),
       child: LayoutBuilder(
@@ -365,10 +333,9 @@ class _StateHouseCard extends ConsumerState<HouseCard> {
                             );
                           }).toList(),
                         ),
-
                       const SizedBox(height: 8),
-                    screenWidth>700?
-                      ListTile(
+                      screenWidth > 700
+                          ? ListTile(
                         leading: Text(
                           "🏠 House Name -> ${widget.house["House Name"]}",
                           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
@@ -377,11 +344,11 @@ class _StateHouseCard extends ConsumerState<HouseCard> {
                           "Price Ksh ${widget.house["House Price"]} per month",
                           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                         ),
-                      ):
-                    Text(
-                      "🏠 House Name -> ${widget.house["House Name"]} \nPrice Ksh ${widget.house["House Price"]} per month",
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
-                    ),
+                      )
+                          : Text(
+                        "🏠 House Name -> ${widget.house["House Name"]} \nPrice Ksh ${widget.house["House Price"]} per month",
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                      ),
                       Text("📍 ${widget.house["Location"] ?? ""}"),
                       Text("📏 ${widget.house["House Size"]}"),
                       Text("📝 ${widget.house["Description"]}"),
@@ -406,7 +373,4 @@ class _StateHouseCard extends ConsumerState<HouseCard> {
       ),
     );
   }
-
-
-
 }

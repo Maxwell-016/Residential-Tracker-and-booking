@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_frontend/View-Model/navigation/routes.dart';
@@ -37,7 +38,9 @@ import 'View/Screens/Landlord/manage_house_listings.dart';
 import 'View/Screens/Student/chart_screen.dart';
 import 'data/payment.dart';
 import 'data/providers.dart';
+import 'data/testnotification.dart';
 import 'firebase_options.dart';
+import 'dart:html' as html;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -52,6 +55,13 @@ Future<void> main() async {
     print('Firebase initialisation error: $e');
   }
   // String initialRoute = await getLastVisitedPage();
+
+
+  if (kIsWeb && html.Notification.supported) {
+    final permission = await html.Notification.requestPermission();
+    print("Notification permission status: $permission");
+  }
+
 
   AwesomeNotifications().initialize(
     null,
