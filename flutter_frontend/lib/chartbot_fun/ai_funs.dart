@@ -78,6 +78,31 @@ Future<bool> validateLocation(String location) async {
   return response.trim().toLowerCase() == "yes";
 }
 
+
+String? validateAndFormatKenyanPhone(String input) {
+  input = input.replaceAll(RegExp(r'[^\d+]'), '');
+
+  if (input.startsWith('+')) {
+    input = input.substring(1); // remove '+'
+  }
+
+  if (input.startsWith('07') && input.length == 10) {
+    return '254' + input.substring(1);
+  } else if (input.startsWith('01') && input.length == 10) {
+    return '254' + input.substring(1);
+  } else if (input.startsWith('254') && input.length == 12) {
+    return input;
+  } else if (input.length == 9 && (input.startsWith('7') || input.startsWith('1'))) {
+    return '254' + input;
+  }
+
+  return null; // invalid
+}
+
+
+
+
+
 Future<bool> validatePhoneNumber(String phn) async {
 
 
@@ -163,6 +188,7 @@ Future<List<Map<String,dynamic>>> getLocationsToBeMarked(Future<List<String>> ma
 
     print("binary $markCode");
     if(markCode!=null){
+      codAi["name"]=location;
       codAi["lat"]=markCode.latitude;
       codAi["lng"]=markCode.longitude;
     }

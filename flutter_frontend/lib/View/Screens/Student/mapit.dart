@@ -25,7 +25,7 @@ class _MapScreenState extends State<MapScreen> {
 
 
   Future<void> _onMapCreated(GoogleMapController controller) async {
-    print("🔍 _onMapCreated triggered");
+
 
     final List<Map<String, dynamic>> toBeMarked = await getLocationsToBeMarked(widget.locations);
 

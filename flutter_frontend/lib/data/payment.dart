@@ -1,12 +1,13 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_frontend/View/Components/snackbars.dart';
+import 'package:flutter_frontend/data/providers.dart';
 import 'package:http/http.dart' as http;
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'notifications.dart';
 
-
+import 'dart:html' as html;
 
   String? checkoutRequestID;
 final FirebaseFirestore fs = FirebaseFirestore.instance;
@@ -14,19 +15,26 @@ final FirebaseFirestore fs = FirebaseFirestore.instance;
   Future<void> initiatePayment(String studentPhone, double amountToPay, String studentEmail,
       String studentName, String houseName, String location,
       String landlordPhone, String landlordId, String lname,
-      String houseId, List<String> houseImages, String paymentOption,double lat,double long,BuildContext context) async {
+      String houseId, List<String> houseImages, String paymentOption,double lat,double long,BuildContext context,ref) async {
 
+
+    print("Phn for payment $studentPhone amount ${ amountToPay/1000}");
     try {
       var response = await http.post(
         Uri.parse("https://mpesaapi.onrender.com/stkpush"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
-          "phone": studentPhone,
-          "amount": amountToPay/1000,
+           "phone": studentPhone,
+          // "phone": "254700742362",
+          "amount": (amountToPay/1000).toInt(),
         }),
       );
 
       print("I am from stkpush ${response.statusCode}");
+      print("Phn for payment $studentPhone amount ${ amountToPay/1000}");
+      var data = jsonDecode(response.body);
+print("I am from api $data");
+
 
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
@@ -63,27 +71,31 @@ final FirebaseFirestore fs = FirebaseFirestore.instance;
 
           String msg="$houseName has been booked successfully with the '$paymentOption' option!";
                print(msg  );
-               trigernotification(context, msg, "House Booked Successfully");
+          html.Notification.permission == 'granted'?
+               trigernotification(context, msg, "House Booked Successfully"):
                SnackBars.showSuccessSnackBar(context, msg);
 
+          ref.read(isBooked.notifier).state = true;
 
         } else {
 
             // return "Payment failed or timed out. Please try again.";
-            trigernotification(context,  "Payment failed or timed out. Please try again.", "Payment failed!!");
+          html.Notification.permission == 'granted'?
+            trigernotification(context,  "Payment failed or timed out. Please try again.", "Payment failed!!"):
             SnackBars.showErrorSnackBar(context,  "Payment failed or timed out. Please try again.");
 
         }
       } else {
 
           // return "STK Push request failed. Try again.";
-          trigernotification(context,  "STK Push request failed. Try again.", "Payment failed!!");
+        html.Notification.permission == 'granted'?
+          trigernotification(context,  "STK Push request failed. Try again.", "Payment failed!!"):
           SnackBars.showErrorSnackBar(context,  "STK Push request failed. Try again.");
 
       }
     } catch (e) {
-
-      trigernotification(context, e.toString(), "Payment failed!!");
+      html.Notification.permission == 'granted'?
+      trigernotification(context, e.toString(), "Payment failed!!"):
       SnackBars.showErrorSnackBar(context,  e.toString());
        // return "Error: ${e.toString()}";
 

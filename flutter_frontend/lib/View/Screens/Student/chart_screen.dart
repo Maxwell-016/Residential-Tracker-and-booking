@@ -79,6 +79,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   String? awaitingLocationInput;
   Map<String, dynamic> house={};
 
+  String validphn='';
+
 
 
 
@@ -154,15 +156,27 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
 
       if (await validatePhoneNumber(userMessage)) {
-        await chatService.savePhoneNumber(userMessage);
+
+           await chatService.savePhoneNumber(userMessage);
+           validphn=userMessage;
+
+
         setState(() {
           messages.add({"role": "ai", "text": "Phone number saved successfully. Proceeding with booking..."});
+
           awaitingPhoneNumberInput = false;
-          showHouses=true;
+          isTyping=false;
+          showHouses=false;
+
         });
 
 
         bookHouse(houseop, paymentOP);
+
+
+
+
+
       } else {
         setState(() {
           messages.add({"role": "ai", "text": "Invalid phone number. Please enter a valid 12-digit Kenyan number starting with 254."});
@@ -217,22 +231,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       }
 
 
-
-
     }
 
-
-
-
-
-
-
-
-
     String aiResponse = "";
-
-
-
 
     if (showHouses) {
 
@@ -251,9 +252,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         setState(() {
           house = selectedHouse;
         });
-
-
-
 
         aiResponse = "You have selected ${house['House Name']}. Proceeding to booking...";
 
@@ -384,7 +382,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         awaitingSpecSelection = false;
         awaitingSpecValue = true;
         conversationStep = "enter_spec_value";
-        messages.add({"role": "ai", "text": "Please enter the amenity you're looking for (e.g., WiFi, hot shower, parking):"});
+        messages.add({"role": "ai", "text": "Please enter the amenity you're looking for (e.g., WiFi,GYM, parking):"});
       });
       } else if (userMessage == "3") {
         setState(() {
@@ -440,7 +438,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         for (var house in results) {
           messages.add({
             "role": "ai",
-            "text": "🏠 ${house["House Name"]} -> Booking",
+            "text": "🏠 ${house["House Name"]}",
             "house": house,
           });
         }
@@ -595,10 +593,13 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
     String? studentEmail = auth.currentUser?.email;
     String? studentName =await chatService.getUserName();
-    String? studentPhone = await chatService.getUserPhone();
 
 
-    if (studentPhone == null || studentPhone.isEmpty) {
+    String? studentPhone = validphn;
+
+
+
+      if (studentPhone == null || studentPhone.isEmpty) {
       setState(() {
 
         awaitingPhoneNumberInput = true;
@@ -637,12 +638,22 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
 
 
-    double amountToPay = paymentOption == "per_semester" ? (price * 4 )/1000: price/1000;
+    double amountToPay = paymentOption == "per_semester" ? (price * 4 ): price;
+
 
     initiatePayment(studentPhone, amountToPay,
         studentEmail, studentName, houseName, location,
         landlordPhone, landlordId, lname, houseId,
-        houseImages, paymentOption,lat,long,context);
+        houseImages, paymentOption,lat,long,context,ref)
+        .then((_){
+      if(ref.watch(isBooked)){
+        // setState(() {
+          showHouses=false;
+          messages.add({"role": "ai", "text": "Congratulation for successfully booking the house ,you can see it in Booked house. type go back to access other services."});
+
+        // });
+      }
+    });
 
 
   }

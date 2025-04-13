@@ -4,8 +4,10 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 
+import '../../../chartbot_fun/ai_funs.dart';
 import '../../../data/chart_provider.dart';
 import '../../../data/payment.dart';
 
@@ -20,7 +22,7 @@ final FirebaseFirestore fs = FirebaseFirestore.instance;
 final FirebaseAuth auth=FirebaseAuth.instance;
 final ChatService chatService = ChatService();
 
-class AvailableHousesScreen extends StatelessWidget {
+class AvailableHousesScreen extends ConsumerWidget {
   final String location;
 
 
@@ -48,20 +50,20 @@ class AvailableHousesScreen extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context,WidgetRef ref) {
     return Scaffold(
       appBar: AppBar(title: Text("Available Houses in $location")),
       body: StreamBuilder<List<Map<String, dynamic>>>(
         stream: streamHousesByLocation(location),
         builder: (context, snapshot) {
           if (!snapshot.hasData) return Center(child: CircularProgressIndicator());
-          return buildHouseGrid(snapshot.data!, context);
+          return buildHouseGrid(snapshot.data!, context,ref);
         },
       ),
     );
   }
 
-  Widget buildHouseGrid(List<Map<String, dynamic>> houses, BuildContext context) {
+  Widget buildHouseGrid(List<Map<String, dynamic>> houses, BuildContext context,ref) {
     final isWide = MediaQuery.of(context).size.width > 700;
 
     return GridView.builder(
@@ -103,7 +105,7 @@ class AvailableHousesScreen extends StatelessWidget {
                     Text("Desc: ${house['Description']}"),
                     const SizedBox(height: 8),
                     ElevatedButton(
-                      onPressed: () => showPaymentDialog(context, house),
+                      onPressed: () => showPaymentDialog(context, house,ref),
                       child: Text("Book"),
                     )
                   ],
@@ -116,72 +118,85 @@ class AvailableHousesScreen extends StatelessWidget {
     );
   }
 
-  Future<void> showPaymentDialog(BuildContext context, Map<String, dynamic> house) async {
+  Future<void> showPaymentDialog(BuildContext context, Map<String, dynamic> house, ref) async {
     final phoneController = TextEditingController();
+    final _formKey = GlobalKey<FormState>();
     String selectedOption = "first_month";
-    String username= await chatService.getUserName();
+    String username = await chatService.getUserName();
 
     showDialog(
       context: context,
       builder: (_) {
         return AlertDialog(
           title: Text("Complete Payment"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: phoneController,
-                keyboardType: TextInputType.phone,
-                decoration: InputDecoration(labelText: "Enter Phone Number"),
-              ),
-              DropdownButton<String>(
-                value: selectedOption,
-                items: ["first_month", "semester"].map((e) {
-                  return DropdownMenuItem(value: e, child: Text(e));
-                }).toList(),
-                onChanged: (val) => selectedOption = val!,
-              ),
-            ],
+          content: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(
+                  controller: phoneController,
+                  keyboardType: TextInputType.phone,
+                  decoration: InputDecoration(
+                    labelText: "Enter Phone Number",
+                    hintText: "e.g., 0712345678",
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) {
+                    String? formatted = validateAndFormatKenyanPhone(value ?? '');
+                    if (formatted == null) {
+                      return "Enter a valid Kenyan phone number";
+                    }
+                    return null;
+                  },
+                ),
+                SizedBox(height: 10),
+                DropdownButton<String>(
+                  value: selectedOption,
+                  items: ["first_month", "semester"].map((e) {
+                    return DropdownMenuItem(value: e, child: Text(e));
+                  }).toList(),
+                  onChanged: (val) => selectedOption = val!,
+                ),
+              ],
+            ),
           ),
           actions: [
             TextButton(
               child: Text("Proceed"),
               onPressed: () async {
-                Navigator.pop(context);
-                double amount = selectedOption == "semester"
-                    ? house["House Price"] * 4
-                    : house["House Price"] * 1;
+                if (_formKey.currentState!.validate()) {
+                  String? formattedPhone = validateAndFormatKenyanPhone(phoneController.text.trim());
+                  Navigator.pop(context); // Close the dialog
+                  double amount = selectedOption == "semester"
+                      ? house["House Price"] * 4
+                      : house["House Price"] * 1;
 
-                showProcessingDialog(context);
+                  showProcessingDialog(context);
 
+                  DocumentSnapshot landlordDoc = await fs.collection("Landlords").doc(house["landlordId"]).get();
+                  String landlordPhone = landlordDoc.exists ? landlordDoc.get("Phone Number") : "Unknown";
+                  String lname = landlordDoc.exists ? landlordDoc.get("Name") : "Unknown";
 
-                DocumentSnapshot landlordDoc = await fs.collection("Landlords").doc( house["landlordId"]).get();
-                String landlordPhone = landlordDoc.exists ? landlordDoc.get("Phone Number") : "Unknown";
-                String lname = landlordDoc.exists ? landlordDoc.get("Name") : "Unknown";
-print(" phn  ${phoneController.text.trim()} amount $amount email ${auth.currentUser?.email??"email"} name $username "
-  "name ${house["House Name"]} location ${house["Location"]} landphn $landlordPhone  landid ${house["landlordId"]}"
-    "landName $lname houseid ${house["id"]} images ${List<String>.from(house["Images"])} paymentOption $selectedOption "
-    "lat ${house["Live Latitude"]} long ${house["Live Longitude"]}");
-
-
-
-                initiatePayment(
-                  phoneController.text.trim(),
-                  amount,
-                  auth.currentUser?.email??"email",
-                  username,
-                  house["House Name"],
-                  house["Location"],
-                  landlordPhone,
-                  house["landlordId"],
-                  lname,
-                  house["id"],
-                  List<String>.from(house["Images"]),
-                  selectedOption,
-                  house["Live Latitude"],
-                  house["Live Longitude"],
-                  context
-                ).then((_) => Navigator.pop(context)); // hide processing dialog
+                  initiatePayment(
+                      formattedPhone!,
+                      amount,
+                      auth.currentUser?.email ?? "email",
+                      username,
+                      house["House Name"],
+                      house["Location"],
+                      landlordPhone,
+                      house["landlordId"],
+                      lname,
+                      house["id"],
+                      List<String>.from(house["Images"]),
+                      selectedOption,
+                      house["Live Latitude"],
+                      house["Live Longitude"],
+                      context,
+                      ref
+                  ).then((_) => Navigator.pop(context)); // hide processing dialog
+                }
               },
             )
           ],
