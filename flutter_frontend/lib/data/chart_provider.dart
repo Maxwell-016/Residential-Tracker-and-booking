@@ -335,7 +335,7 @@ class ChatService {
         .join("\n");
 
     return "Here are the locations with available houses:\n$locationList\n\n"
-        "Would you like to see the available houses in a specific location? (Reply with the location name)";
+        "Would you like to see the available houses in a specific location? (Click on the mark location and then description or Reply with the location name)";
   }
 }
 

@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
 
+import '../../chartbot_fun/ai_funs.dart';
 import '../../data/chart_provider.dart';
 import '../../data/notifications.dart';
 import '../../data/payment.dart';
@@ -61,30 +62,51 @@ class _StateHouseCard extends ConsumerState<HouseCard> {
     setState(() => isBooking = false);
   }
   TextEditingController controller = TextEditingController();
+
+
   Future<void> _promptForPhoneNumber() async {
+    final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+
     String? phoneNumber = await showDialog<String>(
       context: context,
       builder: (context) {
- //       TextEditingController controller = TextEditingController();
         return AlertDialog(
           title: Text("Enter Phone Number For Payment"),
-          content: TextField(
-            controller: controller,
-            keyboardType: TextInputType.phone,
-            decoration: InputDecoration(hintText: "e.g., 2547XXXXXXXX"),
+          content: Form(
+            key: _formKey,
+            child: TextFormField(
+              controller: controller,
+              keyboardType: TextInputType.phone,
+              decoration: InputDecoration(
+                  hintText: "e.g., 0712345678",
+                border: OutlineInputBorder()
+
+              ),
+              validator: (value) {
+                String? formatted = validateAndFormatKenyanPhone(value ?? '');
+                if (formatted == null) {
+                  return "Enter a valid Kenyan phone number";
+                }
+                return null;
+              },
+            ),
           ),
           actions: [
             TextButton(
-              onPressed: (){
-          Navigator.pop(context, null);
-          return;
-
-
-              },
+              onPressed: () => Navigator.pop(context, null),
               child: Text("Cancel"),
             ),
             TextButton(
-              onPressed: () => Navigator.pop(context, controller.text),
+              onPressed: () {
+                if (_formKey.currentState!.validate()) {
+                  String input = controller.text.trim();
+                  print("Input number: $input");
+                  String? formatted = validateAndFormatKenyanPhone(input);
+                  print("Formatted number: $formatted");
+                  Navigator.pop(context, formatted);
+                }
+              },
               child: Text("Send"),
             ),
           ],
@@ -92,14 +114,19 @@ class _StateHouseCard extends ConsumerState<HouseCard> {
       },
     );
 
-    // if (phoneNumber != null && phoneNumber.isNotEmpty) {
-    //   setState(() => studentPhone = phoneNumber);
+    if (phoneNumber != null) {
       await fs.collection("applicants_details").doc(auth.currentUser?.email).set(
         {"phone": studentPhone},
         SetOptions(merge: true),
       );
-    // }
+    }
+
+
+
+
+
   }
+
 
   Future<void> cancelBooking() async {
     setState(() => isBooking = true);
@@ -260,12 +287,13 @@ trigernotification(context,  "Booking canceled successfully.","Booking");
           paymentOption,
           lat,
           long,
-          context
+          context,
+            ref
         ).then((_) {
 
           setState(() {
-            widget.house["isBooked"] = true;
-            ref.read(isBooked.notifier).state = true;
+            widget.house["isBooked"] = ref.watch(isBooked);
+          //  ref.read(isBooked.notifier).state = true;
           });
 
           Navigator.of(context).pop();
