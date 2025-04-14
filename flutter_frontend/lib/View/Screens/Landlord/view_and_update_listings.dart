@@ -133,6 +133,7 @@ final updatedImageNameProvider =
 final updatedImageFileProvider = StateProvider<List<Uint8List>>((ref) => []);
 
 class HouseDetails extends HookConsumerWidget {
+  static  final formKey = GlobalKey<FormState>();
   final Map<String, dynamic> house;
   final int othersLength;
   const HouseDetails({
@@ -146,7 +147,6 @@ class HouseDetails extends HookConsumerWidget {
     final firebaseServicesProvider = ref.watch(firebaseServices);
     ImagePickerService imagePickerService = ImagePickerService();
     Logger logger = Logger();
-    final formKey = GlobalKey<FormState>();
     TextEditingController houseNameController =
         useTextEditingController(text: house['House Name']);
     FocusNode houseNameFocus = useFocusNode();
