@@ -131,7 +131,7 @@ class _BookedHousesScreenState extends State<BookedHousesScreen> {
                     if (images.isNotEmpty)
                       CarouselSlider(
                         options: CarouselOptions(
-                          height: 250,
+                          height: 300,
                           aspectRatio: 16 / 9,
                           autoPlay: true,
                           enlargeCenterPage: true,

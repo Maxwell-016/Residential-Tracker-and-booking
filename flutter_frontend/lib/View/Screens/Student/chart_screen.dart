@@ -339,13 +339,14 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         if (houses.isNotEmpty) {
           aiResponse = "Click on a house or reply with the house name to proceed with booking.";
 
-          for (var house in houses) {
+       // for (var house in houses) {
             messages.add({
               "role": "ai",
-              "text": "🏠 ${house["House Name"]} -> Booking",
-              "house": house,
+              "text": "🏠",
+            "house": houses,
             });
-          }
+        // }
+
           isTyping=false;
           setState(() {
             showHouses=true;
@@ -435,13 +436,13 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
       } else {
         messages.add({"role": "ai", "text": "Here are some houses matching your criteria:\n\nClick on a house or reply with its name to book."});
-        for (var house in results) {
+        // for (var house in results) {
           messages.add({
             "role": "ai",
-            "text": "🏠 ${house["House Name"]}",
-            "house": house,
+            "text": "🏠",
+           "house": results,
           });
-        }
+        // }
         setState(() {
           showHouses = true;
           awaitingSpecValue = false;
@@ -468,13 +469,13 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         if (houses.isNotEmpty) {
           aiResponse = "Click on a house or reply with the house name to proceed with booking.";
 
-          for (var house in houses) {
+          // for (var house in houses) {
             messages.add({
               "role": "ai",
-              "text": "🏠 ${house["House Name"]} -> Booking",
-              "house": house,
+              "text": "🏠",
+            "house": houses,
             });
-          }
+          // }
 
           setState(() {
             showHouses = true;
@@ -815,7 +816,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     } else if (screenWidth < 700) {
       crossAxisCount = 2;
     } else {
-      crossAxisCount = 4;
+      crossAxisCount = 3;
     }
 
     return Column(
@@ -880,9 +881,26 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
 
                   if (message.containsKey("house") && message["house"] != null && showHouses) {
-                    final house = message["house"];
+                    final houses = message["house"];
+                    print("I am house $houses");
 
-                    if (house is Map<String, dynamic>) {
+                    if (houses is List) {
+                      final List<Map<String, dynamic>> houseList = houses.map<Map<String, dynamic>>((e) => Map<String, dynamic>.from(e)).toList();
+                      return Padding(
+                        padding: const EdgeInsets.all(10),
+                        child: GridView.count(
+                          crossAxisCount: crossAxisCount,
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          childAspectRatio: 0.75,
+                          children: houseList.map<Widget>((house) {
+                            return HouseCard(house: house);
+                          }).toList(),
+                        ),
+                      );
+                    }
+                    else  {
+
                       return HouseCard(house: house);
                     }
                   }

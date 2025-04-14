@@ -321,12 +321,20 @@ trigernotification(context,  "Booking canceled successfully.","Booking");
 
     return GestureDetector(
       onTap: () => startBookHouse(),
+
       child: LayoutBuilder(
         builder: (context, constraints) {
           double width = constraints.maxWidth;
 
-          return Center(
-            child: Container(
+          double carouselWidth = constraints.maxWidth;
+          double aspectRatioHeight = carouselWidth * 9 / 16; // 16:9 ratio
+
+
+          return
+            // Center(
+
+            // child:
+            Container(
               constraints: BoxConstraints(
                 maxWidth: width > 600 ? 600 : width * 0.95,
               ),
@@ -344,7 +352,8 @@ trigernotification(context,  "Booking canceled successfully.","Booking");
                           widget.house["Images"] is List)
                         CarouselSlider(
                           options: CarouselOptions(
-                            height: 200,
+                            // height: 200,
+                            height: aspectRatioHeight,
                             enlargeCenterPage: true,
                             enableInfiniteScroll: false,
                             autoPlay: true,
@@ -355,31 +364,33 @@ trigernotification(context,  "Booking canceled successfully.","Booking");
                               child: Image.network(
                                 imgUrl,
                                 width: double.infinity,
-                                height: 200,
+                                // height: 200,
+                                height: aspectRatioHeight,
                                 fit: BoxFit.cover,
                               ),
                             );
                           }).toList(),
                         ),
                       const SizedBox(height: 8),
-                      screenWidth > 700
-                          ? ListTile(
-                        leading: Text(
-                          "🏠 House Name -> ${widget.house["House Name"]}",
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                        ),
-                        trailing: Text(
-                          "Price Ksh ${widget.house["House Price"]} per month",
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                        ),
-                      )
-                          : Text(
+                      // screenWidth > 700
+                      //     ? ListTile(
+                      //   leading: Text(
+                      //     "🏠 House Name -> ${widget.house["House Name"]}",
+                      //     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      //   ),
+                      //   trailing: Text(
+                      //     "Price Ksh ${widget.house["House Price"]} per month",
+                      //     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      //   ),
+                      // )
+                      //     :
+                      Text(
                         "🏠 House Name -> ${widget.house["House Name"]} \nPrice Ksh ${widget.house["House Price"]} per month",
                         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                       ),
                       Text("📍 ${widget.house["Location"] ?? ""}"),
                       Text("📏 ${widget.house["House Size"]}"),
-                      Text("📝 ${widget.house["Description"]}"),
+                      Text("📝 ${widget.house["Description"]}",overflow: TextOverflow.ellipsis,),
                       if (widget.house.containsKey("Available Amenities"))
                         Text(
                           "🔹 Amenities: ${widget.house["Available Amenities"]?.join(", ") ?? "N/A"}",
@@ -395,8 +406,13 @@ trigernotification(context,  "Booking canceled successfully.","Booking");
                   ),
                 ),
               ),
-            ),
-          );
+            );
+          // ,
+
+
+          // );
+
+
         },
       ),
     );
