@@ -61,7 +61,7 @@ Future dialogBox(BuildContext context, String title, String body,
             },
             btnColor: AppColors.deepBlue),
         isLoading
-            ? CircularProgressIndicator()
+            ? Center(child: CircularProgressIndicator())
             : FunctionButton(
                 text: title,
                 onPressed: () async {
