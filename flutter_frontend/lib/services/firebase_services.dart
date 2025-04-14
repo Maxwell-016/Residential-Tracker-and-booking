@@ -186,7 +186,6 @@ class FirebaseServices extends ChangeNotifier {
     try {
       Map<String, dynamic>? landlordDetails = await getLandlordProfile();
 
-      // If no previous data exists, create new profile
       if (landlordDetails == null) {
         await landlordReference.doc(_auth.currentUser!.uid).set({
           'Name': name,
@@ -200,8 +199,6 @@ class FirebaseServices extends ChangeNotifier {
 
         return null;
       }
-
-      // Compare existing data safely using null-aware access
       bool noChanges = (landlordDetails['Name'] ?? '') == name &&
           (landlordDetails['Email'] ?? '') == email &&
           (landlordDetails['Phone Number'] ?? '') == phoneNo &&
@@ -212,7 +209,6 @@ class FirebaseServices extends ChangeNotifier {
         return 'No Change';
       }
 
-      // Update only if there are changes
       await landlordReference.doc(_auth.currentUser!.uid).set({
         'Name': name,
         'Email': email,
@@ -310,18 +306,18 @@ class FirebaseServices extends ChangeNotifier {
     setIsUpdating(true);
     Map<String, dynamic> previousDetails =
         await getIndividualListing(name) as Map<String, dynamic>;
-    if (previousDetails['House Name'] == name &&
+    final noChanges = previousDetails['House Name'] == name &&
             previousDetails['Location'] == location &&
             previousDetails['House Price'] == price &&
             previousDetails['House Size'] == size &&
-            previousDetails['Images'] == images &&
+            const ListEquality().equals(previousDetails['Images'], images) &&
             previousDetails['Description'] == description &&
-            previousDetails['Available Amenities'] == amenities
-        //previousDetails['isBooked'] == isBooked
-        ) {
+            const ListEquality().equals(previousDetails['Available Amenities'], amenities);
+
+    if(noChanges){
       setIsUpdating(false);
       return 'No Change';
-    } else {
+    }
       await landlordReference
           .doc(_auth.currentUser!.uid)
           .collection('Houses')
@@ -336,10 +332,9 @@ class FirebaseServices extends ChangeNotifier {
         'Available Amenities': amenities,
         'isBooked': false,
       });
-      notifyListeners();
       setIsUpdating(false);
       return null;
-    }
+
   }
 
   //fetch details of a house using its house name from Houses sub collection in landlord collection

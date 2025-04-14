@@ -8,9 +8,11 @@ import 'package:flutter_frontend/View/Components/function_button.dart';
 import 'package:flutter_frontend/View/Components/landlord_side_nav.dart';
 import 'package:flutter_frontend/View/Components/snackbars.dart';
 import 'package:flutter_frontend/View/Components/text_field.dart';
+import 'package:flutter_frontend/View/Screens/Landlord/add_house.dart';
 import 'package:flutter_frontend/services/firebase_services.dart';
 import 'package:flutter_frontend/services/image_picker_service.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 
@@ -30,8 +32,10 @@ class LandlordProfile extends HookConsumerWidget {
     required this.changeTheme,
     required this.changeColor,
     required this.colorSelected,
+    this.redirectBack = false,
   });
 
+  final bool redirectBack;
   final ColorSelection colorSelected;
   final void Function(bool useLightMode) changeTheme;
   final void Function(int value) changeColor;
@@ -207,7 +211,7 @@ class LandlordProfile extends HookConsumerWidget {
                                 placeHolder: 'Enter your phone number',
                                 controller: phoneController,
                                 icon: Icon(Icons.phone_outlined),
-                                fieldValidator: Validators.intFieldValidator,
+                                fieldValidator: Validators.phoneNoValidator,
                                 focusNode: phoneFocus,
                                 width: width),
                             Column(
@@ -311,13 +315,17 @@ class LandlordProfile extends HookConsumerWidget {
                                                 context,
                                                 'Profile Updated successfully');
                                           }
+                                          if (redirectBack) {
+                                           context.go('/manageListings/add-house');
+                                          }
                                           if (message == 'No Change') {
                                             SnackBars.showInfoSnackBar(context,
                                                 'There\'s no change on your profile');
-
                                           }
                                         } catch (e) {
-                                          firebaseServicesProvider.setIsUpdatingLandlordProfile(false);
+                                          firebaseServicesProvider
+                                              .setIsUpdatingLandlordProfile(
+                                                  false);
                                           logger.e(e);
                                           SnackBars.showErrorSnackBar(context,
                                               'An error occurred trying to update your profile. Please try again');

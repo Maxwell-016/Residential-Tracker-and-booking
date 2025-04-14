@@ -84,9 +84,9 @@ class UpdateHouseStatus extends HookConsumerWidget {
                   child: Text('Error fetching houses'),
                 );
               }
-              if (!snapshot.hasData) {
+              if (!snapshot.hasData || snapshot.data!.isEmpty) {
                 return Center(
-                  child: Text('You have no booked houses uploaded'),
+                  child: Text('You have no booked houses'),
                 );
               }
               List<Map<String, dynamic>> houseDetails = snapshot.data!;
